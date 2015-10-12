@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Caleydo Importer</title>
+
+    <!-- Add libraries -->
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="http://code.jquery.com/jquery-2.1.4.js" charset="utf-8"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+
+    <!--Stylesheets-->
+    <link rel="stylesheet" type="text/css" href="libs/bootstrap/css/bootstrap.min.css">
+
+    <!-- Get some nice font-->
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+
+    <!--local javascript for each element-->
+    <script src="js/fileUploader.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/jsonOutput.js"></script>
+    <script src="js/SeparatorModal.js"></script>
+    <script src="js/utility.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/localStyle.css">
+
+</head>
+<body>
+    <div class="container">
+        <h1>Caleydo Importer</h1>
+
+        <div class="row">
+            <div id="fileHandler">
+                <!--Reference : http://www.sitepoint.com/html5-file-drag-and-drop/-->
+                <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+
+                    <fieldset>
+                        <legend>Caleydo Importer</legend>
+
+                        <!--todo: check whether following file is required or nt-->
+                        <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+
+                        <label for="fileselect">Files to upload:</label>
+                        <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
+                        <div id="filedrag">
+                            or drop file here
+                        </div>
+                        <div id="submitbutton">
+                            <button type="submit">Upload File</button>
+                        </div>
+
+                    </fieldset>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <!--move style to css-->
+            <div id="importedTable" class=".importedTable" style="float:left;stroke:black; width: 100%;height: 90%; overflow: auto">
+            </div>
+            <div id="pagination"></div>
+        </div>
+
+        <!--this div will store the output messages-->
+        <div class="row">
+            <div id="localConsole"></div>
+        </div>
+    </div>
+
+    <!--reference : http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-modals.php-->
+    <div id="separatorModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Separator confirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="fileDetails" class="modal-body"></div>
+                    <div id="separatorOpr">
+                        <strong> Select separators : </strong>
+                        <input id="comma" type="radio" name="sep" value="comma">comma
+                        <input id="space" type="radio" name="sep" value="space">space
+                        <input id="tab" type="radio" name="sep" value="tab">tab
+                        <input id="semicolon" type="radio" name="sep" value="semicolon">semicolon
+                         &nbsp; or &nbsp; others
+                        <input id="any" type="text" name="sep" style="width:30px">
+                    </div>
+                    <br>
+                    <p>Do you want to save changes you made to document before closing?</p>
+                    <p class="text-warning"><small>If you don't save, your changes will be lost.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="save">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--load the main script as soon as it loaded-->
+    <script src="js/main.js"></script>
+</body>
+</html>
