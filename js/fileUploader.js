@@ -46,11 +46,11 @@ FileUploader.prototype.streamFile = function(file) {
         self.reader.onload = function(e) {
             data = self.reader.result;
             //this will initialize the new separator modal
-            if(self.separatorModal == null) {
-                self.separatorModal = new SeparatorModal(data, file);
+            if(self.dataWrangler == null) {
+                self.dataWrangler = new DataWrangler(data, file);
             }
             else {
-                self.separatorModal.reload(data, file);
+                self.dataWrangler.reload(data, file);
             }
         }
         self.reader.readAsText(file);
