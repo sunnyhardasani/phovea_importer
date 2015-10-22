@@ -149,7 +149,7 @@ DataWrangler.prototype.registerSepEvents =  function(){
  */
 DataWrangler.prototype.guessAndCheckDelimiter = function(){
     /**
-     * take first line look for comma first if found then add comma to the list
+     * take first line, look for comma first, if found then add comma to the list
      * also consider that comma should no tbe present in the double quotes
      * as it will not be considered.
      *
@@ -171,10 +171,11 @@ DataWrangler.prototype.guessAndCheckDelimiter = function(){
     // todo: make generic regex which will deal
     // todo: with all the delimiter
 
+    //ref : http://stackoverflow.com/questions/366202/regex-for-splitting-a-string-using-space-when-not-surrounded-by-single-or-double
     var rxSemi  = /(?!\s|;|$)[^;"]*("(\\.|[^\\"])*"[^;"]*)*/g;
     var rxComma = /(?!\s|,|$)[^,"]*("(\\.|[^\\"])*"[^,"]*)*/g;
     var rxTab   = /(?!\s|\t|$)[^\t"]*("(\\.|[^\\"])*"[^\t"]*)*/g;
-    var rxSpace = /[^\s"']+|"([^"]*)"|'([^']*)'/;   //ref : http://stackoverflow.com/questions/366202/regex-for-splitting-a-string-using-space-when-not-surrounded-by-single-or-double
+    var rxSpace = /[^\s"']+|"([^"]*)"|'([^']*)'/;
 
     //take the copy of data
     var text = self.data;
@@ -265,37 +266,56 @@ DataWrangler.prototype.saveClicked =  function(){
 
     var self = this;
 
-
     //get the selected delimiter from the separator modal
     self.getDelimiter();
 
     //this data
     var text = self.data;
     var dsv = d3.dsv(self.delimiter, "text/plain");
-    var importedData = dsv.parseRows(text);
+    self.importedData = dsv.parseRows(text);
 
-    //this function will fill the data in the column object
-    self.formColumn(importedData);
+    /**
+     *  Approach:
+     *  1. Slice row of the data
+     *  2. Slice column of the data
+     *  3. Form column object and insert each object in array
+     *  4. Guess data type from the column object
+     *  5. Finally send the data to the table creation
+     */
 
-    //read each column data and find out the data type
+    self.sliceRowId();
+    self.sliceColId();
+    self.formColumn();
     self.guessDataType();
 
     //this will keep only one instance of the table class
     if(self.table == null){
-        self.table = new Table(importedData);
+        self.table = new Table(self.importedData);
     }
     else {
-        self.table.reload(importedData);
+        self.table.reload(self.importedData);
     }
 
 }
 
+//todo
+DataWrangler.prototype.sliceRowId =  function() {
+
+}
+
+//todo
+DataWrangler.prototype.sliceColId =  function() {
+
+}
+
+
+
 //this will form each column data
-DataWrangler.prototype.formColumn =  function(importedData){
+DataWrangler.prototype.formColumn =  function(){
 
     self.allColumnsDataArray = {};
 
-    importedData.forEach(function(row){
+    self.importedData.forEach(function(row){
 
         var colKey = 0;
         row.forEach( function(cell){
@@ -306,8 +326,8 @@ DataWrangler.prototype.formColumn =  function(importedData){
                     //insert if any more column information is required
                     "id": 0,
                     "data": [],
-                    "datatype": "",     //data type will be guessed in separate function
-                    "head":"",          //head will guess in separate function
+                    "dataTypeObj": new Object(),         //data type will be guessed in separate function
+                    "head":""              //head will guess in separate function
                 };
             }
 
@@ -327,4 +347,155 @@ DataWrangler.prototype.formColumn =  function(importedData){
 
 DataWrangler.prototype.guessDataType =  function(){
 
+    for(key in self.allColumnsDataArray){
+
+        var col = self.allColumnsDataArray[key];
+        var colData = col["data"];
+        var dataCount = colData.length;
+
+        //following data will get refresh with each iteration
+        var nNumericCount = 0;
+        var nTotalCount = dataCount;
+        var min = MIN_VALUE; //
+        var max = MAX_VALUE;
+        var freqMap = {};
+
+        //for type real and range
+        //first check all the data is numerical
+        for(var index = 0 ; index < dataCount; index++) {
+
+            //following handles the numerical items
+            if(!isNaN(colData[index])) {
+
+                //increase the numerical element count
+                nNumericCount++;
+
+                //converting string to number
+                var nData = Number(colData[index]);
+
+                //note: first checking for min and max value data might of the real and range type
+                //finding the maximum value and the min value might be required for the range
+                if( max < nData)
+                {
+                    max = nData;
+                }
+                if( min > nData)
+                {
+                    min = nData;
+                }
+
+                //calculate the frequency of each element
+                if(!freqMap.hasOwnProperty(nData)){
+                    freqMap[nData] = {
+                        value : 1
+                    };
+                }
+                else{
+                    freqMap[nData].value++;
+                }
+            }
+            else{
+
+                //this will load the data in the frequency map as string and each element frequency is calculated
+                //now string data can be of different types as all the element or all the element can have different elements
+                //calculate the frequency of each element
+                //console.log(nData + " in freq map " + freqMap.hasOwnProperty[nData]);
+
+                var strData = colData[index];
+
+                if(!freqMap.hasOwnProperty(strData)){
+                    freqMap[strData] = {
+                        value : 1
+                    };
+                }
+                else{
+                    freqMap[strData].value++;
+                }
+            }
+        }
+
+        //finding out the total key count in the frequency data map
+        var nKeyCount = Object.keys(freqMap).length;
+
+        //currently considering that there are only numeric and string data
+        //todo: not handled numeric with string to ask the user
+        //only numeric data found
+
+        //only numeric data
+        if(nNumericCount == nTotalCount) {
+
+            // now its confirmed that we have only numeric data
+            // lets check whether the data is stratified or not
+            // todo: Following logic require confirmation after discussion
+            // todo: Ratio logic calculation needs to be discussed and may require change
+
+            //checking for stratified data
+            if( nKeyCount / nNumericCount < RATIO){
+
+                //print that the data in this column is stratified
+                var p = "";
+                for (key in freqMap) {
+                    if (freqMap.hasOwnProperty(key)) {
+                        //todo add handling for datatype in col data
+                        p = p + " Key : " + key + " " + freqMap[key].value;
+                    }
+                }
+
+                console.log("Nominal : " + p);
+
+                col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
+                col["dataTypeObj"].keyCountMap  = freqMap;
+            }
+            else{
+                //todo: set the output parameter in this area
+                //Print the data is real and the range of the data
+                console.log("Vector - Min: " + min +" Max: " + max);
+
+                col["dataTypeObj"].type = "numerical"; //todo: define constants for hardcoded values
+                col["dataTypeObj"].min  = min;
+                col["dataTypeObj"].max  = max;
+            }
+        }
+        else if(nNumericCount == 0){ // only string data
+
+            // If non numeric element found
+            // Todo: following logic require change after discussion
+            //String can be stratified
+            if( (nKeyCount / nTotalCount) < RATIO){ // Todo: logic change is required in this line
+                //Todo: set the output parameter in this area
+                //print that the data in this column is stratified
+                var p = "";
+                for (key in freqMap) {
+                    if (freqMap.hasOwnProperty(key)) {
+                        p = p + " Key : " + key + " " + freqMap[key].value;
+                    }
+                }
+
+                console.log("Nominal : " + p);
+
+                col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
+                col["dataTypeObj"].keyCountMap  = freqMap;
+            }
+            else{
+                //String can be names of the person so chances are
+                //Print the data is real and the range of the data
+                console.log("String Different");
+
+                col["dataTypeObj"].type = "string";
+            }
+
+        }
+        else{
+            // todo get the location of all the different items and
+            // keep the type as error i.e. not able to judge and sent
+            // define error structure and send the doubtful error
+            // location to the server
+
+            col["dataTypeObj"].type = "error";
+            //todo send the column id on which suggestion is requried from the user along with the hyppthesis
+            //col["dataTypeObj"].errorInformation
+
+            console.log("show error - string and numerical data found in one column");
+        }
+    }
 }

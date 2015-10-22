@@ -2,6 +2,10 @@
  * Created by Sunny Hardasani on 10/13/2015.
  */
 
+// to be moved to some other files having constant
+var MIN_VALUE = 9999999999;
+var MAX_VALUE = -9999999999;
+var RATIO = 0.7;
 
 // getElementById
 function $id(id) {
