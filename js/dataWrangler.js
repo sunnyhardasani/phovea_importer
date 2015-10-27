@@ -79,8 +79,8 @@ DataWrangler.prototype.init   = function(){
  * @param msg
  */
 DataWrangler.prototype.output = function(msg){
-    var m = $id("fileDetails");
-    m.innerHTML = msg + m.innerHTML;
+ /*   var m = $id("fileDetails");
+    m.innerHTML = msg + m.innerHTML;*/
 }
 
 /**
@@ -88,7 +88,7 @@ DataWrangler.prototype.output = function(msg){
  * @param msg
  */
 DataWrangler.prototype.clean = function(){
-    $id("fileDetails").innerHTML = "";
+    //$id("fileDetails").innerHTML = "";
     d3.select("#importedTable").selectAll("*").remove();
 }
 
@@ -105,25 +105,28 @@ DataWrangler.prototype.registerSepEvents =  function(){
     // modal
     $("#comma").click( function(){
         if( $(this).is(':checked') ) {
-
+            self.saveClicked();
         }
         else{
         }
     });
     $("#space").click( function(){
         if( $(this).is(':checked') ) {
+            self.saveClicked();
         }
         else{
         }
     });
     $("#tab").click( function(){
         if( $(this).is(':checked') ) {
+            self.saveClicked();
         }
         else{
         }
     });
     $("#semicolon").click( function(){
         if( $(this).is(':checked') ) {
+            self.saveClicked();
         }
         else{
         }
@@ -266,6 +269,9 @@ DataWrangler.prototype.saveClicked =  function(){
 
     var self = this;
 
+    //clean complete table
+    self.clean();
+
     //get the selected delimiter from the separator modal
     self.getDelimiter();
 
@@ -283,10 +289,10 @@ DataWrangler.prototype.saveClicked =  function(){
      *  5. Finally send the data to the table creation
      */
 
-    self.sliceRowId();
-    self.sliceColId();
-    self.formColumn();
-    self.guessDataType();
+    self.sliceRowId();      //todo - auto guess - currently guessing that the first row is column id
+    self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
+    self.formColumn();      //working
+    self.guessDataType();   //working
 
     //this will keep only one instance of the table class
     if(self.table == null){
@@ -296,15 +302,41 @@ DataWrangler.prototype.saveClicked =  function(){
         self.table.reload(self.importedData);
     }
 
+    console.log(self.allColumnsDataArray);
 }
 
 //todo
 DataWrangler.prototype.sliceRowId =  function() {
+    var self = this;
 
+    /**
+     * todo
+     * current fetching the first col as row identifier
+     * need to discuss with Alex about this point
+     * idea: can use data type for knowing aboubt this col
+     */
+    self.rowId = [];
+
+    var key = 0;
+    self.importedData.forEach(function(row) {
+        self.rowId[key] = self.importedData[key].shift();
+        key++;
+    });
 }
 
 //todo
 DataWrangler.prototype.sliceColId =  function() {
+    var self = this;
+
+    /**
+     * todo : need to this logic after discussion with Alex
+     * currently expecting the first row to be the column id
+     * slice of the column from the imported data and keep the remaining structure as it is;
+     * compare with the data type if all the column have either string or int data type then
+     */
+
+
+    self.colId =  self.importedData.shift();
 
 }
 
@@ -313,8 +345,9 @@ DataWrangler.prototype.sliceColId =  function() {
 //this will form each column data
 DataWrangler.prototype.formColumn =  function(){
 
-    self.allColumnsDataArray = {};
+    var self = this;
 
+    self.allColumnsDataArray = {};
     self.importedData.forEach(function(row){
 
         var colKey = 0;
@@ -324,13 +357,12 @@ DataWrangler.prototype.formColumn =  function(){
             if(!self.allColumnsDataArray.hasOwnProperty(colKey)){
                 self.allColumnsDataArray[colKey] = {
                     //insert if any more column information is required
-                    "id": 0,
-                    "data": [],
+                    "id":colKey,
+                    "colId":self.colId[colKey],           //head will guess in separate function
                     "dataTypeObj": new Object(),         //data type will be guessed in separate function
-                    "head":""              //head will guess in separate function
+                    "data": []
                 };
             }
-
 
             // as the column key start from zero this is the starting key
             self.allColumnsDataArray[colKey].id = colKey+1;
@@ -344,8 +376,14 @@ DataWrangler.prototype.formColumn =  function(){
     });
 }
 
-
+/**
+ * Guess Data Type function: this function will take the column array and
+ * guess the data type for each column if found some incorrect information
+ * let the user the by inserting the data in the array column
+ */
 DataWrangler.prototype.guessDataType =  function(){
+
+    var self = this;
 
     for(key in self.allColumnsDataArray){
 

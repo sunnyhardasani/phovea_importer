@@ -11,7 +11,8 @@ function Table(_data){
     var self = this;
 
     self.data = _data;
-    self.displayRowCount = 10;
+    self.displayRowCount = 15;
+    console.log(self.displayRowCount);
 
     self.init();
 }
@@ -20,7 +21,8 @@ Table.prototype.reload = function(_data) {
     var self = this;
 
     self.data = _data;
-    self.displayRowCount = 10;
+    self.displayRowCount = 15;
+    console.log(self.displayRowCount);
 
     self.init();
 }
@@ -50,7 +52,6 @@ Table.prototype.updatePagination = function(){
 Table.prototype.changeRowCount = function(rowCount) {
 
     var self = this;
-
     self.displayRowCount = rowCount;
 }
 

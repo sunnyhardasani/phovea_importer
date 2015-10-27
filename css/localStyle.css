@@ -13,21 +13,21 @@ legend{
 }
 
 #fileHandler{
-    height: 100%;
+    height: 1000px;
 }
 
 #filedrag{
-    display: none;
+   /* display: none;*/
     font-weight: bold;
     text-align: center;
     padding: 1em 0;
     margin: 1em 0;
     color: #555;
-    border: 2px dashed #555;
     border-radius: 7px;
     cursor: default;
     height: 100%;
 }
+
 
 #filedrag.hover{
     color: #f00;
