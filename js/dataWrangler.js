@@ -289,17 +289,17 @@ DataWrangler.prototype.saveClicked =  function(){
      *  5. Finally send the data to the table creation
      */
 
-    self.sliceRowId();      //todo - auto guess - currently guessing that the first row is column id
+    //self.sliceRowId();      //todo - auto guess - currently guessing that the first row is column id
     self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
     self.formColumn();      //working
     self.guessDataType();   //working
 
     //this will keep only one instance of the table class
     if(self.table == null){
-        self.table = new Table(self.importedData);
+        self.table = new Table(self.allColumnsDataArray);
     }
     else {
-        self.table.reload(self.importedData);
+        self.table.reload(self.allColumnsDataArray);
     }
 
     console.log(self.allColumnsDataArray);
@@ -459,6 +459,9 @@ DataWrangler.prototype.guessDataType =  function(){
         //todo: not handled numeric with string to ask the user
         //only numeric data found
 
+        console.log("key count " + nKeyCount);
+        console.log("numeric count " + nNumericCount);
+
         //only numeric data
         if(nNumericCount == nTotalCount) {
 
@@ -468,18 +471,18 @@ DataWrangler.prototype.guessDataType =  function(){
             // todo: Ratio logic calculation needs to be discussed and may require change
 
             //checking for stratified data
-            if( nKeyCount / nNumericCount < RATIO){
+            if( nKeyCount / nNumericCount < RATIO && nKeyCount < 15){ // todo : define variable for 15
 
                 //print that the data in this column is stratified
                 var p = "";
                 for (key in freqMap) {
                     if (freqMap.hasOwnProperty(key)) {
-                        //todo add handling for datatype in col data
+                        //todo add handling for data type in col data
                         p = p + " Key : " + key + " " + freqMap[key].value;
                     }
                 }
 
-                console.log("Nominal : " + p);
+                //console.log("Nominal : " + p);
 
                 col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
                 col["dataTypeObj"].keyCountMap  = freqMap;
