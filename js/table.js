@@ -92,33 +92,50 @@ Table.prototype.updateTable = function(){
     var self = this;
     self.data;
 
+    console.log(self.data);
+
+
     var columns = [];
-    var datatype = [];
+    var datatypeArray = [];
 
     //this will look for the data  in
     var ind = 0;
+    var dInd = 0;
     for(key in self.data) {
         var col = self.data[key];
         columns[ind++] = col["colId"];
 
-        //fetch teh data type
+        datatypeArray[dInd] = "";
+
+        //temporary code fetch teh data type
         var datatype = col["dataTypeObj"].type;
-
+        console.log(datatype);
         if(datatype == "nominal"){
+            var freqMap = col["dataTypeObj"].keyCountMap;
+            for (var key in freqMap) {
 
+                //use this frequency map to plot the data
+                var count = freqMap[key];
+                datatypeArray[dInd] = datatypeArray[dInd] + key + "-" + count.value + "\n";
+
+            }
+            dInd++;
         }
         else if(datatype == "numerical"){
-
+            var count = freqMap[key];
+            datatypeArray[dInd++] = datatypeArray[dInd] + key + " min: " + count.min + " max: " + count.max + "\n";
         }
         else if(datatype == "string"){
-
+            datatypeArray[dInd++] = "string";
         }
         else if(datatype == "error"){
-
+            datatypeArray[dInd++] = "error";
+        }else{
+            datatypeArray[dInd++] = "";
         }
-
     }
 
+    console.log(columns);
 
     var rowCount  = self.data[0]["data"].length;
     var colCount  = Object.keys(self.data).length;
@@ -131,14 +148,47 @@ Table.prototype.updateTable = function(){
         }
     }
 
-    console.log("data = " + data);
-
     var table = d3.select("#importedTable")
                     .append("table")
                     .style("border-collapse", "collapse")
-                    .style("border", "2px black solid");
-        thead = table.append("thead");
-        tbody = table.append("tbody");
+                    .style("border", "1px black solid");
+
+    //set the columns width
+    table.selectAll("col")
+    .data(columns)
+    .enter()
+    .append("col")
+    .style("width", "150px");
+
+    thead       = table.append("thead");
+    tbody       = table.append("tbody");
+
+    var svgRow = thead.selectAll("tr")
+        .data([1])
+        .enter()
+        .append("tr")
+        .style("border", "1px black solid")
+        .style("padding","5px");
+
+    var svgCells = svgRow.selectAll("th")
+                            .data(datatypeArray)
+                            .enter()
+                            .append("th")
+                            .style("border", "1px black solid")
+                            .style("font-size", "12px")
+                            .style("overflow", "hidden")
+                            .style("height", "100px")
+                            .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
+                            .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+
+    //
+    var svg = svgCells.append("svg")
+                        //.text(function(d) { return d; })
+                        .style("height", "100%")
+                        .style("width", "100%");
+
+    svg.append("g");
+
 
     // append the header row
     thead.append("tr")
@@ -146,7 +196,7 @@ Table.prototype.updateTable = function(){
         .data(columns)
         .enter()
         .append("th")
-        .text(function(column) { return column; })
+        .text(function(d) { return d; })
         .style("border", "1px black solid")
         .style("padding", "5px")
         .style("font-size", "12px");
@@ -165,9 +215,11 @@ Table.prototype.updateTable = function(){
         .text(function(d) { return d; })
         .style("border", "1px black solid")
         .style("padding", "5px")
+        .style("font-size", "12px")
+        .style("overflow", "hidden")
         .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
-        .on("mouseout", function(){d3.select(this).style("background-color", "white")})
-        .style("font-size", "12px");
+        .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+
 
     //todo check this out !!!
     /*.data(function(row) {

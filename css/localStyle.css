@@ -82,3 +82,33 @@ pre{
     bottom:0;
     width:100%;
 }
+
+table{
+     table-layout: fixed;
+ }
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    white-space: nowrap;
+}
+table td{
+    /*width: 200px;*/
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+table th{
+    /*width: 200px;*/
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/*
+
+table th {
+    height: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}*!/*/

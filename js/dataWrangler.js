@@ -302,7 +302,6 @@ DataWrangler.prototype.saveClicked =  function(){
         self.table.reload(self.allColumnsDataArray);
     }
 
-    console.log(self.allColumnsDataArray);
 }
 
 //todo
@@ -425,7 +424,9 @@ DataWrangler.prototype.guessDataType =  function(){
                 //calculate the frequency of each element
                 if(!freqMap.hasOwnProperty(nData)){
                     freqMap[nData] = {
-                        value : 1
+                        value : 1,
+                        index: index,
+                        type: "numerical"
                     };
                 }
                 else{
@@ -437,13 +438,14 @@ DataWrangler.prototype.guessDataType =  function(){
                 //this will load the data in the frequency map as string and each element frequency is calculated
                 //now string data can be of different types as all the element or all the element can have different elements
                 //calculate the frequency of each element
-                //console.log(nData + " in freq map " + freqMap.hasOwnProperty[nData]);
 
                 var strData = colData[index];
 
                 if(!freqMap.hasOwnProperty(strData)){
                     freqMap[strData] = {
-                        value : 1
+                        value : 1,
+                        index: index,
+                        type: "string"
                     };
                 }
                 else{
@@ -458,9 +460,6 @@ DataWrangler.prototype.guessDataType =  function(){
         //currently considering that there are only numeric and string data
         //todo: not handled numeric with string to ask the user
         //only numeric data found
-
-        console.log("key count " + nKeyCount);
-        console.log("numeric count " + nNumericCount);
 
         //only numeric data
         if(nNumericCount == nTotalCount) {
@@ -482,19 +481,17 @@ DataWrangler.prototype.guessDataType =  function(){
                     }
                 }
 
-                //console.log("Nominal : " + p);
-
                 col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
                 col["dataTypeObj"].keyCountMap  = freqMap;
             }
             else{
                 //todo: set the output parameter in this area
                 //Print the data is real and the range of the data
-                console.log("Vector - Min: " + min +" Max: " + max);
 
                 col["dataTypeObj"].type = "numerical"; //todo: define constants for hardcoded values
                 col["dataTypeObj"].min  = min;
                 col["dataTypeObj"].max  = max;
+                col["dataTypeObj"].data = colData;
             }
         }
         else if(nNumericCount == 0){ // only string data
@@ -512,7 +509,6 @@ DataWrangler.prototype.guessDataType =  function(){
                     }
                 }
 
-                console.log("Nominal : " + p);
 
                 col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
                 col["dataTypeObj"].keyCountMap  = freqMap;
@@ -520,7 +516,6 @@ DataWrangler.prototype.guessDataType =  function(){
             else{
                 //String can be names of the person so chances are
                 //Print the data is real and the range of the data
-                console.log("String Different");
 
                 col["dataTypeObj"].type = "string";
             }
@@ -535,8 +530,6 @@ DataWrangler.prototype.guessDataType =  function(){
             col["dataTypeObj"].type = "error";
             //todo send the column id on which suggestion is requried from the user along with the hyppthesis
             //col["dataTypeObj"].errorInformation
-
-            console.log("show error - string and numerical data found in one column");
         }
     }
 }
