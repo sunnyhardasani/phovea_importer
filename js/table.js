@@ -16,6 +16,7 @@ function Table(_data){
 
 //    self.init();
     self.updateTable() //todo remove
+    self.printCharts();
 }
 
 Table.prototype.reload = function(_data) {
@@ -27,6 +28,7 @@ Table.prototype.reload = function(_data) {
 
     //self.init();
     self.updateTable() //todo remove
+    self.printCharts();
 }
 
 Table.prototype.init = function() {
@@ -43,8 +45,6 @@ Table.prototype.updatePagination = function(){
     var self = this;
 
     self.totalPages = self.data.length / self.displayRowCount + 1;
-
-
 }
 
 /**
@@ -78,10 +78,115 @@ Table.prototype.paginate = function(page) {
 
     //this function will update the table
     self.updateTable();
+    self.printCharts();
+
+}
+
+Table.prototype.printCharts =  function(){
+
+    var self = this;
+    console.log(1);
+    for(key in self.data) {
+        var col = self.data[key];
+        var dataTypeObj  = col.dataTypeObj;
+        var dataType = dataTypeObj.type;
+
+
+        //add the printing logic per column
+        var svgArea = "#col-"+(col.id-1);
+        console.log(svgArea);
+        if(dataType =="nominal"){
+            //console.log(2)
+
+            var freqMap = dataTypeObj.keyCountMap;
+            var keys = Object.keys(freqMap);
+            var d3FreMap = d3.entries(freqMap);
+            console.log(d3.entries(freqMap));
+
+            /*d3.select(svgArea).selectAll("rect")
+                .data(d3FreMap)
+                .enter()
+                .append("rect")
+                .attr("x",function(d,i){
+                    console.log(d);
+                    console.log(d.value.value);
+                    return i*11;
+                })
+                .attr("width","10")
+                .attr("height",function(d,i){
+                    return d.value.value;
+                })
+                .style("fill","green");*/
+
+            //refernce : http://jsfiddle.net/59vLw/
+            var margin = {top: 0, right: 0, bottom: 0, left: 0},
+                width = 150 - margin.left - margin.right,
+                height = 100 - margin.top - margin.bottom;
+
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+
+            var y = d3.scale.linear()
+                .range([height, 0]);
+
+            var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function(d) {
+                    return d.key
+                         + "&nbsp; <span style='color:red'>" + d.value.value + "</span>";
+                })
+
+            var svg = d3.select(svgArea)
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.call(tip);
+
+            // The following code was contained in the callback function.
+            x.domain(d3FreMap.map(function(d) { return d.key; }));
+            y.domain([0, d3.max(d3FreMap, function(d) { return d.value.value; })]);
+
+            svg.selectAll(".bar")
+                .data(d3FreMap)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.key); })
+                .attr("width", x.rangeBand())
+                .attr("y", function(d) {return y(d.value.value); })
+                .attr("height", function(d) { return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value)) ; })
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide)
+
+            function type(d) {
+                d.value.value = +d.value.value;
+                return d;
+            }
+        }
+        else if(dataType =="numerical"){
+
+
+
+
+        }
+        else if(dataType =="string"){
+
+
+
+
+        }
+        else if(dataType =="error"){
+
+
+
+
+        }
+
+
+    }
 }
 
 /**
- *
+ * This will print the table and svg content on the webpage
  */
 Table.prototype.updateTable = function(){
 
@@ -90,11 +195,6 @@ Table.prototype.updateTable = function(){
     //read the data type information min max value all needs to be stored for display purpose
     //optimize the code
     var self = this;
-    self.data;
-
-    console.log(self.data);
-
-
     var columns = [];
     var datatypeArray = [];
 
@@ -104,43 +204,15 @@ Table.prototype.updateTable = function(){
     for(key in self.data) {
         var col = self.data[key];
         columns[ind++] = col["colId"];
-
-        datatypeArray[dInd] = "";
-
-        //temporary code fetch teh data type
-        var datatype = col["dataTypeObj"].type;
-        console.log(datatype);
-        if(datatype == "nominal"){
-            var freqMap = col["dataTypeObj"].keyCountMap;
-            for (var key in freqMap) {
-
-                //use this frequency map to plot the data
-                var count = freqMap[key];
-                datatypeArray[dInd] = datatypeArray[dInd] + key + "-" + count.value + "\n";
-
-            }
-            dInd++;
-        }
-        else if(datatype == "numerical"){
-            var count = freqMap[key];
-            datatypeArray[dInd++] = datatypeArray[dInd] + key + " min: " + count.min + " max: " + count.max + "\n";
-        }
-        else if(datatype == "string"){
-            datatypeArray[dInd++] = "string";
-        }
-        else if(datatype == "error"){
-            datatypeArray[dInd++] = "error";
-        }else{
-            datatypeArray[dInd++] = "";
-        }
     }
 
-    console.log(columns);
-
+    //take the row count and col count
     var rowCount  = self.data[0]["data"].length;
     var colCount  = Object.keys(self.data).length;
     var data = [];
 
+    // this will create the data 2d array which
+    // will be used to print the data
     for(var rowIndex = 0 ; rowIndex < rowCount ; rowIndex++){
         data[rowIndex] = [];
         for(var colIndex = 0 ; colIndex < colCount ; colIndex++){
@@ -148,6 +220,7 @@ Table.prototype.updateTable = function(){
         }
     }
 
+    //now the printing begins
     var table = d3.select("#importedTable")
                     .append("table")
                     .style("border-collapse", "collapse")
@@ -171,7 +244,7 @@ Table.prototype.updateTable = function(){
         .style("padding","5px");
 
     var svgCells = svgRow.selectAll("th")
-                            .data(datatypeArray)
+                            .data(columns)
                             .enter()
                             .append("th")
                             .style("border", "1px black solid")
@@ -183,11 +256,13 @@ Table.prototype.updateTable = function(){
 
     //
     var svg = svgCells.append("svg")
-                        //.text(function(d) { return d; })
                         .style("height", "100%")
                         .style("width", "100%");
 
-    svg.append("g");
+    svg.append("g")
+        .attr("id",function(d,i){
+            return "col-"+i;
+        });
 
 
     // append the header row
@@ -220,38 +295,4 @@ Table.prototype.updateTable = function(){
         .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
         .on("mouseout", function(){d3.select(this).style("background-color", "white")});
 
-
-    //todo check this out !!!
-    /*.data(function(row) {
-        return columns.map(function(column) {
-            return {column: column, value: row[column]};
-        });
-    })*/
-
-
-
-    //this will contain the each col data
-    //self.data
-
-    //ref:http://christopheviau.com/d3_tutorial/
-    /*var sampleHTML = d3.select("#importedTable")
-        .append("table")
-        .style("border-collapse", "collapse")
-        .style("border", "2px black solid")
-
-        .selectAll("tr")
-        .data(data)
-        .enter().append("tr")
-
-        .selectAll("td")
-        .data(function(d){return d;})
-        .enter().append("td")
-        .style("border", "1px black solid")
-        .style("padding", "5px")
-        .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
-        .on("mouseout", function(){d3.select(this).style("background-color", "white")})
-        .text(function(d){return d;})
-        .style("font-size", "12px");*/
-
-    //todo add exit and remove for the table
 }

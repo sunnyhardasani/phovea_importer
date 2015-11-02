@@ -289,7 +289,7 @@ DataWrangler.prototype.saveClicked =  function(){
      *  5. Finally send the data to the table creation
      */
 
-    //self.sliceRowId();      //todo - auto guess - currently guessing that the first row is column id
+    //self.sliceRowId();    //todo - auto guess - currently guessing that the first row is column id
     self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
     self.formColumn();      //working
     self.guessDataType();   //working
@@ -357,7 +357,7 @@ DataWrangler.prototype.formColumn =  function(){
                 self.allColumnsDataArray[colKey] = {
                     //insert if any more column information is required
                     "id":colKey,
-                    "colId":self.colId[colKey],           //head will guess in separate function
+                    "colId":self.colId[colKey],          //head will guess in separate function
                     "dataTypeObj": new Object(),         //data type will be guessed in separate function
                     "data": []
                 };
@@ -528,8 +528,16 @@ DataWrangler.prototype.guessDataType =  function(){
             // location to the server
 
             col["dataTypeObj"].type = "error";
-            //todo send the column id on which suggestion is requried from the user along with the hyppthesis
-            //col["dataTypeObj"].errorInformation
+
+            // guessing the base data type of the column if base type
+            // is numerical than highlight the strings with red color
+            // currently added the ratio of 0.8, if suppose there are
+            // 10 numbers and then for base type to be numerical there
+            // must be 6,7,8,9 or 10 numbers else its base type change
+            // to string
+            col["dataTypeObj"].baseType  = (nNumericCount / nTotalCount) >= 0.5 ? "numerical" : "string";
+
+            col["dataTypeObj"].keyCountMap  = freqMap;
         }
     }
 }
