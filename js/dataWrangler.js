@@ -198,11 +198,6 @@ DataWrangler.prototype.guessAndCheckDelimiter = function(){
     var nTabCount = arrTab.length;
     var nSpaceCount = arrSpace.length;
 
-    console.log("comma" + nCommaCount);
-    console.log("semicolon" + nSemiCount);
-    console.log("space" +nSpaceCount);
-    console.log("tab" + nTabCount);
-
 
     // this will mark the guessed delimiter
     // on the ui of the separator modal
@@ -236,27 +231,20 @@ DataWrangler.prototype.getDelimiter =  function() {
 
     var self = this;
 
-    console.log($id("tab").checked);
-
-    if ($id('comma').checked) {
+    if($id('any').value != ""){
+        this.delimiter = $id('any').value.charAt(0);
+    }
+    else if ($id('comma').checked) {
         this.delimiter = ",";
-        console.log("selected delimiter : comma");
     }
     else if($id('space').checked){
         this.delimiter = "\s";
-        console.log("selected delimiter : space");
     }
     else if($id("tab").checked){
         this.delimiter = "\t";
-        console.log("selected delimiter : tab");
     }
     else if($id('semicolon').checked){
         this.delimiter = ";";
-        console.log("selected delimiter : semicolon");
-    }
-
-   if($id('any').value != ""){
-        this.delimiter = $id('any').value.charAt(0);
     }
 }
 

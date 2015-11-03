@@ -11,30 +11,51 @@ function Table(_data){
     var self = this;
 
     self.data = _data;
-    self.displayRowCount = 15;
-    console.log(self.displayRowCount);
+    self.displayRowCount = DISPLAY_ROW_COUNT;
+    self.currPage = 1;
+    self.dataToDisplay = [];
 
-//    self.init();
-    self.updateTable() //todo remove
-    self.printCharts();
+    //load file data and call initialize
+    self.init();
+
 }
 
+/**
+ * this function will called when new file
+ * is loaded on the same session
+ * @param _data
+ */
 Table.prototype.reload = function(_data) {
     var self = this;
 
     self.data = _data;
-    self.displayRowCount = 15;
-    console.log(self.displayRowCount);
+    self.displayRowCount = DISPLAY_ROW_COUNT;
+    self.currPage = 1;
+    self.dataToDisplay = [];
 
-    //self.init();
-    self.updateTable() //todo remove
-    self.printCharts();
+    //load file data and call initialize
+    self.init();
 }
 
+/**
+ * Only constructor or reload function call
+ * this function this will load the data and
+ * update the pagination, update table and
+ * print charts
+ */
 Table.prototype.init = function() {
     var self = this;
-    //self.updatePagination();
-    self.paginate(1);
+
+    //take the row count and col count
+    self.rowCount  = self.data[0]["data"].length;
+    self.colCount  = Object.keys(self.data).length;
+    self.totalPages = Math.ceil(self.rowCount/DISPLAY_ROW_COUNT);
+
+
+    self.updatePagination();
+    self.printTableHeaders();
+    self.paginate(self.currPage);
+    self.printCharts();
 }
 
 
@@ -44,15 +65,39 @@ Table.prototype.init = function() {
 Table.prototype.updatePagination = function(){
     var self = this;
 
-    self.totalPages = self.data.length / self.displayRowCount + 1;
+    //total pages in the pagination;
+    var pageData = [];
+
+    //this will create the page
+    pageData.push("previous");
+    for(i =0 ; i < self.totalPages && i < 10; i++){
+        pageData.push(i+1);
+    }
+    pageData.push("next");
+
+    var pagination = d3.select("#paginate").selectAll(".pagination");
+    var page = pagination.selectAll("li").data(pageData);
+
+    page.enter().append("li")
+        .append("a")
+        .text(function(d){return d;})
+        .style("cursor","pointer")
+        .on("click",function(d){
+            return self.paginate(d);
+        });
+
+   /* page.text(function(d){return d;})
+        .style("cursor","pointer")
+        .on("click",function(d){
+            return self.paginate(d);
+        });*/
 }
 
 /**
- *
+ * todo later if row count display multiple change is required
  * @param rowCount
  */
 Table.prototype.changeRowCount = function(rowCount) {
-
     var self = this;
     self.displayRowCount = rowCount;
 }
@@ -65,27 +110,20 @@ Table.prototype.paginate = function(page) {
 
     var self = this;
 
-    self.selPage = page;
-
-    var startIndex = (page-1) * self.displayRowCount;
-    var endIndex = page*self.displayRowCount + 1; //+1 is for excluding the column
-
-    console.log("start index : " + startIndex );
-    console.log("end index : " + endIndex);
-
-    //fetches the data to display on page
-    self.tableData  = (self.data).slice(startIndex,endIndex);
+    self.currPage = page;
 
     //this function will update the table
+    self.fetchPageData(self.currPage);
     self.updateTable();
-    self.printCharts();
+    //alert("hit");
 
 }
+
 
 Table.prototype.printCharts =  function(){
 
     var self = this;
-    console.log(1);
+
     for(key in self.data) {
         var col = self.data[key];
         var dataTypeObj  = col.dataTypeObj;
@@ -94,32 +132,15 @@ Table.prototype.printCharts =  function(){
 
         //add the printing logic per column
         var svgArea = "#col-"+(col.id-1);
-        console.log(svgArea);
+
         if(dataType =="nominal"){
-            //console.log(2)
 
             var freqMap = dataTypeObj.keyCountMap;
             var keys = Object.keys(freqMap);
             var d3FreMap = d3.entries(freqMap);
-            console.log(d3.entries(freqMap));
-
-            /*d3.select(svgArea).selectAll("rect")
-                .data(d3FreMap)
-                .enter()
-                .append("rect")
-                .attr("x",function(d,i){
-                    console.log(d);
-                    console.log(d.value.value);
-                    return i*11;
-                })
-                .attr("width","10")
-                .attr("height",function(d,i){
-                    return d.value.value;
-                })
-                .style("fill","green");*/
 
             //refernce : http://jsfiddle.net/59vLw/
-            var margin = {top: 0, right: 0, bottom: 0, left: 0},
+            var margin = {top: 5, right: 0, bottom: 0, left: 0},
                 width = 150 - margin.left - margin.right,
                 height = 100 - margin.top - margin.bottom;
 
@@ -163,40 +184,21 @@ Table.prototype.printCharts =  function(){
             }
         }
         else if(dataType =="numerical"){
-
-
-
-
         }
         else if(dataType =="string"){
-
-
-
-
         }
         else if(dataType =="error"){
-
-
-
-
         }
-
-
     }
 }
 
 /**
- * This will print the table and svg content on the webpage
+ * update columns
  */
-Table.prototype.updateTable = function(){
-
-    //todo divide this function into different functiosn
-    //todo fix the table width
-    //read the data type information min max value all needs to be stored for display purpose
-    //optimize the code
+Table.prototype.printTableHeaders = function(){
     var self = this;
+
     var columns = [];
-    var datatypeArray = [];
 
     //this will look for the data  in
     var ind = 0;
@@ -206,67 +208,54 @@ Table.prototype.updateTable = function(){
         columns[ind++] = col["colId"];
     }
 
-    //take the row count and col count
-    var rowCount  = self.data[0]["data"].length;
-    var colCount  = Object.keys(self.data).length;
-    var data = [];
-
-    // this will create the data 2d array which
-    // will be used to print the data
-    for(var rowIndex = 0 ; rowIndex < rowCount ; rowIndex++){
-        data[rowIndex] = [];
-        for(var colIndex = 0 ; colIndex < colCount ; colIndex++){
-            data[rowIndex][colIndex] = self.data[colIndex]["data"][rowIndex];
-        }
-    }
-
-    //now the printing begins
-    var table = d3.select("#importedTable")
-                    .append("table")
-                    .style("border-collapse", "collapse")
-                    .style("border", "1px black solid");
+    self.table = d3.select("#importedTable").append("table")
+                            .style("border-collapse", "collapse")
+                            .style("border", "1px black solid");
 
     //set the columns width
-    table.selectAll("col")
-    .data(columns)
-    .enter()
-    .append("col")
-    .style("width", "150px");
+    self.table.selectAll("col")
+            .data(columns)
+            .enter()
+            .append("col")
+            .style("width", "150px");
 
-    thead       = table.append("thead");
-    tbody       = table.append("tbody");
+    // making it global as regularly used by the function to update the cell value
+    self.thead = self.table.append("thead");
+    self.tbody = self.table.append("tbody");
 
-    var svgRow = thead.selectAll("tr")
+    //add svg row in thhead
+    var svgRow = self.thead.selectAll("tr")
         .data([1])
         .enter()
         .append("tr")
         .style("border", "1px black solid")
         .style("padding","5px");
 
+    //add multiple svg cell per column
     var svgCells = svgRow.selectAll("th")
-                            .data(columns)
-                            .enter()
-                            .append("th")
-                            .style("border", "1px black solid")
-                            .style("font-size", "12px")
-                            .style("overflow", "hidden")
-                            .style("height", "100px")
-                            .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
-                            .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+        .data(columns)
+        .enter()
+        .append("th")
+        .style("border", "1px black solid")
+        .style("font-size", "12px")
+        .style("overflow", "hidden")
+        .style("height", "100px")
+        .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
+        .on("mouseout", function(){d3.select(this).style("background-color", "white")});
 
-    //
+    //add svg in svg cell
     var svg = svgCells.append("svg")
-                        .style("height", "100%")
-                        .style("width", "100%");
+        .style("height", "100%")
+        .style("width", "100%");
 
+    //add svg
     svg.append("g")
         .attr("id",function(d,i){
             return "col-"+i;
         });
 
-
-    // append the header row
-    thead.append("tr")
+    // add the column id names
+    self.thead.append("tr")
         .selectAll("th")
         .data(columns)
         .enter()
@@ -275,17 +264,52 @@ Table.prototype.updateTable = function(){
         .style("border", "1px black solid")
         .style("padding", "5px")
         .style("font-size", "12px");
+}
+
+/**
+ * todo : most important function to add intelligence to perform calculation
+ * this function will take the data required to
+ * display the data fetch
+ *
+ * In future this function might take few more argument
+ * and perform the some data wrangling to fetch the data
+ * reqruied to display
+ */
+Table.prototype.fetchPageData = function(pageNum) {
+    var self = this;
+
+    var rowIndex = 0;
+    // this will create the data 2d array which
+    // will be used to print the data
+    for(var index = (pageNum - 1) * DISPLAY_ROW_COUNT ; index < ((pageNum - 1) * DISPLAY_ROW_COUNT) + DISPLAY_ROW_COUNT && index < self.rowCount ; index++){
+        self.dataToDisplay[rowIndex] = [];
+        for(var colIndex = 0 ; colIndex < self.colCount ; colIndex++){
+            self.dataToDisplay[rowIndex][colIndex] = self.data[colIndex]["data"][index];
+        }
+        rowIndex++;
+    }
+}
+
+/**
+ * This will print the table and svg content on the webpage
+ */
+Table.prototype.updateTable = function(){
+
+    var self = this;
 
     // create a row for each object in the data
-    var rows = tbody.selectAll("tr")
-        .data(data)
-        .enter()
-        .append("tr");
+    var rows = self.tbody.selectAll("tr")
+        .data(self.dataToDisplay);
+
+    //for introducing fresh rows
+    rows.enter().append("tr");
 
     // create a cell in each row for each column
     var cells = rows.selectAll("td")
-        .data(function(d){return d;})
-        .enter()
+        .data(function(d){ return d;});
+
+    //for fresh cell values
+    cells.enter()
         .append("td")
         .text(function(d) { return d; })
         .style("border", "1px black solid")
@@ -294,5 +318,21 @@ Table.prototype.updateTable = function(){
         .style("overflow", "hidden")
         .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
         .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+
+    //for updating cell values
+    cells
+        .text(function(d) { return d; })
+        .style("border", "1px black solid")
+        .style("padding", "5px")
+        .style("font-size", "12px")
+        .style("overflow", "hidden")
+        .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
+        .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+
+
+    //remove in case data is not there
+    cells.exit().remove();
+    rows.exit().remove();
+
 
 }

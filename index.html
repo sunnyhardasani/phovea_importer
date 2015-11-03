@@ -24,6 +24,10 @@
     <script src="js/utility.js"></script>
     <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
+    <script>
+
+
+    </script>
 
     <link rel="stylesheet" type="text/css" href="css/localStyle.css">
 
@@ -32,7 +36,7 @@
 
 <div class="container-fluid" style="border: dashed; border-width: thin; height: 100%">
 
-    <div id="ribbon" class="row" style="background: #00cc00; border: dashed; border-width: thin; height: 70px">
+    <div id="ribbon" class="row" style="/*background: #00cc00;*/ border: dashed; border-width: thin; height: 70px">
         <div id="fileHandler" class="col-md-1" style="border: dashed; border-width: thin; height: 70px; align-content: center">
                 <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
                     <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
@@ -71,11 +75,17 @@
         <div id="importedTable" class="col-md-12" style="border: dashed; border-width: thin;  height: 550px; overflow: auto ">
 
         </div>
-        <div id="pagination" class="col-md-12" style="border: dashed; border-width: thin;  height: 50px; ">
-            pagination
+        <div id="paginate" class="col-md-12" style="border: dashed; border-width: thin;  height: 50px; ">
+            <ul class="pagination">
+                <!--<li><a onclick="paginate(2);"  style="cursor: pointer;">1</a></li>
+                <li class="active"><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>-->
+            </ul>
         </div>
     </div>
-    <div id="footer" class="row" style="background: #843534; border: dashed; border-width: thin; ">
+    <div id="footer" class="row" style="/*background: #843534;*/ border: dashed; border-width: thin; ">
         <div id="footer-col" class="col-md-12" style="border: dashed; border-width: thin; height: 50px">
             footer
         </div>

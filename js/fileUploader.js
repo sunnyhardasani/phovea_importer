@@ -21,30 +21,53 @@ function FileUploader(_fileData,_table){
 FileUploader.prototype.fileSelectHandler = function(e) {
 
     var self = this;
-    console.log(e);
 
     // cancel event and hover styling
     self.fileDragHover(e);
 
     // fetch FileList object
-    var files = e.target.files || e.dataTransfer.files;
-
-    console.log("files" + files[0]);
+    self.files = e.target.files || e.dataTransfer.files;
 
     // process all File objects
-    self.streamFile(files[0]);
+    self.streamFile(self.files[0], INITIAL_START_BYTE, INITIAL_END_BYTE);
 };
 
-FileUploader.prototype.streamFile = function(file) {
+
+FileUploader.prototype.streamNextFrame = function(){
+    var self = this;
+}
+
+/**
+ * Stream file will read the file from start byte to end byte
+ * @param file
+ * @param start_byte
+ * @param end_byte
+ */
+FileUploader.prototype.streamFile = function(file, start_byte, end_byte) {
 
     var self = this;
-    var data;
 
-    //Todo: following logic needs to be changed for large files (look for node.js examples)
-    if (file.type.indexOf("text") == 0) {
-        self.reader = new FileReader();
-        self.reader.onload = function(e) {
-            data = self.reader.result;
+    // Reference for file reading in blocks:
+    // http://www.html5rocks.com/en/tutorials/file/dndfiles/
+    var start = parseInt(start_byte) || 0;
+    var stop = parseInt(end_byte) || file.size - 1;
+    var reader = new FileReader();
+
+    // If we use onloadend, we need to check the readyState.
+    reader.onloadend = function(evt) {
+        if (evt.target.readyState == FileReader.DONE) {
+
+            //read file data completely
+            var data;
+            self.file_data =  evt.target.result;
+
+            //read data line by line
+            if(self.file_data.lastIndexOf("\n")>0) {
+                data = self.file_data.substring(0, self.file_data.lastIndexOf("\n"));
+            } else {
+                data = self.file_data;
+            }
+
             //this will initialize the new separator modal
             if(self.dataWrangler == null) {
                 self.dataWrangler = new DataWrangler(data, file);
@@ -53,8 +76,10 @@ FileUploader.prototype.streamFile = function(file) {
                 self.dataWrangler.reload(data, file);
             }
         }
-        self.reader.readAsText(file);
-    }
+    };
+
+    var blob = file.slice(start, stop + 1);
+    reader.readAsText(blob);
 };
 
 // file drag hover
