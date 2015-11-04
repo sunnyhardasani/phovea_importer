@@ -8,7 +8,7 @@ var MAX_VALUE = -9999999999;
 var RATIO = 0.7;
 var INITIAL_START_BYTE = 0;
 var INITIAL_END_BYTE = 1024*10*10;
-var DISPLAY_ROW_COUNT = 15;
+var DISPLAY_ROW_COUNT = 14;
 
 // getElementById
 function $id(id) {
@@ -64,8 +64,8 @@ function CSVToArray( strData, strDelimiter ){
     );
 
 
-    // Create an array to hold our data. Give the array
-    // a default empty first row.
+    // Create an array to hold our data. Give
+    // the array a default empty first row.
     var arrData = [[]];
 
     // Create an array to hold our individual pattern
@@ -84,15 +84,12 @@ function CSVToArray( strData, strDelimiter ){
         // (is not the start of string) and if it matches
         // field delimiter. If id does not, then we know
         // that this delimiter is a row delimiter.
-        if (
-            strMatchedDelimiter.length &&
-            strMatchedDelimiter !== strDelimiter
-        ){
+        if ( strMatchedDelimiter.length &&
+             strMatchedDelimiter !== strDelimiter ){
 
             // Since we have reached a new row of data,
             // add an empty row to our data array.
             arrData.push( [] );
-
         }
 
         var strMatchedValue;
@@ -110,10 +107,8 @@ function CSVToArray( strData, strDelimiter ){
             );
 
         } else {
-
             // We found a non-quoted value.
             strMatchedValue = arrMatches[ 3 ];
-
         }
 
         alert(strMatchedValue);

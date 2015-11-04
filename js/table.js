@@ -51,7 +51,6 @@ Table.prototype.init = function() {
     self.colCount  = Object.keys(self.data).length;
     self.totalPages = Math.ceil(self.rowCount/DISPLAY_ROW_COUNT);
 
-
     self.updatePagination();
     self.printTableHeaders();
     self.paginate(self.currPage);
@@ -69,16 +68,32 @@ Table.prototype.updatePagination = function(){
     var pageData = [];
 
     //this will create the page
+    //todo clean the following code to handle pagination logic
+    //todo pagination display on page not working properly when pages reache to end
+
+    /*if(self.totalPages - self.currPage < 10){
+        x = self.totalPages - 10;
+    }else*/{
+        x = self.currPage;
+    }
+
     pageData.push("previous");
-    for(i =0 ; i < self.totalPages && i < 10; i++){
-        pageData.push(i+1);
+    for(i =0; ( x + i) < self.totalPages && i < 10; i++){
+        if(self.currPage < 7){
+            pageData.push(i+1);
+        }
+        else{
+            pageData.push((self.currPage - 6) + i+1);
+        }
     }
     pageData.push("next");
 
     var pagination = d3.select("#paginate").selectAll(".pagination");
     var page = pagination.selectAll("li").data(pageData);
 
-    page.enter().append("li")
+    page.enter()
+        .append("li")
+        .attr("class",function(d){ if(d == self.currPage) return "active";})
         .append("a")
         .text(function(d){return d;})
         .style("cursor","pointer")
@@ -86,11 +101,16 @@ Table.prototype.updatePagination = function(){
             return self.paginate(d);
         });
 
-   /* page.text(function(d){return d;})
+    page.attr("class",function(d){ if(d == self.currPage) return "active";})
+        .select("a")
+        .text(function(d){return d;})
         .style("cursor","pointer")
         .on("click",function(d){
             return self.paginate(d);
-        });*/
+        });
+
+    page.exit().remove();
+
 }
 
 /**
@@ -110,13 +130,25 @@ Table.prototype.paginate = function(page) {
 
     var self = this;
 
-    self.currPage = page;
+    if(page === "next"){
+        self.currPage = self.currPage + 10;
+        if (self.currPage > self.totalPages) {
+            self.currPage = self.totalPages - 10;
+        }
+    }
+    else if(page === "previous") {
+        self.currPage = self.currPage - 10;
+        if (self.currPage < 0) {
+            self.currPage = 1;
+        }
+    }else{
+        self.currPage = page;
+    }
 
     //this function will update the table
     self.fetchPageData(self.currPage);
     self.updateTable();
-    //alert("hit");
-
+    self.updatePagination();
 }
 
 
@@ -125,6 +157,7 @@ Table.prototype.printCharts =  function(){
     var self = this;
 
     for(key in self.data) {
+
         var col = self.data[key];
         var dataTypeObj  = col.dataTypeObj;
         var dataType = dataTypeObj.type;
@@ -132,6 +165,9 @@ Table.prototype.printCharts =  function(){
 
         //add the printing logic per column
         var svgArea = "#col-"+(col.id-1);
+        var margin = {top: 5, right: 0, bottom: 0, left: 0},
+            width = 150 - margin.left - margin.right,
+            height = 100 - margin.top - margin.bottom;
 
         if(dataType =="nominal"){
 
@@ -140,9 +176,7 @@ Table.prototype.printCharts =  function(){
             var d3FreMap = d3.entries(freqMap);
 
             //refernce : http://jsfiddle.net/59vLw/
-            var margin = {top: 5, right: 0, bottom: 0, left: 0},
-                width = 150 - margin.left - margin.right,
-                height = 100 - margin.top - margin.bottom;
+
 
             var x = d3.scale.ordinal()
                 .rangeRoundBands([0, width], .1);
@@ -184,10 +218,43 @@ Table.prototype.printCharts =  function(){
             }
         }
         else if(dataType =="numerical"){
+            var min = dataTypeObj.min;
+            var max = dataTypeObj.max;
+            var heightOfBar  = height/4;
+
+            var tip1 = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html("hi"
+                    /*"Min: &nbsp; <span style='color:red'>" + min + "</span><br>Max:" + "&nbsp; <span style='color:red'>" + max + "</span>"*/
+                );
+
+            var svg = d3.select(svgArea)
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.selectAll("text").data([1]).enter().append("text").attr("x",5 ).attr("y",10).text("Min: "+min+" Max:"+max);
+
+            svg.selectAll(".numerical-bar")
+                .data([1])
+                .enter().append("rect")
+                .attr("class", "numerical-bar")
+                .attr("x", 5)
+                .attr("width", width - 10)
+                .attr("y", height - margin.bottom - heightOfBar)
+                .attr("height", heightOfBar);
+                /*.on('mouseover', tip1.show)
+                .on('mouseout', tip1.hide);*/
+
+            function type(d) {
+
+                return 0;
+            }
+
         }
         else if(dataType =="string"){
         }
         else if(dataType =="error"){
+
         }
     }
 }
