@@ -218,15 +218,16 @@ Table.prototype.printCharts =  function(){
             }
         }
         else if(dataType =="numerical"){
+
             var min = dataTypeObj.min;
             var max = dataTypeObj.max;
-            var heightOfBar  = height/4;
+            /*var heightOfBar  = height/4;
 
             var tip1 = d3.tip()
                 .attr('class', 'd3-tip')
                 .offset([-10, 0])
                 .html("hi"
-                    /*"Min: &nbsp; <span style='color:red'>" + min + "</span><br>Max:" + "&nbsp; <span style='color:red'>" + max + "</span>"*/
+                    /!*"Min: &nbsp; <span style='color:red'>" + min + "</span><br>Max:" + "&nbsp; <span style='color:red'>" + max + "</span>"*!/
                 );
 
             var svg = d3.select(svgArea)
@@ -242,13 +243,65 @@ Table.prototype.printCharts =  function(){
                 .attr("width", width - 10)
                 .attr("y", height - margin.bottom - heightOfBar)
                 .attr("height", heightOfBar);
-                /*.on('mouseover', tip1.show)
-                .on('mouseout', tip1.hide);*/
+                /!*.on('mouseover', tip1.show)
+                .on('mouseout', tip1.hide);*!/*/
 
-            function type(d) {
+            var histogram = d3.layout.histogram().bins(/*settings.bins*/10)
+            (dataTypeObj.data);
 
-                return 0;
-            }
+            var x = d3.scale.ordinal()
+                .domain(histogram.map(function(d) { return d.x; }))
+                .rangeRoundBands([0, width]);
+
+            var y = d3.scale.linear()
+                .domain([0, d3.max(histogram, function(d) { return d.y; })])
+                .range([0, height/* - settings.bottompad*/]);
+
+
+            var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                //.offset([-10, 0])
+                .html(function(d) {
+                    console.log(d);
+                    return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d)+" - "+d3.max(d) + "</span><strong>]</strong>";
+                });
+
+            var vis = d3.select(svgArea)
+                .attr("class", "chart")
+                .attr("width", width)
+                .attr("height", height);
+
+            vis.call(tip);
+
+            vis.selectAll("rect")
+                .data(histogram)
+                .enter().append("svg:rect")
+                .classed("numerical-bar",true)
+                .classed("numerical-bar:hover",true)
+                // move the bars down by their total height, so they animate up (not down)
+                .attr("transform", function(d) { return "translate(" + x(d.x) + "," + (height - y(d.y) /*- settings.bottompad*/) + ")"; })
+                .attr("width", x.rangeBand()-1)
+                .attr("y", 0)
+                //.attr("x", x.rangeBand() + 1)
+                .attr("height", function(d) { return y(d.y); })
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide);
+
+            // bottom line
+            vis.append("svg:line")
+                .attr("x1", 0)
+                .attr("x2", width)
+                .attr("y1", height /*- settings.bottompad*/)
+                .attr("y2", height /*- settings.bottompad*/);
+
+
+            // bucket numbers
+            vis.selectAll("text")
+                .data(histogram)
+                .enter().append("svg:text")
+                .attr("x", function(d, i) { return x(d.x) + x.rangeBand() / 2; })
+                .attr("y", height)
+                .attr("width", x.rangeBand());
 
         }
         else if(dataType =="string"){

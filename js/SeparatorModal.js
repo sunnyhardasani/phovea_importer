@@ -277,5 +277,4 @@ SeparatorModal.prototype.saveClicked =  function(){
     else {
         self.table.reload(importedData);
     }
-
 }
