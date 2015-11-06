@@ -355,6 +355,7 @@ DataWrangler.prototype.formColumn =  function(){
             self.allColumnsDataArray[colKey].id = colKey+1;
 
             // push the cell content into repective array
+            // this data is use for printing
             self.allColumnsDataArray[colKey].data.push(cell);
 
             //increase the key
@@ -367,6 +368,7 @@ DataWrangler.prototype.formColumn =  function(){
  * Guess Data Type function: this function will take the column array and
  * guess the data type for each column if found some incorrect information
  * let the user the by inserting the data in the array column
+ * todo need to optimize the below code for both space and time complexity
  */
 DataWrangler.prototype.guessDataType =  function(){
 
@@ -384,6 +386,8 @@ DataWrangler.prototype.guessDataType =  function(){
         var min = MIN_VALUE; //
         var max = MAX_VALUE;
         var freqMap = {};
+        var numberMap = {};
+        var stringMap = {};
 
         //for type real and range
         //first check all the data is numerical
@@ -410,6 +414,7 @@ DataWrangler.prototype.guessDataType =  function(){
                 }
 
                 //calculate the frequency of each element
+                //todo freqmap data strcuture will require few changes
                 if(!freqMap.hasOwnProperty(nData)){
                     freqMap[nData] = {
                         value : 1,
@@ -420,6 +425,9 @@ DataWrangler.prototype.guessDataType =  function(){
                 else{
                     freqMap[nData].value++;
                 }
+
+                //add the number data in the array
+                numberMap[index]=colData[index];
             }
             else{
 
@@ -439,6 +447,10 @@ DataWrangler.prototype.guessDataType =  function(){
                 else{
                     freqMap[strData].value++;
                 }
+
+                //add the number data in the array
+                //this data is required by the error field
+                stringMap[index]=colData[index];
             }
         }
 
@@ -524,8 +536,8 @@ DataWrangler.prototype.guessDataType =  function(){
             // must be 6,7,8,9 or 10 numbers else its base type change
             // to string
             col["dataTypeObj"].baseType  = (nNumericCount / nTotalCount) >= 0.5 ? "numerical" : "string";
-
-            col["dataTypeObj"].keyCountMap  = freqMap;
+            col["dataTypeObj"].numberMap  = numberMap;
+            col["dataTypeObj"].stringMap  = stringMap;
         }
     }
 }
