@@ -35,6 +35,11 @@ Table.prototype.reload = function(_data) {
 
     //load file data and call initialize
     self.init();
+
+    //load the resizable columns
+    $("table").resizableColumns({
+        store: store
+    });
 }
 
 /**
@@ -55,6 +60,7 @@ Table.prototype.init = function() {
     self.printTableHeaders();
     self.paginate(self.currPage);
     self.printCharts();
+
 }
 
 
@@ -368,17 +374,20 @@ Table.prototype.printTableHeaders = function(){
         var col = self.data[key];
         columns[ind++] = col["colId"];
     }
+    var tableWidth = ind * 150;
 
     self.table = d3.select("#importedTable").append("table")
+                            .attr("id", "data-table")
                             .style("border-collapse", "collapse")
-                            .style("border", "1px black solid");
+                            .style("border", "1px black solid")
+                            .style("width", tableWidth+"px"); //todo string type
 
     //set the columns width
-    self.table.selectAll("col")
+    /*self.table.selectAll("col")
             .data(columns)
             .enter()
             .append("col")
-            .style("width", "150px");
+            .style("width", "150px");*/
 
     // making it global as regularly used by the function to update the cell value
     self.thead = self.table.append("thead");
@@ -454,7 +463,7 @@ Table.prototype.fetchPageData = function(pageNum) {
 /**
  * This will print the table and svg content on the webpage
  */
-Table.prototype.updateTable = function(){
+Table.prototype.updateTable = function() {
 
     var self = this;
 
@@ -467,33 +476,47 @@ Table.prototype.updateTable = function(){
 
     // create a cell in each row for each column
     var cells = rows.selectAll("td")
-        .data(function(d){ return d;});
+        .data(function (d) {
+            return d;
+        });
 
     //for fresh cell values
     cells.enter()
         .append("td")
-        .text(function(d) { return d; })
+        .text(function (d) {
+            return d;
+        })
         .style("border", "1px black solid")
         .style("padding", "5px")
         .style("font-size", "12px")
         .style("overflow", "hidden")
-        .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
-        .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+        .on("mouseover", function () {
+            d3.select(this).style("background-color", "aliceblue")
+        })
+        .on("mouseout", function () {
+            d3.select(this).style("background-color", "white")
+        });
 
     //for updating cell values
     cells
-        .text(function(d) { return d; })
+        .text(function (d) {
+            return d;
+        })
         .style("border", "1px black solid")
         .style("padding", "5px")
         .style("font-size", "12px")
         .style("overflow", "hidden")
-        .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
-        .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+        .on("mouseover", function () {
+            d3.select(this).style("background-color", "aliceblue")
+        })
+        .on("mouseout", function () {
+            d3.select(this).style("background-color", "white")
+        });
 
 
     //remove in case data is not there
     cells.exit().remove();
     rows.exit().remove();
 
-
+    $("table").resizableColumns();
 }

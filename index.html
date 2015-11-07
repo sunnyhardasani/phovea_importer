@@ -13,6 +13,7 @@
     <!--Stylesheets-->
     <link rel="stylesheet" type="text/css" href="libs/bootstrap/css/bootstrap.min.css">
 
+
     <!-- Get some nice font-->
     <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
 
@@ -24,9 +25,15 @@
     <script src="js/utility.js"></script>
     <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="libs/jquery.resizableColumns.css">
+    <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css">
+    <script src="libs/jquery.dataTables.min.js"></script>
+    <script src="libs/jquery.resizableColumns.js"></script>
+
     <script>
-
-
+       /* $(function(){
+            $("table").resizableColumns();
+        });*/
     </script>
 
     <link rel="stylesheet" type="text/css" href="css/localStyle.css">
@@ -72,12 +79,28 @@
         </div>
     </div>
     <div id="main" class="row" style=" border: dashed; border-width: thin;  height: 600px; padding: 0 ">
-        <div id="importedTable" class="col-md-12" style="border: dashed; border-width: thin;  height: 550px; overflow: auto ">
+        <div class="col-md-10" style="align:left;">
+            <div id="importedTable" class="col-md-12" style="border: dashed; border-width: thin;  height: 550px; overflow: auto ">
 
+            </div>
+            <div id="paginate" class="col-md-12" style="border: dashed; border-width: thin;  height: 50px; ">
+                <ul class="pagination">
+                </ul>
+            </div>
         </div>
-        <div id="paginate" class="col-md-12" style="border: dashed; border-width: thin;  height: 50px; ">
-            <ul class="pagination">
-            </ul>
+        <div class="col-md-2" id = "operations">
+            <table class="table table-striped table-bordered table-hover"">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
     </div>
     <div id="footer" class="row" style="/*background: #843534;*/ border: dashed; border-width: thin; ">
