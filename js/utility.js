@@ -5,7 +5,7 @@
 // to be moved to some other files having constant
 var MIN_VALUE = 9999999999;
 var MAX_VALUE = -9999999999;
-var RATIO = 0.7;
+var RATIO = 0.65;
 var INITIAL_START_BYTE = 0;
 var INITIAL_END_BYTE = 1024*10*10;
 var DISPLAY_ROW_COUNT = 14;

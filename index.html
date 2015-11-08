@@ -25,10 +25,10 @@
     <script src="js/utility.js"></script>
     <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="libs/jquery.resizableColumns.css">
-    <link rel="stylesheet" type="text/css" href="libs/bootstrap.min.css">
-    <script src="libs/jquery.dataTables.min.js"></script>
-    <script src="libs/jquery.resizableColumns.js"></script>
+    <link rel="stylesheet" type="text/css" href="libs/resizable-columns/jquery.resizableColumns.css">
+    <link rel="stylesheet" type="text/css" href="libs/resizable-columns/bootstrap.min.css">
+    <script src="libs/resizable-columns/jquery.dataTables.min.js"></script>
+    <script src="libs/resizable-columns/jquery.resizableColumns.js"></script>
 
     <script>
        /* $(function(){
@@ -66,7 +66,7 @@
                 <button type="submit">Upload File</button>
             </div>
         </div>
-        <div id="other" class="col-md-8" style="border: dashed; border-width: thin; height: 70px">
+        <div id="other" class="col-md-8" style="border: dashed; border-width: thin; height: 70px; fill: green;">
             <div id="separatorOpr" class="col-md-8">
                 <strong> Select separators : </strong>
                 <input id="comma" type="radio" name="sep" value="comma">comma
@@ -79,7 +79,7 @@
         </div>
     </div>
     <div id="main" class="row" style=" border: dashed; border-width: thin;  height: 600px; padding: 0 ">
-        <div class="col-md-10" style="align:left;">
+        <div id="table-group" class="col-md-12" style="align:left;">
             <div id="importedTable" class="col-md-12" style="border: dashed; border-width: thin;  height: 550px; overflow: auto ">
 
             </div>
@@ -88,19 +88,12 @@
                 </ul>
             </div>
         </div>
-        <div class="col-md-2" id = "operations">
-            <table class="table table-striped table-bordered table-hover"">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
-                </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+        <div id = "operations" class="col-md-2 hidden"  style="text-align:right; border: dashed; border-width: thin; height: 600px;">
+            <!--todo copy this gif to local folder-->
+            <img src="http://noriegafurniture.com/store/images/close-icon.gif">
+            <div id = "semis">
+
+            </div>
         </div>
     </div>
     <div id="footer" class="row" style="/*background: #843534;*/ border: dashed; border-width: thin; ">

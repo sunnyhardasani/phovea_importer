@@ -483,6 +483,8 @@ DataWrangler.prototype.guessDataType =  function(){
 
                 col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
                 col["dataTypeObj"].keyCountMap  = freqMap;
+                col["dataTypeObj"].stringMap = stringMap;           //adding string map if suppose user ask to change the datatye
+                col["dataTypeObj"].numberMap  = numberMap;          //adding numerical map if suppose user ask to change the datatye
             }
             else{
                 //todo: set the output parameter in this area
@@ -516,8 +518,9 @@ DataWrangler.prototype.guessDataType =  function(){
             else{
                 //String can be names of the person so chances are
                 //Print the data is real and the range of the data
-
                 col["dataTypeObj"].type = "string";
+                col["dataTypeObj"].keyCountMap = freqMap;
+                col["dataTypeObj"].stringMap = stringMap;
             }
 
         }

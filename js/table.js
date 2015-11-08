@@ -17,7 +17,6 @@ function Table(_data){
 
     //load file data and call initialize
     self.init();
-
 }
 
 /**
@@ -35,11 +34,6 @@ Table.prototype.reload = function(_data) {
 
     //load file data and call initialize
     self.init();
-
-    //load the resizable columns
-    $("table").resizableColumns({
-        store: store
-    });
 }
 
 /**
@@ -61,6 +55,12 @@ Table.prototype.init = function() {
     self.paginate(self.currPage);
     self.printCharts();
 
+    //this will set on resizable columns
+    $("table").resizableColumns();
+    $("#operations > img").click( function(){
+        $('#table-group').attr("class","col-md-12");
+        $('#operations').attr("class","col-md-0 hidden");
+    });
 }
 
 
@@ -165,7 +165,6 @@ Table.prototype.printCharts =  function(){
     for(key in self.data) {
 
         var col = self.data[key];
-        console.log(col);
         var dataTypeObj  = col.dataTypeObj;
         var dataType = dataTypeObj.type;
 
@@ -184,7 +183,6 @@ Table.prototype.printCharts =  function(){
 
 
             //refernce : http://jsfiddle.net/59vLw/
-
             var x = d3.scale.ordinal()
                 .rangeRoundBands([0, width], .1);
 
@@ -287,6 +285,7 @@ Table.prototype.printCharts =  function(){
 
         }
         else if(dataType =="string"){
+
         }
         else if(dataType =="error"){
 
@@ -374,22 +373,15 @@ Table.prototype.printTableHeaders = function(){
         var col = self.data[key];
         columns[ind++] = col["colId"];
     }
-    var tableWidth = ind * 150;
+    var tableWidth = ind * 400;
 
     self.table = d3.select("#importedTable").append("table")
                             .attr("id", "data-table")
                             .style("border-collapse", "collapse")
                             .style("border", "1px black solid")
-                            .style("width", tableWidth+"px"); //todo string type
+                            .style("width", ""+tableWidth+"px"); //todo string type
 
-    //set the columns width
-    /*self.table.selectAll("col")
-            .data(columns)
-            .enter()
-            .append("col")
-            .style("width", "150px");*/
-
-    // making it global as regularly used by the function to update the cell value
+       // making it global as regularly used by the function to update the cell value
     self.thead = self.table.append("thead");
     self.tbody = self.table.append("tbody");
 
@@ -466,6 +458,10 @@ Table.prototype.fetchPageData = function(pageNum) {
 Table.prototype.updateTable = function() {
 
     var self = this;
+    //for(key in self.data) {
+        var tableData = self.data;
+        //columns[ind++] = col["colId"];
+    //}
 
     // create a row for each object in the data
     var rows = self.tbody.selectAll("tr")
@@ -490,6 +486,11 @@ Table.prototype.updateTable = function() {
         .style("padding", "5px")
         .style("font-size", "12px")
         .style("overflow", "hidden")
+        .on("mouseup",function(d,i){
+            if(self.data[i]["dataTypeObj"].type == "string"){
+                return self.mouseUpEventTriggered(i);
+            }
+        })
         .on("mouseover", function () {
             d3.select(this).style("background-color", "aliceblue")
         })
@@ -498,8 +499,7 @@ Table.prototype.updateTable = function() {
         });
 
     //for updating cell values
-    cells
-        .text(function (d) {
+    cells.text(function (d) {
             return d;
         })
         .style("border", "1px black solid")
@@ -517,6 +517,38 @@ Table.prototype.updateTable = function() {
     //remove in case data is not there
     cells.exit().remove();
     rows.exit().remove();
+}
 
-    $("table").resizableColumns();
+/**
+ * this function will be called when text is select on the
+ * string column
+ */
+Table.prototype.mouseUpEventTriggered = function(col) {
+    var self = this;
+
+    var selection;
+    if (window.getSelection) {
+        selection = window.getSelection();
+    } else if (document.selection) {
+        selection = document.selection.createRange();
+    }
+
+    var selStr = selection.toString().trim();
+    if(selStr.length > 0 ) {
+        $('#table-group').attr("class", "col-md-10");
+        $('#operations').attr("class", "col-md-2 show");
+
+
+        //ref: http://jsbin.com/iriwaw/2/edit?html,js,output
+
+        //now make the regex for the selection operations
+        var x = document.getElementById('data-table').rows;
+        for (var i = 2; i < DISPLAY_ROW_COUNT + 2 ; i++) {
+            var y = x[i].cells;
+            //todo handle for inner html use text   http://stackoverflow.com/questions/9727111/innerhtml-without-the-html-just-text
+            y[col].innerHTML = y[col].innerHTML.replace(new RegExp('('  +   '(?=.)[a-zA-Z\\s]+(?=[-])'   +    ')','gi'), '<span style="background-color:#c4e3f3">$1</span>');
+        }
+
+        //todo add handling when the new page gets loaded it changes
+    }
 }
