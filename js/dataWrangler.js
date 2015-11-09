@@ -2,12 +2,13 @@
  * Created by sunny hardasani on 10/14/2015.
  */
 //make it data wrangler
-function DataWrangler(_data,_file){
+function DataWrangler(_data,_file, _mainInstance){
 
     var self = this;
     self.data = _data;
     self.file = _file;
     self.delimiter ={};
+    self.mainInstance = _mainInstance;
     self.idColumn= 0; //todo: this variable will indicate the column row in the data, need to guess automatically
     self.idRow=0; //todo: this will indicate the row identification in the table
 
@@ -25,11 +26,12 @@ function DataWrangler(_data,_file){
 
 };
 
-DataWrangler.prototype.reload = function(data,file) {
+DataWrangler.prototype.reload = function(data,file,_mainInstance) {
 
     var self = this;
     self.data = data;
     self.file = file;
+    self.mainInstance = _mainInstance;
     self.delimiter ={};
     self.idColumn= 0; //todo: this variable will indicate the column row in the data, need to guess automatically
     self.idRow=0; //todo: this will indicate the row identification in the table
@@ -50,23 +52,19 @@ DataWrangler.prototype.init   = function(){
 
     var self = this;
 
-    //this will display the file information on the modal
-    self.output(
-     "<p>File information: <strong>" + self.file.name +
-     "</strong> type: <strong>" + self.file.type +
-     "</strong> size: <strong>" + self.file.size +
-     "</strong> bytes</p>"
-     );
 
-    //this will display the file data on the modal
-    self.output(
-     "<p><strong>" + self.file.name + ":</strong></p><pre>" +
-     self.data.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
-     "</pre>"
-     );
 
     //now guess the separator in the file
     self.guessAndCheckDelimiter();
+    //get the selected delimiter from the separator modal
+    self.getDelimiter();
+
+    //this data
+    var text = self.data;
+    var dsv = d3.dsv(self.delimiter, "text/plain");
+    self.importedData = dsv.parseRows(text);
+
+
     self.saveClicked();
 
     //this will open the modal with the file details in it
@@ -140,7 +138,6 @@ DataWrangler.prototype.registerSepEvents =  function(){
 
     // this will read the event on the
     $('#save').click( function(){
-        alert("save registered");
         // get the current value of the input field.
         self.saveClicked();
     });
@@ -253,20 +250,29 @@ DataWrangler.prototype.getDelimiter =  function() {
  * dsv delimiter are used which are checked on the
  * separator modal and also the
  */
-DataWrangler.prototype.saveClicked =  function(){
+DataWrangler.prototype.saveClicked =  function(newCategoryData){  //todo temporary solution for new data
 
     var self = this;
 
     //clean complete table
     self.clean();
 
-    //get the selected delimiter from the separator modal
-    self.getDelimiter();
+    /*//get the selected delimiter from the separator modal
+    self.getDelimiter();*/
 
-    //this data
+    /*//this data
     var text = self.data;
     var dsv = d3.dsv(self.delimiter, "text/plain");
-    self.importedData = dsv.parseRows(text);
+    self.importedData = dsv.parseRows(text);*/
+
+    //this will check if there is any element in the array then add
+    //to the imported array
+    console.log(newCategoryData);
+    if(newCategoryData != null && newCategoryData.length != 0){
+        for(index in self.importedData){
+            self.importedData[index].push(newCategoryData[index]);
+        }
+    }
 
     /**
      *  Approach:
@@ -284,12 +290,11 @@ DataWrangler.prototype.saveClicked =  function(){
 
     //this will keep only one instance of the table class
     if(self.table == null){
-        self.table = new Table(self.allColumnsDataArray);
+        self.table = new Table(self.allColumnsDataArray, self);
     }
     else {
-        self.table.reload(self.allColumnsDataArray);
+        self.table.reload(self.allColumnsDataArray, self);
     }
-
 }
 
 //todo

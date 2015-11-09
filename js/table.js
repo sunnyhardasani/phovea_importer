@@ -7,13 +7,14 @@
  * @param _fileData
  * @constructor
  */
-function Table(_data){
+function Table(_data, _parentInstance){
     var self = this;
 
     self.data = _data;
     self.displayRowCount = DISPLAY_ROW_COUNT;
     self.currPage = 1;
     self.dataToDisplay = [];
+    self.parentInstance = _parentInstance;
 
     //load file data and call initialize
     self.init();
@@ -24,13 +25,14 @@ function Table(_data){
  * is loaded on the same session
  * @param _data
  */
-Table.prototype.reload = function(_data) {
+Table.prototype.reload = function(_data, _parentInstance) {
     var self = this;
 
     self.data = _data;
     self.displayRowCount = DISPLAY_ROW_COUNT;
     self.currPage = 1;
     self.dataToDisplay = [];
+    self.parentInstance = _parentInstance;
 
     //load file data and call initialize
     self.init();
@@ -57,7 +59,7 @@ Table.prototype.init = function() {
 
     //this will set on resizable columns
     $("table").resizableColumns();
-    $("#operations > img").click( function(){
+    $("#string-opr-menu > img").click( function(){
         $('#table-group').attr("class","col-md-12");
         $('#operations').attr("class","col-md-0 hidden");
     });
@@ -373,7 +375,7 @@ Table.prototype.printTableHeaders = function(){
         var col = self.data[key];
         columns[ind++] = col["colId"];
     }
-    var tableWidth = ind * 400;
+    var tableWidth = ind * 150;
 
     self.table = d3.select("#importedTable").append("table")
                             .attr("id", "data-table")
@@ -522,33 +524,101 @@ Table.prototype.updateTable = function() {
 /**
  * this function will be called when text is select on the
  * string column
+ *
+ * 1. triggered when the user make some selection on the string column
+ * 2. this will send the selected range to the guessRegex function to guess the regex
+ * 3. this function will call another function to highlight on the selected
+ *    column (that function will be called always when user changes the table)
+ * 4. this function will send the regex to to another function which will
+ *    perform regex operations on the complete data of the column.
  */
 Table.prototype.mouseUpEventTriggered = function(col) {
     var self = this;
 
     var selection;
     if (window.getSelection) {
-        selection = window.getSelection();
+        selection = window.getSelection().getRangeAt(0);
     } else if (document.selection) {
         selection = document.selection.createRange();
     }
 
     var selStr = selection.toString().trim();
     if(selStr.length > 0 ) {
-        $('#table-group').attr("class", "col-md-10");
-        $('#operations').attr("class", "col-md-2 show");
 
+        //guess regex from the selection and given column
+        self.guessRegex(selection,col);
+        //this function will highlight regex text on that particular column
+        self.highlightColumn(col);
 
-        //ref: http://jsbin.com/iriwaw/2/edit?html,js,output
-
-        //now make the regex for the selection operations
-        var x = document.getElementById('data-table').rows;
-        for (var i = 2; i < DISPLAY_ROW_COUNT + 2 ; i++) {
-            var y = x[i].cells;
-            //todo handle for inner html use text   http://stackoverflow.com/questions/9727111/innerhtml-without-the-html-just-text
-            y[col].innerHTML = y[col].innerHTML.replace(new RegExp('('  +   '(?=.)[a-zA-Z\\s]+(?=[-])'   +    ')','gi'), '<span style="background-color:#c4e3f3">$1</span>');
+        // this function will show the hidden div on the right side
+        // of the table
+        if(self.stringOperations == null) {
+            self.stringOperations = new StringOperations(self.data,col,self.regex, self);
         }
-
-        //todo add handling when the new page gets loaded it changes
+        else {
+            self.stringOperations.reload(self.data,col,self.regex, self);
+        }
     }
+}
+
+
+Table.prototype.highlightColumn = function(col) {
+    var self = this;
+
+    //todo add handling when the new page gets loaded it changes
+    //ref: http://jsbin.com/iriwaw/2/edit?html,js,output
+    //now make the regex for the selection operations
+    var x = document.getElementById('data-table').rows;
+    for (var i = 2; i < DISPLAY_ROW_COUNT + 2 ; i++) {
+        var y = x[i].cells;
+        y[col].innerHTML = y[col].textContent.replace(new RegExp('('  +   self.regex   +    ')','gi'), '<span style="background-color:#c4e3f3">$1</span>');
+    }
+}
+
+Table.prototype.guessRegex = function(selection, col) {
+    var self = this;
+
+    var startOff = selection.startOffset;
+    var endOff = selection.endOffset;
+    var selStr = selection.startContainer.textContent;
+
+    // get the start index
+    var startChar;
+    for(var ind = startOff; ind >= 0 ; ind-- ){
+        if(!((selStr[ind] >='a' && selStr[ind] <= 'z')
+            || (selStr[ind] >='A' && selStr[ind] <= 'Z')
+            || (selStr[ind] == ' ')
+            || (selStr[ind] >='0' && selStr[ind] <= '9'))){
+            startChar = selStr[ind];
+            console.log(selStr,ind);
+            console.log(startChar);
+            break;
+        }
+    }
+
+    var endChar;
+    for(var ind = endOff; ind <= selStr.length ; ind++ ){
+        console.log(selStr);
+        if(!((selStr[ind] >='a' && selStr[ind] <= 'z')
+            || (selStr[ind] >='A' && selStr[ind] <= 'Z')
+            || (selStr[ind] === ' ')
+            || (selStr[ind] >='0' && selStr[ind] <= '9'))){
+            endChar = selStr[ind];
+            console.log(selStr,ind);
+            console.log(endChar);
+            break;
+        }
+        console.log(selStr,ind);
+    }
+
+    self.regex = "";
+    if(startChar && startChar.length > 0)
+        self.regex = self.regex + "(?="+startChar+")";
+    self.regex = self.regex + "[0-9a-zA-Z\\s]+";
+    if(endChar && endChar.length > 0)
+        self.regex = self.regex + "(?=["+endChar+"])";
+
+    console.log(self.regex);
+
+    self.regex = "(?![.:])[a-zA-Z\\s]+(?=[-])";
 }

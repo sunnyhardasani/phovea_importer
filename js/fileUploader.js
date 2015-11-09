@@ -70,10 +70,10 @@ FileUploader.prototype.streamFile = function(file, start_byte, end_byte) {
 
             //this will initialize the new separator modal
             if(self.dataWrangler == null) {
-                self.dataWrangler = new DataWrangler(data, file);
+                self.dataWrangler = new DataWrangler(data, file, self);
             }
             else {
-                self.dataWrangler.reload(data, file);
+                self.dataWrangler.reload(data, file, self);
             }
         }
     };
@@ -91,7 +91,6 @@ FileUploader.prototype.fileDragHover = function(e) {
     e.preventDefault();
     e.target.className = (e.type == "dragover" ? "hover" : "");
 };
-
 
 
 /**

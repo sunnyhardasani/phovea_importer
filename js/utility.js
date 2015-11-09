@@ -15,6 +15,7 @@ function $id(id) {
     return document.getElementById(id);
 }
 
+
 // output information
 function Output(msg) {
 
