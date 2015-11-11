@@ -56,13 +56,15 @@ DataWrangler.prototype.init   = function(){
 
     //now guess the separator in the file
     self.guessAndCheckDelimiter();
+
+    //todo changes should be made to new function
     //get the selected delimiter from the separator modal
-    self.getDelimiter();
+    /*self.getDelimiter();
 
     //this data
     var text = self.data;
     var dsv = d3.dsv(self.delimiter, "text/plain");
-    self.importedData = dsv.parseRows(text);
+    self.importedData = dsv.parseRows(text);*/
 
 
     self.saveClicked();
@@ -246,7 +248,7 @@ DataWrangler.prototype.getDelimiter =  function() {
 }
 
 /**
- * this function will convert dsv to json converter
+ * This function will convert dsv to json converter
  * dsv delimiter are used which are checked on the
  * separator modal and also the
  */
@@ -257,23 +259,25 @@ DataWrangler.prototype.saveClicked =  function(newCategoryData){  //todo tempora
     //clean complete table
     self.clean();
 
-    /*//get the selected delimiter from the separator modal
-    self.getDelimiter();*/
 
-    /*//this data
+    //get the selected delimiter from the separator modal
+    self.getDelimiter();
+
+    //this data
     var text = self.data;
     var dsv = d3.dsv(self.delimiter, "text/plain");
-    self.importedData = dsv.parseRows(text);*/
+    self.importedData = dsv.parseRows(text);
 
     //this will check if there is any element in the array then add
     //to the imported array
-    console.log(newCategoryData);
+    /*console.log(newCategoryData);
     if(newCategoryData != null && newCategoryData.length != 0){
         for(index in self.importedData){
             self.importedData[index].push(newCategoryData[index]);
         }
-    }
+    }*/
 
+    console.log(self.allColumnsDataArray);
     /**
      *  Approach:
      *  1. Slice row of the data
@@ -297,7 +301,9 @@ DataWrangler.prototype.saveClicked =  function(newCategoryData){  //todo tempora
     }
 }
 
-//todo
+/**
+ * This function will slice the row id
+ */
 DataWrangler.prototype.sliceRowId =  function() {
     var self = this;
 

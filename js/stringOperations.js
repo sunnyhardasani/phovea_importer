@@ -83,30 +83,39 @@ StringOperations.prototype.findRegexElements = function(){
     }
 }
 
-
+/**
+ * This function will print the bar chart required for the
+ * data operations.
+ * Reference: http://dataviscourse.net/2015/lectures/lecture-advanced-d3/
+ * @param data
+ */
 StringOperations.prototype.printElementsBar = function(data){
     var self = this;
 
     // the height and width of the actual drawing area
     var margin = {top: 0, right: 0, bottom: 0, left: 0};
     var width = 100 - margin.left - margin.right;
-    var height = /*700 - */margin.top - margin.bottom + data.length * (15 + 1);
 
+    //height of the bar chart is variable currently width of the
+    //bar chart is taken 16 ( 15 + 1) 15 actual width and 1 for space
+    var height = margin.top - margin.bottom + data.length * (15 + 1);
+
+    //select the semis svg from the main index file
     var svg = d3.select("#semis")
         .attr({
             width: width + margin.left + margin.right,
             height: height + margin.top + margin.bottom
         });
 
+        // introducing dummy data as only one group is needed every time
         svg.data([1]).enter().append("g")
+
         // here we move everything by the margins
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
     var max = d3.max(data, function(d) { return d.value.count; })
 
-
-    // sorting the array based on product, type, or tonnage
     //todo add this if sorting required
     /*data = data.sort(function compare(a, b) {
         return a.value
@@ -124,16 +133,15 @@ StringOperations.prototype.printElementsBar = function(data){
                 return a.tons - b.tons;
                 break;
         }
-    });  */
+    }); */
 
-
-    var textWidth = 0;
-
+    // set the x scale for the graph
     var xScale = d3.scale.linear()
         .domain([0, max])
         .range([0, width])
         .nice();
 
+    // set the color scale for the graph
     var colorScale = d3.scale.ordinal()
         .domain([0, max])
         .range(colorbrewer.Greens[7]);
@@ -143,6 +151,7 @@ StringOperations.prototype.printElementsBar = function(data){
     var yScale = d3.scale.ordinal()
         .rangeRoundBands([0, height], .1);
 
+   /*
     var xAxis = d3.svg.axis();
     xAxis.scale(xScale);
     xAxis.orient("bottom");
@@ -150,9 +159,9 @@ StringOperations.prototype.printElementsBar = function(data){
     svg.append("g")
         .classed("axis", true)
         .attr("transform", "translate(" + 0 + "," + height + ")")
-        .call(xAxis);
+        .call(xAxis);*/
 
-    // here we update the yscale
+    // here we update the y-scale
     yScale.domain(data.map(function (d) {
         return d.value.match;
     }))
@@ -172,14 +181,15 @@ StringOperations.prototype.printElementsBar = function(data){
             return d.value.match;
         });
 
-        var barGroupsEnter = barGroups.enter()
-            .append("g")
-            .classed("barGroup", true).attr("transform", function (d, i) {
-                return "translate(" + 0 + "," + yScale(d.value.match) + ")";
-            });
+    var barGroupsEnter = barGroups.enter()
+        .append("g")
+        .classed("barGroup", true).attr("transform", function (d, i) {
+            return "translate(" + 0 + "," + yScale(d.value.match) + ")";
+        });
 
 
-        barGroupsEnter.append("rect")
+    //adding rectangle for checkboxes
+    barGroupsEnter.append("rect")
         .attr("x","2" )
         .attr("width","10")
         .attr("height","11")
@@ -194,6 +204,7 @@ StringOperations.prototype.printElementsBar = function(data){
         .style("fill","white")
         .style("stroke","black")
         .on("click",function(d,i){
+
                 var eID = "element-" + i;
                 if(d3.select("#"+eID).attr("check") === "false") {
                     d3.select("#"+eID).style("fill", "black").attr("check","true");
@@ -208,22 +219,24 @@ StringOperations.prototype.printElementsBar = function(data){
                     d.value.match);
             });
 
-        barGroupsEnter.append("rect")
-            .attr("x", "15")
-            .attr("height", yScale.rangeBand())
-            .style("fill", function (d) {
-                // here we apply the color scale
-                return colorScale(d.value.count);
-            })
-            .attr("width", function (d, i) {
-                // here we call the scale function.
-                return Math.abs(xScale(d.value.count) - xScale(0));
-            })
-            //setting up the tips
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide);
+    //adding the rectangle for bar display
+    barGroupsEnter.append("rect")
+        .attr("x", "15")
+        .attr("height", yScale.rangeBand())
+        .style("fill", function (d) {
+            // here we apply the color scale
+            return colorScale(d.value.count);
+        })
+        .attr("width", function (d, i) {
+            // here we call the scale function.
+            return Math.abs(xScale(d.value.count) - xScale(0));
+        })
+        //setting up the tips
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
-        barGroupsEnter.append("text").text(function (d) {
+    //adding the count
+    barGroupsEnter.append("text").text(function (d) {
             return d.value.count;
         })
         .attr("x", function (d, i) {
@@ -238,16 +251,15 @@ StringOperations.prototype.printElementsBar = function(data){
         .attr("alignment-baseline", "middle");
 
 
-        barGroups.exit().remove();
-
+    //Exit and remove
+    barGroups.exit().remove();
 }
 
-//reference: http://dataviscourse.net/2015/lectures/lecture-advanced-d3/
+
 
 
 StringOperations.prototype.onElementSelection = function(element,check,displayText){
     var self = this;
-
 
     if(check === "true"){
         d3.select("#elements-selected").append("div").attr("id","sel"+element).text(displayText);
@@ -281,11 +293,12 @@ StringOperations.prototype.newCategoryColToData = function(){
     }
 
     //add the column name
-    self.localMatchedData.unshift(newColName);
+    self.localMatchedData[0] = newColName;
 
-    //
+    //todo patch: sending the data to wrangler class
     self.parentInstance.parentInstance.saveClicked(self.localMatchedData);
 
+    //hiding the column
     $('#table-group').attr("class","col-md-12");
     $('#operations').attr("class","col-md-0 hidden");
 }

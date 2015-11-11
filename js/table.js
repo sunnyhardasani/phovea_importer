@@ -460,10 +460,8 @@ Table.prototype.fetchPageData = function(pageNum) {
 Table.prototype.updateTable = function() {
 
     var self = this;
-    //for(key in self.data) {
-        var tableData = self.data;
-        //columns[ind++] = col["colId"];
-    //}
+
+    var tableData = self.data;
 
     // create a row for each object in the data
     var rows = self.tbody.selectAll("tr")
@@ -490,6 +488,7 @@ Table.prototype.updateTable = function() {
         .style("overflow", "hidden")
         .on("mouseup",function(d,i){
             if(self.data[i]["dataTypeObj"].type == "string"){
+                // when selection is done on the string column
                 return self.mouseUpEventTriggered(i);
             }
         })
@@ -522,7 +521,7 @@ Table.prototype.updateTable = function() {
 }
 
 /**
- * this function will be called when text is select on the
+ * This function will be called when text is select on the
  * string column
  *
  * 1. triggered when the user make some selection on the string column
@@ -531,13 +530,15 @@ Table.prototype.updateTable = function() {
  *    column (that function will be called always when user changes the table)
  * 4. this function will send the regex to to another function which will
  *    perform regex operations on the complete data of the column.
+ *
+ * @param col - column number
  */
 Table.prototype.mouseUpEventTriggered = function(col) {
     var self = this;
 
     var selection;
     if (window.getSelection) {
-        selection = window.getSelection().getRangeAt(0);
+        selection = window.getSelection()/*.getRangeAt(0)*/;
     } else if (document.selection) {
         selection = document.selection.createRange();
     }
@@ -550,8 +551,8 @@ Table.prototype.mouseUpEventTriggered = function(col) {
         //this function will highlight regex text on that particular column
         self.highlightColumn(col);
 
-        // this function will show the hidden div on the right side
-        // of the table
+        // this function will show the hidden div
+        // on the right side of the table
         if(self.stringOperations == null) {
             self.stringOperations = new StringOperations(self.data,col,self.regex, self);
         }
@@ -561,24 +562,37 @@ Table.prototype.mouseUpEventTriggered = function(col) {
     }
 }
 
-
+/**
+ * This function will higlight the column ht
+ * References: http://jsbin.com/iriwaw/2/edit?html,js,output
+ * TODO:
+ * 1. Add handling when the new page gets loaded it changes
+ * @param col
+ */
 Table.prototype.highlightColumn = function(col) {
     var self = this;
+    var startIndexOfData = 2;
 
-    //todo add handling when the new page gets loaded it changes
-    //ref: http://jsbin.com/iriwaw/2/edit?html,js,output
     //now make the regex for the selection operations
     var x = document.getElementById('data-table').rows;
-    for (var i = 2; i < DISPLAY_ROW_COUNT + 2 ; i++) {
+    for (var i = startIndexOfData; i < DISPLAY_ROW_COUNT + startIndexOfData ; i++) {
         var y = x[i].cells;
         y[col].innerHTML = y[col].textContent.replace(new RegExp('('  +   self.regex   +    ')','gi'), '<span style="background-color:#c4e3f3">$1</span>');
     }
 }
 
+/**
+ * This function will parse the text information
+ * and guess regex automatically
+ * TODO:
+ * 1. Logic pending need to be decided when
+ * @param selection
+ * @param col
+ */
 Table.prototype.guessRegex = function(selection, col) {
     var self = this;
 
-    var startOff = selection.startOffset;
+    /*var startOff = selection.startOffset;
     var endOff = selection.endOffset;
     var selStr = selection.startContainer.textContent;
 
@@ -618,7 +632,8 @@ Table.prototype.guessRegex = function(selection, col) {
     if(endChar && endChar.length > 0)
         self.regex = self.regex + "(?=["+endChar+"])";
 
-    console.log(self.regex);
+    console.log(self.regex);*/
 
+    // currently setting the default regex
     self.regex = "(?![.:])[a-zA-Z\\s]+(?=[-])";
 }
