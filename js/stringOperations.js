@@ -279,6 +279,9 @@ StringOperations.prototype.onElementSelection = function(element,check,displayTe
     }
 }
 
+/**
+ *
+ */
 StringOperations.prototype.newCategoryColToData = function(){
     var self = this;
 

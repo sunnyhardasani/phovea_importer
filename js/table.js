@@ -172,7 +172,7 @@ Table.prototype.printCharts =  function(){
 
 
         //add the printing logic per column
-        var svgArea = "#col-"+(col.id-1);
+        var svgArea = "#svg-col-"+(col.id-1);
         var margin = {top: 5, right: 5, bottom: 0, left: 5},
             width = 150 - margin.left - margin.right,
             height = 100 - margin.top - margin.bottom;
@@ -373,7 +373,7 @@ Table.prototype.printTableHeaders = function(){
     var dInd = 0;
     for(key in self.data) {
         var col = self.data[key];
-        columns[ind++] = col["colId"];
+        columns[ind++] = col;
     }
     var tableWidth = ind * 150;
 
@@ -388,10 +388,7 @@ Table.prototype.printTableHeaders = function(){
     self.tbody = self.table.append("tbody");
 
     //add svg row in thhead
-    var svgRow = self.thead.selectAll("tr")
-        .data([1])
-        .enter()
-        .append("tr")
+    var svgRow = self.thead.append("tr")
         .style("border", "1px black solid")
         .style("padding","5px");
 
@@ -400,12 +397,46 @@ Table.prototype.printTableHeaders = function(){
         .data(columns)
         .enter()
         .append("th")
+        .attr("id",function(d,i){
+            return "col-"+i;
+        })
         .style("border", "1px black solid")
         .style("font-size", "12px")
         .style("overflow", "hidden")
         .style("height", "100px")
         .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
         .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+
+    var opr  = svgCells.append("div").style("height","20px")
+
+    var datatype = opr.append("div")
+                        .text(function(d){
+                                return d.dataTypeObj.type;
+                            })
+                        .style("overflow","hidden")
+                        .style("text-overflow","ellipsis")
+                        .style("width","50px")
+                        .style("float","left")
+                        .style("background-color", "lightgrey");
+
+    var closeImg = opr.append("div")
+                .style("text-align","right");
+
+    closeImg.append("img")
+        .attr("src","/Importer/img/CloseWindow.png")
+        .style("margin-right","5px")
+        .on("click",function(d,i){
+            self.hideColumn(i);
+        })
+
+    /*//todo for diply on mouse hover
+     .style("width","10")
+     .on("mouseover", function(){
+     d3.select(this).style("display", "inline")
+     })
+     .on("mouseout", function(){
+     d3.select(this).style("display", "none")
+     });*/
 
     //add svg in svg cell
     var svg = svgCells.append("svg")
@@ -415,7 +446,7 @@ Table.prototype.printTableHeaders = function(){
     //add svg
     svg.append("g")
         .attr("id",function(d,i){
-            return "col-"+i;
+            return "svg-col-"+i;
         });
 
     // add the column id names
@@ -424,7 +455,7 @@ Table.prototype.printTableHeaders = function(){
         .data(columns)
         .enter()
         .append("th")
-        .text(function(d) { return d; })
+        .text(function(d) { return d.colId; })
         .style("border", "1px black solid")
         .style("padding", "5px")
         .style("font-size", "12px");
@@ -460,7 +491,6 @@ Table.prototype.fetchPageData = function(pageNum) {
 Table.prototype.updateTable = function() {
 
     var self = this;
-
     var tableData = self.data;
 
     // create a row for each object in the data
@@ -475,6 +505,8 @@ Table.prototype.updateTable = function() {
         .data(function (d) {
             return d;
         });
+
+
 
     //for fresh cell values
     cells.enter()
@@ -499,9 +531,13 @@ Table.prototype.updateTable = function() {
             d3.select(this).style("background-color", "white")
         });
 
+
     //for updating cell values
     cells.text(function (d) {
             return d;
+        })
+        .attr("id",function(d,i){
+                return "col-"+i;
         })
         .style("border", "1px black solid")
         .style("padding", "5px")
@@ -636,4 +672,19 @@ Table.prototype.guessRegex = function(selection, col) {
 
     // currently setting the default regex
     self.regex = "(?![.:])[a-zA-Z\\s]+(?=[-])";
+}
+
+/**
+ * This function will take the column id and hide the column
+ * @param col
+ */
+Table.prototype.hideColumn = function(col) {
+
+    var self = this;
+
+    //setting the column width to 0
+    document.getElementsByTagName('th')[col].style.width = '0%';
+
+    //calling the resize event to restore the divs
+    $(window).trigger('resize');
 }

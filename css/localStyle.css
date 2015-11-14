@@ -83,10 +83,6 @@ pre{
     width:100%;
 }
 
-table{
-     table-layout: fixed;
- }
-
 table {
     table-layout: fixed;
     width: 100%;
@@ -166,11 +162,3 @@ line {
     border:3px solid #73AD21;
     padding: 10px;
 }
-/*
-
-table th {
-    height: 100px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}*!/*/
