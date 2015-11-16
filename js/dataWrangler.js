@@ -494,8 +494,8 @@ DataWrangler.prototype.guessDataType =  function(){
 
                 col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
                 col["dataTypeObj"].keyCountMap  = freqMap;
-                col["dataTypeObj"].stringMap = stringMap;           //adding string map if suppose user ask to change the datatye
-                col["dataTypeObj"].numberMap  = numberMap;          //adding numerical map if suppose user ask to change the datatye
+                col["dataTypeObj"].stringMap = stringMap;           //adding string map if suppose user ask to change the datatype
+                col["dataTypeObj"].numberMap  = numberMap;          //adding numerical map if suppose user ask to change the datatype
             }
             else{
                 //todo: set the output parameter in this area

@@ -16,6 +16,9 @@ function Table(_data, _parentInstance){
     self.dataToDisplay = [];
     self.parentInstance = _parentInstance;
 
+    //todo uncomment to check the behaviour
+    //var j = new JSONOutput(self.data,self);
+
     //load file data and call initialize
     self.init();
 }
@@ -291,71 +294,156 @@ Table.prototype.printCharts =  function(){
         }
         else if(dataType =="error"){
 
-            var min = dataTypeObj.min;
-            var max = dataTypeObj.max
+            if(dataTypeObj.baseType == "numerical") {
 
-            var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
-            (d3.values(dataTypeObj.numberMap));
+                var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
+                (d3.values(dataTypeObj.numberMap));
 
-            console.log(col.colId,histogram);
+                console.log(col.colId, histogram);
 
-            //new value added for error histogram
-            histogram[10] = new Array;
+                //new value added for error histogram
+                histogram[10] = new Array;
 
-            //todo check this logic with other data
-            if(histogram[9].dx == 0){
-                histogram[9].x = 0;
-                histogram[10].x = 50;
+                //todo check this logic with other data
+                if (histogram[9].dx == 0) {
+                    histogram[9].x = 0;
+                    histogram[10].x = 50;
+                }
+                else {
+                    histogram[10].x = histogram[9].x + histogram[9].dx;
+                }
+                histogram[10].y = d3.values(dataTypeObj.stringMap).length;
+
+                var x = d3.scale.ordinal()
+                    .domain(histogram.map(function (d) {
+                        return d.x;
+                    }))
+                    .rangeRoundBands([0, width]);
+
+                var y = d3.scale.linear()
+                    .domain([0, d3.max(histogram, function (d) {
+                        return d.y;
+                    })])
+                    .range([0, height]);
+
+                var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d, i) {
+
+                        if (i == (histogram.length - 1))
+                            return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : </strong> <span style='color:red'>" + d.y + "</span><strong></strong>";
+
+                        return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
+                    });
+
+                var vis = d3.select(svgArea)
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                vis.call(tip);
+
+                vis.selectAll("rect")
+                    .data(histogram)
+                    .enter().append("svg:rect")
+                    .classed("numerical-bar", true)
+                    .classed("numerical-bar:hover", true)
+
+                    // move the bars down by their total height, so they animate up (not down)
+                    .attr("transform", function (d) {
+                        return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
+                    })
+                    .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
+                    .attr("y", 0)
+                    .attr("height", function (d) {
+                        return y(d.y);
+                    })
+
+                    //adding separate color for bar graph
+                    .style("fill", function (d, i) {
+                        if (i == (histogram.length - 1)) return "#FF3333";
+                    })
+
+                    //setting up the tips
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
             }
-            else {
-                histogram[10].x = histogram[9].x + histogram[9].dx;
+            else{
+
+                var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
+                (d3.values(dataTypeObj.stringMap));
+
+                console.log(col.colId, histogram);
+
+                //new value added for error histogram
+                histogram[10] = new Array;
+
+                //todo check this logic with other data
+                if (histogram[9].dx == 0) {
+                    histogram[9].x = 0;
+                    histogram[10].x = 50;
+                }
+                else {
+                    histogram[10].x = histogram[9].x + histogram[9].dx;
+                }
+                histogram[10].y = d3.values(dataTypeObj.numberMap).length;
+
+                var x = d3.scale.ordinal()
+                    .domain(histogram.map(function (d) {
+                        return d.x;
+                    }))
+                    .rangeRoundBands([0, width]);
+
+                var y = d3.scale.linear()
+                    .domain([0, d3.max(histogram, function (d) {
+                        return d.y;
+                    })])
+                    .range([0, height]);
+
+                var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d, i) {
+
+                        if (i == (histogram.length - 1))
+                            return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : </strong> <span style='color:red'>" + d.y + "</span><strong></strong>";
+
+                        return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
+                    });
+
+                var vis = d3.select(svgArea)
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                vis.call(tip);
+
+                vis.selectAll("rect")
+                    .data(histogram)
+                    .enter().append("svg:rect")
+                    .classed("numerical-bar", true)
+                    .classed("numerical-bar:hover", true)
+
+                    // move the bars down by their total height, so they animate up (not down)
+                    .attr("transform", function (d) {
+                        return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
+                    })
+                    .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
+                    .attr("y", 0)
+                    .attr("height", function (d) {
+                        return y(d.y);
+                    })
+
+                    //adding separate color for bar graph
+                    .style("fill", function (d, i) {
+                        if (i == (histogram.length - 1)) return "#FF3333";
+                    })
+
+                    //setting up the tips
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
             }
-            histogram[10].y = d3.values(dataTypeObj.stringMap).length;
-
-            var x = d3.scale.ordinal()
-                .domain(histogram.map(function(d) { return d.x; }))
-                .rangeRoundBands([0, width]);
-
-            var y = d3.scale.linear()
-                .domain([0, d3.max(histogram, function(d) { return d.y; })])
-                .range([0, height]);
-
-            var tip = d3.tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function(d,i) {
-
-                    if(i==(histogram.length-1))
-                        return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : </strong> <span style='color:red'>" + d.y + "</span><strong></strong>";
-
-                    return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d)+" - "+d3.max(d) + "</span><strong>]</strong>";
-                });
-
-            var vis = d3.select(svgArea)
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                .attr("width", width)
-                .attr("height", height);
-
-            vis.call(tip);
-
-            vis.selectAll("rect")
-                .data(histogram)
-                .enter().append("svg:rect")
-                .classed("numerical-bar",true)
-                .classed("numerical-bar:hover",true)
-
-                // move the bars down by their total height, so they animate up (not down)
-                .attr("transform", function(d) { return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")"; })
-                .attr("width", x.rangeBand()-1) //-1 for setting difference between bars
-                .attr("y", 0)
-                .attr("height", function(d) { return y(d.y); })
-
-                //adding separate color for bar graph
-                .style("fill", function(d,i) {if(i==(histogram.length-1)) return "#FF3333"; })
-
-                //setting up the tips
-                .on('mouseover', tip.show)
-                .on('mouseout', tip.hide);
         }
     }
 }
