@@ -55,6 +55,14 @@ JSONOutput.prototype.init = function(){
     self.saveObjectToFile();
 }
 
+JSONOutput.prototype.addFileInfo = function(){
+
+}
+
+JSONOutput.prototype.createDataTypeJSONObj = function(dataTypeObj){
+
+}
+
 JSONOutput.prototype.readData = function(){
 
     var self = this;

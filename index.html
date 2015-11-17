@@ -34,9 +34,20 @@
     <script src="libs/resizable-columns/store.min.js"></script>
 
     <script>
-       /* $(function(){
-            $("table").resizableColumns();
-        });*/
+        jQuery(document).ready(function($){
+            //open the lateral panel
+            $('#upload').on('click', function(event){
+                event.preventDefault();
+                $('.cd-panel').addClass('is-visible');
+            });
+            //clode the lateral panel
+            $('.cd-panel').on('click', function(event){
+                if( $(event.target).is('.cd-panel') || $(event.target).is('.cd-panel-close') ) {
+                    $('.cd-panel').removeClass('is-visible');
+                    event.preventDefault();
+                }
+            });
+        });
     </script>
 
     <link rel="stylesheet" type="text/css" href="css/localStyle.css">
@@ -44,84 +55,108 @@
 </head>
 <body style="height: auto">
 
-<div class="container-fluid" style="border: dashed; border-width: thin; height: 100%">
-
-    <div id="ribbon" class="row" style="/*background: #00cc00;*/ border: dashed; border-width: thin; height: 70px">
-        <div id="fileHandler" class="col-md-1" style="border: dashed; border-width: thin; height: 70px; align-content: center">
-                <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
-                    <!--todo copy this icon to local folder-->
-                    <label for="fileselect"><img src="/Importer/img/add_file.png" height="40" width="40"/></label>
-                    <input type="file" id="fileselect" style="display: none" />
-                </form>
-        </div>
-        <div  class="col-md-3" >
-            <div id="filedrag" style="border: solid">
-                or drop file here
-            </div>
-            <div id="submitbutton">
-                <button type="submit">Upload File</button>
-            </div>
-        </div>
-        <div id="other" class="col-md-8" style="/*border: dashed;*/ border-width: thin; height: 70px; fill: green;">
-            <div id="separatorOpr" class="col-md-8">
-                <strong> Select separators : </strong>
-                <input id="comma" type="radio" name="sep" value="comma">comma
-                <input id="space" type="radio" name="sep" value="space">space
-                <input id="tab" type="radio" name="sep" value="tab">tab
-                <input id="semicolon" type="radio" name="sep" value="semicolon">semicolon
-                &nbsp; or &nbsp; others
-                <input id="any" type="text" name="sep" style="width:30px">
-            </div>
-        </div>
-    </div>
-    <div id="main" class="row" style=" /*border: dashed;*/ border-width: thin;  height: 600px; padding: 0 ">
-        <div id="table-group" class="col-md-12" style="align:left;">
-            <div id="importedTable" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  height: 550px; overflow: auto ">
-
-            </div>
-            <div id="paginate" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  height: 50px; ">
-                <ul class="pagination">
-                </ul>
-            </div>
-        </div>
-        <div id = "operations" class="col-md-2 hidden"  style="border: dashed; border-width: thin; height: 550px;">
-            <!--todo copy this gif to local folder-->
-            <div id="string-opr-menu" style="text-align:right;">
-            <img src="http://noriegafurniture.com/store/images/close-icon.gif">
-            </div>
-            <div style="background-color: lightgrey">
-                <h5><strong>Data Operations</strong></h5>
-            </div>
-            <div style="height: 200px;/* border: dashed; border-width: thin;padding: 0;*/ overflow: auto">
-                <svg id = "semis">
-
-                </svg>
-            </div>
-            <div id = "parent-operator">
-                <br>
-                <!--reference: https://css-tricks.com/snippets/javascript/clear-field-on-focus/-->
-                <input id="new-col-name" type="text" onfocus="if(this.value == 'Column-1') { this.value = ''; }" value="Column-1" />
-                <br>
-                <strong>Select elements to form new category:</strong>
-                <div id="elements-selected" style="height: 100px;/* border: dashed; border-width: thin;padding: 0;*/ overflow: auto; font-size: small; background-color: lightgoldenrodyellow">
-
+    <main class="cd-main-content">
+        <div class="container-fluid" style="border: dashed; border-width: thin; height: 100%">
+            <div id="ribbon" class="row" style="/*background: #00cc00;*/ border: dashed; border-width: thin; height: 70px">
+                <div id="fileHandler" class="col-md-1" style="border: dashed; border-width: thin; height: 70px; align-content: center">
+                        <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+                            <!--todo copy this icon to local folder-->
+                            <label for="fileselect"><img src="/Importer/img/add_file.png" height="40" width="40"/></label>
+                            <input type="file" id="fileselect" style="display: none" />
+                        </form>
                 </div>
-                <div id="operator" style="font-size: small">
-                    <input type="checkbox" name="selected-category" checked>Mark remaining as others<br>
-                    <button id="button-new-category" type="button" style="background-color: #1b6d85; color: white">Create new category</button>
+                <div  class="col-md-3" >
+                    <div id="filedrag" style="border: solid">
+                        or drop file here
+                    </div>
+                    <div id="submitbutton">
+                        <button type="submit">Upload File</button>
+                    </div>
+                </div>
+                <div id="other" class="col-md-8" style="/*border: dashed;*/ border-width: thin; height: 70px; fill: green;">
+                    <div id="separatorOpr" class="col-md-8">
+                        <strong> Select separators : </strong>
+                        <input id="comma" type="radio" name="sep" value="comma">comma
+                        <input id="space" type="radio" name="sep" value="space">space
+                        <input id="tab" type="radio" name="sep" value="tab">tab
+                        <input id="semicolon" type="radio" name="sep" value="semicolon">semicolon
+                        &nbsp; or &nbsp; others
+                        <input id="any" type="text" name="sep" style="width:30px">
+                    </div>
                 </div>
             </div>
+            <div id="main" class="row" style=" /*border: dashed;*/ border-width: thin;  height: 600px; padding: 0 ">
+                <div id="table-group" class="col-md-12" style="align:left;">
+                    <div id="importedTable" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  height: 550px; overflow: auto ">
+
+                    </div>
+                    <div id="paginate" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  height: 50px; ">
+                        <ul class="pagination">
+                        </ul>
+                    </div>
+                </div>
+                <div id = "operations" class="col-md-2 hidden"  style="border: dashed; border-width: thin; height: 550px;">
+                    <!--todo copy this gif to local folder-->
+                    <div id="string-opr-menu" style="text-align:right;">
+                    <img src="http://noriegafurniture.com/store/images/close-icon.gif">
+                    </div>
+                    <div style="background-color: lightgrey">
+                        <h5><strong>Data Operations</strong></h5>
+                    </div>
+                    <div style="height: 200px;/* border: dashed; border-width: thin;padding: 0;*/ overflow: auto">
+                        <svg id = "semis">
+
+                        </svg>
+                    </div>
+                    <div id = "parent-operator">
+                        <br>
+                        <!--reference: https://css-tricks.com/snippets/javascript/clear-field-on-focus/-->
+                        <input id="new-col-name" type="text" onfocus="if(this.value == 'Column-1') { this.value = ''; }" value="Column-1" />
+                        <br>
+                        <strong>Select elements to form new category:</strong>
+                        <div id="elements-selected" style="height: 100px;/* border: dashed; border-width: thin;padding: 0;*/ overflow: auto; font-size: small; background-color: lightgoldenrodyellow">
+
+                        </div>
+                        <div id="operator" style="font-size: small">
+                            <input type="checkbox" name="selected-category" checked>Mark remaining as others<br>
+                            <button id="button-new-category" type="button" style="background-color: #1b6d85; color: white">Create new category</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div id="footer" class="row" style="/*background: #843534;*/ /*border: dashed;*/ border-width: thin; ">
+                <div id="footer-col" class="col-md-12" style="border: dashed; border-width: thin; height: 50px; ">
+                    <!--footer-->
+                </div>
             </div>
         </div>
-    </div>
-    <div id="footer" class="row" style="/*background: #843534;*/ /*border: dashed;*/ border-width: thin; ">
-        <div id="footer-col" class="col-md-12" style="border: dashed; border-width: thin; height: 50px; ">
-            <!--footer-->
-        </div>
-    </div>
-</div>
+    </main>
+    <div class="cd-panel from-right">
+        <header class="cd-panel-header">
+            <h1>Title Goes Here</h1>
+            <a href="#0" class="cd-panel-close">Close</a>
+        </header>
+        <div class="cd-panel-container">
+            <div class="cd-panel-content" style="background-color: #1b6d85">
+                <p>
+                   Checking the content of the panel
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
 
+                </p>
+            </div> <!-- cd-panel-content -->
+        </div> <!-- cd-panel-container -->
+    </div> <!-- cd-panel -->
     <!--load the main script as soon as it loaded-->
     <script src="js/main.js"></script>
 </body>
