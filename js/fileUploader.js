@@ -9,6 +9,19 @@ function FileUploader(_fileData,_table){
     self.reader = _fileData;
     self.table = _table;
 
+    //todo move in the new function to initialize UI
+    $("#open-configuration-window").click(function(){
+        $(".box").animate({
+            width: "toggle"
+        });
+    });
+    $("#close-configuration-window").click(function(){
+        $(".box").animate({
+            width: "toggle"
+        });
+    });
+
+
     if (window.File && window.FileList && window.FileReader){
         self.init();
     }

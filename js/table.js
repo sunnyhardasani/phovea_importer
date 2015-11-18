@@ -17,7 +17,7 @@ function Table(_data, _parentInstance){
     self.parentInstance = _parentInstance;
 
     //todo uncomment to check the behaviour
-    //var j = new JSONOutput(self.data,self);
+    var j = new JSONOutput(self.data,self);
 
     //load file data and call initialize
     self.init();
@@ -771,7 +771,7 @@ Table.prototype.hideColumn = function(col) {
     var self = this;
 
     //setting the column width to 0
-    document.getElementsByTagName('th')[col].style.width = '0%';
+    document.getElementsByTagName('th')[col].style.width = '0.1%';
 
     //calling the resize event to restore the divs
     $(window).trigger('resize');

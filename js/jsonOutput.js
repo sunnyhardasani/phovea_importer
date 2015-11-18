@@ -32,8 +32,8 @@ JSONOutput.prototype.init = function(){
     var self = this;
 
     self.readData();
-    self.addFileInfo();
-    self.addAllColumns();
+   /* self.addFileInfo();
+    self.addAllColumns();*/
 
     /**
      *  TODO - Approach for change to the main application:
@@ -52,7 +52,7 @@ JSONOutput.prototype.init = function(){
 
 
     //once all the col details are filled save the object to main file
-    self.saveObjectToFile();
+    /*self.saveObjectToFile();*/
 }
 
 JSONOutput.prototype.addFileInfo = function(){
@@ -67,19 +67,78 @@ JSONOutput.prototype.readData = function(){
 
     var self = this;
 
-    for(key in self.data){
-
+    var outColumnArray = [];
+    console.log("hit");
+    for(col in self.data) {
+        console.log("hit");
         //fetching the required type and converting it to new structure
-        var col             = self.data[col];
-        var dataTypeObj     = self.data["dataTypeObj"];
-        var id              = col["id"];
-        var colId           = col["colId"];
-        var data            = col["data"];
+        var col = self.data[col];
+        var dataTypeObj = col["dataTypeObj"];
+        var data = col["data"];
 
-        //1. create new data type required for the output
-        //2. add self.addnewCol() and send the data type object to it
 
+        //taking the json output information
+        var outId = col["id"];
+        var outHeader = col["colId"];
+
+        //for numerical data type
+        if (dataTypeObj.type === "numerical") {
+            var outNumericalDTType = {
+                    type: dataTypeObj.type,
+                    min: dataTypeObj.min,
+                    max: dataTypeObj.max
+                };
+            outColumnArray.push({
+                "id":outId,
+                "header":outHeader,
+                "datatype" : outNumericalDTType
+            });
+        }
+        //for nominal data type
+        else if(dataTypeObj.type === "nominal") {
+            var outCategories = [];
+            for(cat in dataTypeObj.keyCountMap){
+                outCategories.push({
+                    "name":cat,
+                    "freq": dataTypeObj.keyCountMap[cat]
+                });
+            }
+            var outNominalDTType = {
+                    type: dataTypeObj.type,
+                    categories:outCategories
+            };
+            outColumnArray.push({
+                "id":outId,
+                "header":outHeader,
+                "datatype" : outNominalDTType
+            });
+        }
+        //for string data type
+        else if(dataTypeObj.type === "string") {
+            var outStringDTType = {
+                    type: dataTypeObj.type
+            };
+            outColumnArray.push({
+                "id":outId,
+                "header":outHeader,
+                "datatype" : outStringDTType
+            });
+        }
+        //for error data type
+        else if(dataTypeObj.type === "error") {
+            var outErrorDTType = {
+                    type: dataTypeObj.type,
+                    expected_type: dataTypeObj.baseType
+            };
+            outColumnArray.push({
+                "id":outId,
+                "header":outHeader,
+                "datatype" : outErrorDTType
+            });
+        }
     }
+
+    console.log(JSON.stringify(outColumnArray));
 }
 
 JSONOutput.prototype.addNewCol = function( id, colId, dataType){
