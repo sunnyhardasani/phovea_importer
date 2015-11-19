@@ -16,9 +16,6 @@ function Table(_data, _parentInstance){
     self.dataToDisplay = [];
     self.parentInstance = _parentInstance;
 
-    //todo uncomment to check the behaviour
-    var j = new JSONOutput(self.data,self);
-
     //load file data and call initialize
     self.init();
 }
@@ -66,6 +63,11 @@ Table.prototype.init = function() {
         $('#table-group').attr("class","col-md-12");
         $('#operations').attr("class","col-md-0 hidden");
     });
+
+    //todo remove this calling the file configuration load data function
+    //by making this class singleton
+    var fileConfig = new FileConfiguration();
+    fileConfig.tempDataLoad(self.data);
 }
 
 
@@ -299,7 +301,6 @@ Table.prototype.printCharts =  function(){
                 var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
                 (d3.values(dataTypeObj.numberMap));
 
-                console.log(col.colId, histogram);
 
                 //new value added for error histogram
                 histogram[10] = new Array;

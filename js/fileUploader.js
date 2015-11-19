@@ -9,19 +9,6 @@ function FileUploader(_fileData,_table){
     self.reader = _fileData;
     self.table = _table;
 
-    //todo move in the new function to initialize UI
-    $("#open-configuration-window").click(function(){
-        $(".box").animate({
-            width: "toggle"
-        });
-    });
-    $("#close-configuration-window").click(function(){
-        $(".box").animate({
-            width: "toggle"
-        });
-    });
-
-
     if (window.File && window.FileList && window.FileReader){
         self.init();
     }
@@ -40,6 +27,11 @@ FileUploader.prototype.fileSelectHandler = function(e) {
 
     // fetch FileList object
     self.files = e.target.files || e.dataTransfer.files;
+
+    //call the file configuration instance and
+    //add the new file to the file configuration
+    var fileConfigInst = new FileConfiguration();
+    fileConfigInst.addNewFile(self.files[0]);
 
     // process all File objects
     self.streamFile(self.files[0], INITIAL_START_BYTE, INITIAL_END_BYTE);
