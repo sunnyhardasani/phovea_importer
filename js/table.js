@@ -90,16 +90,34 @@ Table.prototype.updatePagination = function(){
         x = self.currPage;
     }
 
-    pageData.push("previous");
-    for(i =0; ( x + i) < self.totalPages && i < 10; i++){
-        if(self.currPage < 7){
-            pageData.push(i+1);
+    //handling for first six pages
+    if(self.currPage <= 3){
+        for(i =1; i < self.totalPages && i<=5 ; i++) {
+            pageData.push(i);
         }
-        else{
-            pageData.push((self.currPage - 6) + i+1);
+        pageData.push("next");
+    }
+    //handling for last six pages
+    else if(self.totalPages - self.currPage>= 1 && self.totalPages - self.currPage <= 6){
+        pageData.push("previous");
+
+        for(var i = self.totalPages-6 ; i<self.totalPages ; i++){
+            pageData.push(i);
         }
     }
-    pageData.push("next");
+    //any page between them
+    else{
+
+        pageData.push("previous");
+
+        for(var i = -2 ; i <= 2 ; i++)
+            pageData.push(self.currPage + i);
+
+        pageData.push("next");
+
+    }
+
+
 
     var pagination = d3.select("#paginate").selectAll(".pagination");
     var page = pagination.selectAll("li").data(pageData);
@@ -144,13 +162,13 @@ Table.prototype.paginate = function(page) {
     var self = this;
 
     if(page === "next"){
-        self.currPage = self.currPage + 10;
+        self.currPage = self.currPage + 5;
         if (self.currPage > self.totalPages) {
-            self.currPage = self.totalPages - 10;
+            self.currPage = self.totalPages - 5;
         }
     }
     else if(page === "previous") {
-        self.currPage = self.currPage - 10;
+        self.currPage = self.currPage - 5;
         if (self.currPage < 0) {
             self.currPage = 1;
         }
@@ -280,6 +298,7 @@ Table.prototype.printCharts =  function(){
                 .attr("x2", width)
                 .attr("y1", height)
                 .attr("y2", height);
+
 
             // bucket numbers
             vis.selectAll("text")

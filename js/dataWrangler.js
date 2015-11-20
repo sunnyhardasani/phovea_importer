@@ -293,12 +293,10 @@ DataWrangler.prototype.saveClicked =  function(newCategoryData){  //todo tempora
     self.guessDataType();   //working
 
     //this will keep only one instance of the table class
-    if(self.table == null){
-        self.table = new Table(self.allColumnsDataArray, self);
-    }
-    else {
-        self.table.reload(self.allColumnsDataArray, self);
-    }
+    if(!self.table)
+    self.table = new Table(self.allColumnsDataArray, self);
+    else
+    self.table.constructor = Table(self.allColumnsDataArray, self);
 }
 
 /**
