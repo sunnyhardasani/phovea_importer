@@ -281,7 +281,6 @@ Table.prototype.printCharts =  function(){
                 .attr("y1", height)
                 .attr("y2", height);
 
-
             // bucket numbers
             vis.selectAll("text")
                 .data(histogram)

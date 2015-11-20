@@ -113,7 +113,7 @@ FileConfiguration.prototype.saveConfiguration = function() {
     //convert the table data to the json output format
     self.outFileData.columns = self.loadData(self.tempData); //todo this will take the data from the table
 
-    //push the new file data to the local json data
+    //push the new file data to the local json dat  a
     self.localJSONData.push(self.outFileData);
 
     //write the json output to file
@@ -128,6 +128,10 @@ FileConfiguration.prototype.saveConfiguration = function() {
  * and save the data for the future refernce
  */
 FileConfiguration.prototype.writeJsonToFile = function(data){
+    //todo showing json output tempoaray on the screen
+    //remove this and save it on the server
+    $("#json-output").html(JSON.stringify(data));
+
     var self = this;
 }
 
@@ -143,13 +147,52 @@ FileConfiguration.prototype.readLocalData = function(){
 
     //read the file information and display on the
     //file confguration GUI
-    var recentFiles = d3.select("#recentFiles").selectAll("#file").data(self.localJSONData);
-    var fileDiv  = recentFiles.enter().append("div")
-    fileDiv.append("img").attr("src","img/recent-file.png").style("width","50px").style("height","50px");
-    fileDiv.append("div").text(function(d){
-        console.log(d);
-                    return d.path;
-                });
+
+    //todo make it using exit and remove
+    d3.select("#recentFiles").selectAll("*").remove();
+
+    var recentFiles = d3.select("#recentFiles").style("width","400px").style("overflow","auto").selectAll("#file");
+    var fileDivs  = recentFiles.data(self.localJSONData)
+                        .enter().append("div")
+                        .style("float","left")
+                        .attr("id","#file");
+
+    console.log(fileDivs);
+
+        fileDivs.append("img")
+                .attr("src","img/recent-file.png")
+                .style("width","50px")
+                .style("height","50px");
+
+        fileDivs.append("div")
+                .style("width","60px")
+                .style("overflow","hidden")
+                .style("text-overflow","ellipsis")
+                    .text(function(d){
+                        console.log(d);
+                                    return d.path;
+                                });
+
+        fileDivs.on("click",function(d){
+            self.recentFileClicked(d.path);
+        });
+
+        //todo add following
+        //fileDivs.exit().remove();
+}
+
+/**
+ * this function will get called when recent file is clicked
+ * on the file configuration UI, this will load the UI with
+ * selected file information.
+ * @param filepath
+ */
+FileConfiguration.prototype.recentFileClicked = function(filepath){
+
+    //todo send the data on the server and on file click operation
+    //call the file uploader function to open the save file from the
+    //server
+    alert(filepath);
 }
 
 /**
