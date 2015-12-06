@@ -108,16 +108,14 @@ Table.prototype.updatePagination = function(){
     //any page between them
     else{
 
-        pageData.push("previous");
+    pageData.push("previous");
 
-        for(var i = -2 ; i <= 2 ; i++)
-            pageData.push(self.currPage + i);
+    for(var i = -2 ; i <= 2 ; i++)
+        pageData.push(self.currPage + i);
 
-        pageData.push("next");
+    pageData.push("next");
 
-    }
-
-
+}
 
     var pagination = d3.select("#paginate").selectAll(".pagination");
     var page = pagination.selectAll("li").data(pageData);
@@ -494,16 +492,67 @@ Table.prototype.printTableHeaders = function(){
     self.thead = self.table.append("thead");
     self.tbody = self.table.append("tbody");
 
+
+    //////////////////////Following code to be moved into new class////////////////////////
+
+    var drag = d3.behavior.drag()
+        .origin(function(d) { console.log(d); return d; })
+        .on("dragstart", dragstarted)
+        .on("drag", dragged)
+        .on("dragend", dragended);
+
+    var colOperations = self.thead.selectAll(".opr")
+        .data(columns)
+        .enter()
+        .append("th")
+        .classed("opr",true)
+        .style("border", "1px black solid")
+        .style("font-size", "12px")
+        .style("overflow", "hidden")
+        .style("height", "100px")
+        .on("mouseover", function(){d3.select(this).style("background-color", "aliceblue")})
+        .on("mouseout", function(){d3.select(this).style("background-color", "white")});
+
+    colOperations.append("svg")
+        .attr("width","150")
+        .attr("height","100")
+        .append("rect")
+        .attr("width","10")
+        .attr("height","10")
+        .call(drag);
+
+    function dragstarted(d) {
+        console.log(d)
+        d3.event.sourceEvent.stopPropagation();
+        d3.select(this).classed("dragging", true);
+    }
+
+    function dragged(d) {
+        console.log(d)
+        d3.select(this).attr("x", d.x = d3.event.x).attr("y", d.y = d3.event.y);
+    }
+
+    function dragended(d) {
+        console.log(d)
+        d3.select(this).classed("dragging", false);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
     //add svg row in thhead
     var svgRow = self.thead.append("tr")
         .style("border", "1px black solid")
         .style("padding","5px");
 
     //add multiple svg cell per column
-    var svgCells = svgRow.selectAll("th")
+    var svgCells = svgRow.selectAll(".colSvg")
         .data(columns)
         .enter()
         .append("th")
+        .classed("colSvg",true)
         .attr("id",function(d,i){
             return "col-"+i;
         })
