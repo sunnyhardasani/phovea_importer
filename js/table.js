@@ -191,7 +191,6 @@ Table.prototype.printCharts =  function(){
         var dataTypeObj  = col.dataTypeObj;
         var dataType = dataTypeObj.type;
 
-
         //add the printing logic per column
         var svgArea = "#svg-col-"+(col.id-1);
         var margin = {top: 5, right: 5, bottom: 0, left: 5},
@@ -209,13 +208,16 @@ Table.prototype.printCharts =  function(){
                 .on("drag", dragmove)
                 .on("dragend",dragstop);
 
-
             //refernce : http://jsfiddle.net/59vLw/
             var x = d3.scale.ordinal()
                 .rangeRoundBands([0, width], .1);
 
             var y = d3.scale.linear()
                 .range([height, 0]);
+
+            var o = d3.scale.ordinal()
+                .domain(d3FreMap.map(function(d) { return d.key; }))
+                .range(colorbrewer.YlOrRd[9]);
 
             var tip = d3.tip()
                 .attr('class', 'd3-tip')
@@ -226,7 +228,7 @@ Table.prototype.printCharts =  function(){
                 })
 
             var svg = d3.select(svgArea)
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             svg.call(tip);
 
@@ -234,17 +236,11 @@ Table.prototype.printCharts =  function(){
             x.domain(d3FreMap.map(function(d) { return d.key; }));
             y.domain([0, d3.max(d3FreMap, function(d) { return d.value.value; })]);
 
-
             d3FreMap.map(function(d) {d.x = x(d.key);d.y = y(d.value.value);})
-
-
-
 
             svg.selectAll(".bar")
                 .data(d3FreMap)
-                .enter().append("rect")/*
-                .attr("x", function(d) { return d.x; })
-                .attr("y", function(d) { return d.y; })*/
+                .enter().append("rect")
                 .attr("class", "bar")
                 .attr("x", function(d) { return d.x; })
                 .attr("width", x.rangeBand())
@@ -252,15 +248,15 @@ Table.prototype.printCharts =  function(){
                 .attr("height", function(d) { return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value)) ; })
                 .on('mouseover', tip.show)
                 .on('mouseout', tip.hide)
+                .style("fill",function(d) { return o(d.key); })
                 .call(drag);
 
             function type(d) {
                 d.value.value = +d.value.value;
                 return d;
             }
-
-            function dragmove(){
-                d3.select(this).attr("x", /*d.x =*/ Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
+            function dragmove(d){
+                d3.select(this).attr("x", d.x = Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
             }
             function dragstop(){
                 console.log(this);
@@ -499,8 +495,11 @@ Table.prototype.printTableHeaders = function(){
     var dInd = 0;
     for(key in self.data) {
         var col = self.data[key];
-        columns[ind++] = col;
+        columns[ind] = col;
+        columns[ind].x = (5 + 130) + (150 * ind); // required for drag and drop selection
+        ind++;
     }
+    console.log(columns);
     var tableWidth = ind * 150;
 
     self.table = d3.select("#importedTable").append("table")
@@ -521,8 +520,8 @@ Table.prototype.printTableHeaders = function(){
         .origin(function(d) { console.log(d); return d; })
         .on("dragstart", dragstarted)
         .on("drag", dragged)
-        .on("dragend", dragended);
-
+        .on("dragend", dragended);*/
+/*
     var colOperations = self.thead.selectAll(".opr")
         .data(columns)
         .enter()
@@ -537,13 +536,13 @@ Table.prototype.printTableHeaders = function(){
 
     colOperations.append("svg")
         .attr("width","150")
-        .attr("height","100")
+        .attr("height","100");*//*
         .append("rect")
         .attr("width","10")
         .attr("height","10")
-        .call(drag);
+        .call(drag);*/
 
-    function dragstarted(d) {
+    /*function dragstarted(d) {
         console.log(d)
         d3.event.sourceEvent.stopPropagation();
         d3.select(this).classed("dragging", true);
@@ -574,10 +573,10 @@ Table.prototype.printTableHeaders = function(){
         .data(columns)
         .enter()
         .append("th")
-        .classed("colSvg",true)
+        .classed("colSvg",true)/*
         .attr("id",function(d,i){
             return "col-"+i;
-        })
+        })*/
         .style("border", "1px black solid")
         .style("font-size", "12px")
         .style("overflow", "hidden")
@@ -607,7 +606,7 @@ Table.prototype.printTableHeaders = function(){
             self.hideColumn(i);
         })
 
-    /*//todo for diply on mouse hover
+    /*//todo for display on mouse hover
      .style("width","10")
      .on("mouseover", function(){
      d3.select(this).style("display", "inline")
@@ -627,6 +626,13 @@ Table.prototype.printTableHeaders = function(){
             return "svg-col-"+i;
         });
 
+
+
+
+    ////////////////////start  - code for drag and drop setting /////////////////////////////////
+    self.addDragNDrop(columns);
+    ////////////////////end - code for drag and drop setting /////////////////////////////////
+
     // add the column id names
     self.thead.append("tr")
         .selectAll("th")
@@ -637,6 +643,130 @@ Table.prototype.printTableHeaders = function(){
         .style("border", "1px black solid")
         .style("padding", "5px")
         .style("font-size", "12px");
+}
+
+/**
+ * This function will handle all the drag and drop related operations of the table
+ *
+ */
+Table.prototype.addDragNDrop = function(columns){
+    var self = this;
+
+    var width = 150*columns.length,
+        height = 12,
+        radius = 3,
+        radio = 5;
+
+    var drag = d3.behavior.drag()
+        .origin(function(d) { return d; })
+        .on("drag", dragmove)
+        .on("dragend",dragstop);
+
+    var osvg = self.thead.append("th").attr("colspan",columns.length).append("svg")
+        .attr("width",width)
+        .attr("height", height);
+
+    var rad1 = osvg.selectAll(".rad")
+        .data(columns).enter().append("circle")
+        .attr("r", radio)
+        .attr("class","rad")
+        .style("fill","white")
+        .style("stroke","black")
+        .style("fill-opacity",0)
+        .attr("cx", function(d,i){return d.x;})
+        .attr("cy", height/2)
+        .on("click",function(d,i){
+            if(d3.select(c[0][i]).attr("visibility") == "hidden"){
+                d3.select(c[0][i]).attr("visibility","visible");
+            }
+            else{
+                d3.select(c[0][i]).attr("visibility","hidden");
+            }
+        });
+
+    var c = osvg.selectAll(".dot")
+        .data(columns).enter().append("circle")
+        .attr("class","dot")
+        .attr("r", radius)
+        .style("fill","blue")
+        .style("fill-opacity","0.3")
+        .attr("visibility", "hidden")
+        .attr("cx", function(d,i){return d.x;})
+        .attr("cy", height/2)
+        .call(drag);
+
+    var r = osvg.selectAll(".high")
+        .data(columns).enter().append("rect")
+        .attr("class","high")
+        .style("fill","blue")
+        .style("fill-opacity","0.3")
+        .attr("x",function(d,i){return d.x;})
+        .attr("y",height/2-radius)
+        .attr("height",radius*2).call(drag);
+
+    function dragmove(d) {
+        var selRecLen = 0;
+        d3.select(this)
+            .attr("cx", selRecLen = Math.max(d.x , Math.min(width - radius, d3.event.x)));
+        d3.select(r[0][d.id-1]).attr("width",selRecLen - d.x);
+
+        checkRightRadios(d.x,selRecLen);
+
+    }
+    function dragstop(d) {
+        d3.select(r[0][d.id-1]).attr("width",0);
+        d3.select(this).attr("cx", d.x)
+    }
+
+    function checkRightRadios(fromLoc, currentLoc){
+        for(var i = 0 ; i < c[0].length ; i++) {
+            var selectedCircle = d3.select(c[0][i]);
+            if (currentLoc > selectedCircle.attr("cx") && selectedCircle.attr("cx") >= fromLoc){
+                selectedCircle.attr("visibility","visible");
+            }
+        }
+    }
+
+
+
+
+    //color change operations
+    var colRect = osvg.selectAll(".colChangeBtn")
+        .data(columns)
+        .attr("class","colChangeBtn");
+    colRect.enter().append("rect")
+        .style("fill","red")
+        .attr("x",function(d,i){return d.x - 130;})
+        .attr("y",1)
+        .attr("height",(height-2)/2)
+        .attr("width",(height-2)/2);
+    colRect.enter()
+        .append("rect")
+        .style("fill","green")
+        .attr("x",function(d,i){return d.x - 130 + (height-2)/2;})
+        .attr("y",1)
+        .attr("height",(height-2)/2)
+        .attr("width",(height-2)/2);
+    colRect.enter()
+        .append("rect")
+        .style("fill","blue")
+        .attr("x",function(d,i){return d.x - 130;})
+        .attr("y",1 + (height-2)/2)
+        .attr("height",(height-2)/2)
+        .attr("width",(height-2)/2);
+    colRect.enter()
+        .append("rect")
+        .style("fill","yellow")
+        .attr("x",function(d,i){return d.x - 130 + (height-2)/2;})
+        .attr("y",1 + (height-2)/2)
+        .attr("height",(height-2)/2)
+        .attr("width",(height-2)/2);
+
+    colRect.on("click",function(){
+
+    })
+
+
 }
 
 /**
