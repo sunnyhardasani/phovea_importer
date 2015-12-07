@@ -204,6 +204,11 @@ Table.prototype.printCharts =  function(){
             var keys = Object.keys(freqMap);
             var d3FreMap = d3.entries(freqMap);
 
+            var drag = d3.behavior.drag()
+                .origin(function(d) { return d; })
+                .on("drag", dragmove)
+                .on("dragend",dragstop);
+
 
             //refernce : http://jsfiddle.net/59vLw/
             var x = d3.scale.ordinal()
@@ -229,20 +234,36 @@ Table.prototype.printCharts =  function(){
             x.domain(d3FreMap.map(function(d) { return d.key; }));
             y.domain([0, d3.max(d3FreMap, function(d) { return d.value.value; })]);
 
+
+            d3FreMap.map(function(d) {d.x = x(d.key);d.y = y(d.value.value);})
+
+
+
+
             svg.selectAll(".bar")
                 .data(d3FreMap)
-                .enter().append("rect")
+                .enter().append("rect")/*
+                .attr("x", function(d) { return d.x; })
+                .attr("y", function(d) { return d.y; })*/
                 .attr("class", "bar")
-                .attr("x", function(d) { return x(d.key); })
+                .attr("x", function(d) { return d.x; })
                 .attr("width", x.rangeBand())
-                .attr("y", function(d) {return y(d.value.value); })
+                .attr("y", function(d) {return d.y; })
                 .attr("height", function(d) { return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value)) ; })
                 .on('mouseover', tip.show)
                 .on('mouseout', tip.hide)
+                .call(drag);
 
             function type(d) {
                 d.value.value = +d.value.value;
                 return d;
+            }
+
+            function dragmove(){
+                d3.select(this).attr("x", /*d.x =*/ Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
+            }
+            function dragstop(){
+                console.log(this);
             }
         }
         else if(dataType =="numerical"){
@@ -495,7 +516,8 @@ Table.prototype.printTableHeaders = function(){
 
     //////////////////////Following code to be moved into new class////////////////////////
 
-    var drag = d3.behavior.drag()
+    //self.thead.append("th").attr("colspan",ind).text("hi");
+    /*var drag = d3.behavior.drag()
         .origin(function(d) { console.log(d); return d; })
         .on("dragstart", dragstarted)
         .on("drag", dragged)
@@ -535,7 +557,7 @@ Table.prototype.printTableHeaders = function(){
     function dragended(d) {
         console.log(d)
         d3.select(this).classed("dragging", false);
-    }
+    }*/
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
