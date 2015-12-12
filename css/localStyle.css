@@ -179,3 +179,42 @@ for better animation effect */
     padding: 10px;
     border: 1px solid #a29415;
 }
+
+
+
+/* HOVER STYLES */
+div#pop-up {
+    display: none;
+    position: absolute;
+    width: 230px;
+    height: 100px;
+    padding: 10px;
+    background: white;
+    color: #000000;
+    border: 1px solid #1a1a1a;
+    font-size: 90%;
+    overflow-y: auto;
+}
+
+.allcolor {
+    background: white;
+    width: 200px;
+    height: 100px;
+}
+
+.palette {
+    cursor: pointer;
+    display: inline-block;
+    /*vertical-align: bottom;*/
+    margin: 0px;
+    padding: 4px;
+    background: #fff;
+    border: solid 1px #aaa;
+}
+
+.swatch {
+    /*display: block;*/
+    /*vertical-align: middle;*/
+    width: 6px;
+    height: 4px;
+}
