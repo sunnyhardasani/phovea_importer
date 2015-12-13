@@ -186,14 +186,14 @@ for better animation effect */
 div#pop-up {
     display: none;
     position: absolute;
-    width: 230px;
-    height: 100px;
+    width: 218px;
+    height: 185px;
     padding: 10px;
     background: white;
     color: #000000;
     border: 1px solid #1a1a1a;
     font-size: 90%;
-    overflow-y: auto;
+    /*overflow-y: auto;*/
 }
 
 .allcolor {

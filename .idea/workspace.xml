@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="031cbc25-74b6-4b16-87f4-0f0b679551dd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/localStyle.css" afterPath="$PROJECT_DIR$/css/localStyle.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/table.js" afterPath="$PROJECT_DIR$/js/table.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Importer.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -24,22 +25,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="table.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="table.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/table.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.9310344">
-              <caret line="275" column="49" selection-start-line="275" selection-start-column="49" selection-end-line="275" selection-end-column="50" />
+            <state vertical-scroll-proportion="3.6984127">
+              <caret line="798" column="35" selection-start-line="798" selection-start-column="35" selection-end-line="798" selection-end-column="35" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
                 <element signature="n#!!block;n#Table#0" expanded="false" />
-                <marker date="1449927144980" expanded="true" signature="24216:24225" placeholder="..." />
-                <marker date="1449927144980" expanded="true" signature="28046:28055" placeholder="..." />
-                <marker date="1449927144980" expanded="true" signature="31167:31176" placeholder="..." />
-                <marker date="1449927144980" expanded="true" signature="31288:31297" placeholder="..." />
-                <marker date="1449927144980" expanded="true" signature="34167:34176" placeholder="..." />
-                <marker date="1449927144980" expanded="true" signature="34288:34297" placeholder="..." />
-                <marker date="1449927144980" expanded="true" signature="49346:49370" placeholder="..." />
+                <marker date="1449992712437" expanded="true" signature="6249:6258" placeholder="..." />
+                <marker date="1449992712437" expanded="true" signature="10070:10079" placeholder="..." />
+                <marker date="1449992712437" expanded="true" signature="13191:13200" placeholder="..." />
+                <marker date="1449992712437" expanded="true" signature="13312:13321" placeholder="..." />
+                <marker date="1449992712437" expanded="true" signature="16191:16200" placeholder="..." />
+                <marker date="1449992712437" expanded="true" signature="16312:16321" placeholder="..." />
+                <marker date="1449992712437" expanded="true" signature="29579:29603" placeholder="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dataWrangler.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/js/dataWrangler.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="438" column="40" selection-start-line="438" selection-start-column="33" selection-end-line="438" selection-end-column="40" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -47,8 +58,8 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.423077">
-              <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
+            <state vertical-scroll-proportion="-3.2727273">
+              <caret line="117" column="30" selection-start-line="117" selection-start-column="25" selection-end-line="117" selection-end-column="30" />
               <folding>
                 <element signature="n#style#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="false" />
@@ -79,11 +90,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="localStyle.css" pinned="false" current-in-tab="true">
+      <file leaf-file-name="localStyle.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/css/localStyle.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.14285715">
-              <caret line="188" column="14" selection-start-line="188" selection-start-column="14" selection-end-line="188" selection-end-column="14" />
+            <state vertical-scroll-proportion="-5.9310346">
+              <caret line="87" column="16" selection-start-line="87" selection-start-column="16" selection-end-line="87" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -119,8 +130,8 @@
         <option value="$PROJECT_DIR$/js/fileConfiguration.js" />
         <option value="$PROJECT_DIR$/js/dataWrangler.js" />
         <option value="$PROJECT_DIR$/index.html" />
-        <option value="$PROJECT_DIR$/js/table.js" />
         <option value="$PROJECT_DIR$/css/localStyle.css" />
+        <option value="$PROJECT_DIR$/js/table.js" />
       </list>
     </option>
   </component>
@@ -288,12 +299,12 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="754" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20535715" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32817337" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32692307" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32972136" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -335,13 +346,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/js/utility.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -389,13 +393,13 @@
           <folding>
             <element signature="n#!!doc" expanded="true" />
             <element signature="n#!!block;n#Table#0" expanded="false" />
-            <marker date="1449927144980" expanded="true" signature="24216:24225" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="28046:28055" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="31167:31176" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="31288:31297" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="34167:34176" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="34288:34297" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="49346:49370" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="6249:6258" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="10070:10079" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="13191:13200" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="13312:13321" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="16191:16200" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="16312:16321" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="29579:29603" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -475,13 +479,13 @@
           <folding>
             <element signature="n#!!doc" expanded="true" />
             <element signature="n#!!block;n#Table#0" expanded="false" />
-            <marker date="1449927144980" expanded="true" signature="24216:24225" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="28046:28055" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="31167:31176" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="31288:31297" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="34167:34176" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="34288:34297" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="49346:49370" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="6249:6258" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="10070:10079" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="13191:13200" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="13312:13321" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="16191:16200" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="16312:16321" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="29579:29603" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -789,13 +793,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/dataWrangler.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="523" column="48" selection-start-line="523" selection-start-column="48" selection-end-line="523" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/SeparatorModal.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -824,10 +821,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/bower_components/colorbrewer/colorbrewer.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6938776">
+          <caret line="16" column="60" selection-start-line="16" selection-start-column="60" selection-end-line="16" selection-end-column="60" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/dataWrangler.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="438" column="40" selection-start-line="438" selection-start-column="33" selection-end-line="438" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.423077">
-          <caret line="158" column="0" selection-start-line="158" selection-start-column="0" selection-end-line="158" selection-end-column="0" />
+        <state vertical-scroll-proportion="-3.2727273">
+          <caret line="117" column="30" selection-start-line="117" selection-start-column="25" selection-end-line="117" selection-end-column="30" />
           <folding>
             <element signature="n#style#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="false" />
@@ -857,29 +870,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/table.js">
+    <entry file="file://$PROJECT_DIR$/css/localStyle.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.9310344">
-          <caret line="275" column="49" selection-start-line="275" selection-start-column="49" selection-end-line="275" selection-end-column="50" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-            <element signature="n#!!block;n#Table#0" expanded="false" />
-            <marker date="1449927144980" expanded="true" signature="24216:24225" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="28046:28055" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="31167:31176" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="31288:31297" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="34167:34176" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="34288:34297" placeholder="..." />
-            <marker date="1449927144980" expanded="true" signature="49346:49370" placeholder="..." />
-          </folding>
+        <state vertical-scroll-proportion="-5.9310346">
+          <caret line="87" column="16" selection-start-line="87" selection-start-column="16" selection-end-line="87" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/localStyle.css">
+    <entry file="file://$PROJECT_DIR$/js/table.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.14285715">
-          <caret line="188" column="14" selection-start-line="188" selection-start-column="14" selection-end-line="188" selection-end-column="14" />
-          <folding />
+        <state vertical-scroll-proportion="3.6984127">
+          <caret line="798" column="35" selection-start-line="798" selection-start-column="35" selection-end-line="798" selection-end-column="35" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="n#!!block;n#Table#0" expanded="false" />
+            <marker date="1449992712437" expanded="true" signature="6249:6258" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="10070:10079" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="13191:13200" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="13312:13321" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="16191:16200" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="16312:16321" placeholder="..." />
+            <marker date="1449992712437" expanded="true" signature="29579:29603" placeholder="..." />
+          </folding>
         </state>
       </provider>
     </entry>
