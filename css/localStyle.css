@@ -165,25 +165,23 @@ line {
 
 .box{
     position: absolute;
-    margin-top: 40px;
+    margin-top: 100px;
     z-index: 10;
     float:left;
     overflow: hidden;
-    background: lightyellow;
+    background: white;
 }
 /* Add padding and border to inner content
 for better animation effect */
 .box-inner{
     width: 1000px;
-    height: 600px;
+    height: 800px;
     padding: 10px;
-    border: 1px solid #a29415;
+    /*border: 1px solid #a29415;*/
 }
 
-
-
 /* HOVER STYLES */
-div#pop-up {
+div#colorbox-pop-up {
     display: none;
     position: absolute;
     width: 218px;
@@ -218,3 +216,49 @@ div#pop-up {
     width: 6px;
     height: 4px;
 }
+
+div#datatype-pop-up {
+    display: none;
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    padding: 10px;
+    background: white;
+    color: #000000;
+    border: 1px solid #1a1a1a;
+    font-size: 90%;
+    /*overflow-y: auto;*/
+}
+
+#menu {
+    background-color:black;
+    color:white;
+    /*text-align:left;*/
+    padding:5px;
+    width: auto;
+}
+
+ul.pagination {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+
+#paginate ul.pagination li {display: inline;}
+
+#paginate ul.pagination li a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+}
+
+#paginate.pagination.ul.li.a.active {
+    background-color: #4CAF50;
+    color: white;
+    border: 1px solid #4CAF50;
+}
+
+#paginate ul.pagination li a:hover:not(.active) {background-color: #ddd;}

@@ -42,15 +42,14 @@
     <link rel="stylesheet" type="text/css" href="css/localStyle.css">
 </head>
 <body style="height: auto;">
+
     <div class="box">
         <div class="box-inner">
             <div>
-                <div id="close-configuration-window" style="text-align:right;">
+                <!--<div id="close-configuration-window" style="text-align:right;">
                     <img src="img/CloseWindow.png">
-                </div>
-                <div>
-                    <h1>File Configuration</h1>
-                </div>
+                </div>-->
+
             </div>
             <div>
                 <div id="ribbon">
@@ -86,12 +85,12 @@
             <div id = "save-current-conf">
                 <button id="save-conf-button"> Save Current Configuration</button>
             </div>
-            <div id="par-json-output">
+           <!-- <div id="par-json-output">
                 <div>JSON Output</div>
                 <div id="json-output"  style="overflow: auto; width: 500px; height: 150px; border: solid; border-width: thin;">
 
                 </div>
-            </div>
+            </div>-->
             <div>
                 <h5>Most Recent Files</h5>
                 <div id = "recentFiles">
@@ -104,23 +103,26 @@
         </div>
     </div>
 
-    <div class="container-fluid" style="/*border: dashed;*/ border-width: thin; height: 100%">
-        <div id="menu" class="row" style="/*background: #00cc00;*//* border: dashed;*/ border-width: thin; height: 70px">
-            <div id="open-configuration-window" >
-                <img src="img/menu_icon.png">
-            </div>
+    <div id="menu">
+        <div id="open-configuration-window">
+            &nbsp;&nbsp;&nbsp;
+            <img src="http://caleydo.github.io/assets/images/logos/caleydo_c.svg" width="50" height="50">
+            <span style="font-size: large; color: white"><strong>Caleydo Importer</strong></span>
         </div>
-        <div id="main" class="row" style=" /*border: dashed;*/ border-width: thin;  height: 600px; padding: 0 ">
+    </div>
+
+    <div class="container-fluid" style="border-width: thin; height: 100%;" >
+        <div id="main" class="row" style="margin-top: 20px;border-width: thin;  /*height: 600px;*/ padding: 0 ">
             <div id="table-group" class="col-md-12" style="align:left;">
-                <div id="importedTable" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  height: 550px; overflow: auto ">
+                <div id="importedTable" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  /*height: 550px; */overflow: auto ">
 
                 </div>
-                <div id="paginate" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  height: 50px; ">
+                <div id="paginate" class="col-md-12 text-center" style="/*border: dashed;*/ border-width: thin;  height: 50px; ">
                     <ul class="pagination">
                     </ul>
                 </div>
             </div>
-            <div id = "operations" class="col-md-2 hidden"  style="border: dashed; border-width: thin; height: 550px;">
+            <div id = "operations" class="col-md-2 hidden"  style="border: dashed; border-width: thin; /*height: 550px;*/">
                 <!--todo copy this gif to local folder-->
                 <div id="string-opr-menu" style="text-align:right;">
                 <img src="img/CloseWindow.png">
@@ -147,7 +149,6 @@
                         <button id="button-new-category" type="button" style="background-color: #1b6d85; color: white">Create new category</button>
                     </div>
                 </div>
-                </div>
             </div>
         </div>
         <div id="footer" class="row" style="/*background: #843534;*/ /*border: dashed;*/ border-width: thin; ">
@@ -156,12 +157,18 @@
             </div>
         </div>
     </div>
-
-    <div id="pop-up">
+    <div id="colorbox-pop-up">
         <!--<p>
             This div only appears when the trigger link is hovered over.
             Otherwise it is hidden from view.
         </p>-->
+    </div>
+    <div id="datatype-pop-up">
+
+        <input type="radio" name="datatype" value="string"> String <br>
+        <input type="radio" name="datatype" value="nominal"> Nominal <br>
+        <input type="radio" name="datatype" value="ordinal"> Ordinal <br>
+        <input type="radio" name="datatype" value="numerical"> Numerical <br>
     </div>
     <!--load the main script as soon as it loaded-->
     <script src="js/main.js"></script>

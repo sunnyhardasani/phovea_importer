@@ -52,13 +52,15 @@ Table.prototype.init = function() {
     self.colCount  = Object.keys(self.data).length;
     self.totalPages = Math.ceil(self.rowCount/DISPLAY_ROW_COUNT);
 
+    self.createColorBox();
+    self.createDataTypeBox();
     self.updatePagination();
     self.printTableHeaders();
     self.paginate(self.currPage);
     self.printCharts();
 
     //this will set on resizable columns
-    $("table").resizableColumns();
+    $("table").resizableColumns(); //todo to start resizable columns
     $("#string-opr-menu > img").click( function(){
         $('#table-group').attr("class","col-md-12");
         $('#operations').attr("class","col-md-0 hidden");
@@ -180,14 +182,35 @@ Table.prototype.paginate = function(page) {
     self.updatePagination();
 }
 
-/**
- * this function will print the charts
- */
-Table.prototype.printCharts =  function(){
-
+Table.prototype.createDataTypeBox =  function(colId) {
     var self = this;
 
-    self.colorBox = d3.select("#pop-up")
+    $('#datatype-pop-up input:radio').prop('checked', false);
+    $('#datatype-pop-up input:radio').off('click');
+
+    $('#datatype-pop-up input:radio').click(function() {
+        if ($(this).val() === DATATYPE_STRING) {
+            self.parentInstance.changeDataType(colId,DATATYPE_STRING);
+        }
+        else if ($(this).val() === DATATYPE_NOMINAL) {
+            self.parentInstance.changeDataType(colId,DATATYPE_NOMINAL);
+        }
+        else if ($(this).val() === DATATYPE_NUMERICAL) {
+            self.parentInstance.changeDataType(colId,DATATYPE_NUMERICAL);
+        }
+        else if ($(this).val() === DATATYPE_ORDINAL) {
+            //self.parentInstance.changeDataType(colId,DATATYPE_ORDINAL);
+        }
+
+        $('#datatype-pop-up').hide();
+    });
+
+}
+
+Table.prototype.createColorBox =  function(){
+    var self = this;
+
+    self.colorBox = d3.select("#colorbox-pop-up")
         .append("div")
         .attr("class","allcolor")
         .selectAll(".palette")
@@ -195,6 +218,13 @@ Table.prototype.printCharts =  function(){
         .enter().append("div")
         .attr("class", "palette")
         .attr("title", function(d) { return d.key; });
+}
+/**
+ * this function will print the charts
+ */
+Table.prototype.printCharts =  function(){
+
+    var self = this;
 
     for(key in self.data) {
 
@@ -286,15 +316,17 @@ Table.prototype.printCharts =  function(){
                                     return o(d.key);
                                 });
 
-                            $('#pop-up').hide();
+                            $('#colorbox-pop-up').hide();
                         })
+
+                        //todo need to check the below code whether its required or not
                         .selectAll(".swatch")
                         .data(function(d) { return d.value[d3.keys(d.value).map(Number).sort(d3.descending)[0]]; })
                         .enter().append("div")
                         .attr("class", "swatch")
                         .style("background-color", function(d) { return d; });
 
-                    $('#pop-up')
+                    $('#colorbox-pop-up')
                         .show()
                         .css('top', d3.event.pageY )
                         .css('left',d3.event.pageX)
@@ -347,10 +379,12 @@ Table.prototype.printCharts =  function(){
                 .enter().append("svg:rect")
                 .classed("numerical-bar",true)
                 .classed("numerical-bar:hover",true)
+
                 // move the bars down by their total height, so they animate up (not down)
                 .attr("transform", function(d) { return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")"; })
                 .attr("width", x.rangeBand()-1) //-1 for setting difference between bars
                 .attr("y", 0)
+
                 .attr("height", function(d) { return y(d.y); })
                 //setting up the tips
                 .on('mouseover', tip.show)
@@ -589,7 +623,17 @@ Table.prototype.printTableHeaders = function(){
                         .style("text-overflow","ellipsis")
                         .style("width","50px")
                         .style("float","left")
-                        .style("background-color", "lightgrey");
+                        .on("dblclick",function(d){ // todo move this in the separate function
+
+                            console.log(d);
+                            self.createDataTypeBox(d.id-1);
+
+                            $('#datatype-pop-up')
+                                .show()
+                                .css('top', d3.event.pageY )
+                                .css('left',d3.event.pageX)
+                                .appendTo('body');
+                        });
 
     var closeImg = opr.append("div")
                 .style("text-align","right");

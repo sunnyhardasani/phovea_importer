@@ -19,9 +19,8 @@ function DataWrangler(_data,_file, _mainInstance){
     //call the initialize function
     self.init();
 
-    // registering all the events of the
-    // check box and input box on the separator
-    // modal
+    // registering all the events of the check box
+    // and input box on the separator modal
     self.registerSepEvents();
 
 };
@@ -88,7 +87,9 @@ DataWrangler.prototype.output = function(msg){
  * @param msg
  */
 DataWrangler.prototype.clean = function(){
+    console.log("clean called");
     //$id("fileDetails").innerHTML = "";
+    d3.select("#colorbox-pop-up").selectAll("*").remove();
     d3.select("#importedTable").selectAll("*").remove();
 }
 
@@ -277,7 +278,6 @@ DataWrangler.prototype.saveClicked =  function(newCategoryData){  //todo tempora
         }
     }*/
 
-    console.log(self.allColumnsDataArray);
     /**
      *  Approach:
      *  1. Slice row of the data
@@ -293,10 +293,12 @@ DataWrangler.prototype.saveClicked =  function(newCategoryData){  //todo tempora
     self.guessDataType();   //working
 
     //this will keep only one instance of the table class
-    if(!self.table)
-    self.table = new Table(self.allColumnsDataArray, self);
-    else
-    self.table.constructor = Table(self.allColumnsDataArray, self);
+    if(!self.table) {
+        self.table = new Table(self.allColumnsDataArray, self);
+    }
+    else {
+        self.table.reload(self.allColumnsDataArray, self);
+    }
 }
 
 /**
@@ -371,6 +373,8 @@ DataWrangler.prototype.formColumn =  function(){
             colKey++;
         });
     });
+
+    console.log(self.allColumnsDataArray);
 }
 
 /**
@@ -463,6 +467,15 @@ DataWrangler.prototype.guessDataType =  function(){
             }
         }
 
+        //add all the type of data in the column
+        //
+        col["dataTypeObj"].keyCountMap  = freqMap;
+        col["dataTypeObj"].stringMap = stringMap;           //adding string map if suppose user ask to change the datatype
+        col["dataTypeObj"].numberMap  = numberMap;          //adding numerical map if suppose user ask to change the datatype
+        col["dataTypeObj"].data = colData;
+        col["dataTypeObj"].min  = min;
+        col["dataTypeObj"].max  = max;
+
         //finding out the total key count in the frequency data map
         var nKeyCount = Object.keys(freqMap).length;
 
@@ -479,30 +492,13 @@ DataWrangler.prototype.guessDataType =  function(){
             // todo: Ratio logic calculation needs to be discussed and may require change
 
             //checking for stratified data
-            if( nKeyCount / nNumericCount < RATIO && nKeyCount < 15){ // todo : define variable for 15
-
-                //print that the data in this column is stratified
-                var p = "";
-                for (key in freqMap) {
-                    if (freqMap.hasOwnProperty(key)) {
-                        //todo add handling for data type in col data
-                        p = p + " Key : " + key + " " + freqMap[key].value;
-                    }
-                }
-
-                col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
-                col["dataTypeObj"].keyCountMap  = freqMap;
-                col["dataTypeObj"].stringMap = stringMap;           //adding string map if suppose user ask to change the datatype
-                col["dataTypeObj"].numberMap  = numberMap;          //adding numerical map if suppose user ask to change the datatype
+            if( nKeyCount / nNumericCount < RATIO && nKeyCount < TOTAL_STRAT_COUNT){
+                col["dataTypeObj"].type = DATATYPE_NOMINAL;
             }
             else{
                 //todo: set the output parameter in this area
                 //Print the data is real and the range of the data
-
-                col["dataTypeObj"].type = "numerical"; //todo: define constants for hardcoded values
-                col["dataTypeObj"].min  = min;
-                col["dataTypeObj"].max  = max;
-                col["dataTypeObj"].data = colData;
+                col["dataTypeObj"].type = DATATYPE_NUMERICAL;
             }
         }
         else if(nNumericCount == 0){ // only string data
@@ -511,25 +507,12 @@ DataWrangler.prototype.guessDataType =  function(){
             // Todo: following logic require change after discussion
             //String can be stratified
             if( (nKeyCount / nTotalCount) < RATIO){ // Todo: logic change is required in this line
-                //Todo: set the output parameter in this area
-                //print that the data in this column is stratified
-                var p = "";
-                for (key in freqMap) {
-                    if (freqMap.hasOwnProperty(key)) {
-                        p = p + " Key : " + key + " " + freqMap[key].value;
-                    }
-                }
-
-
-                col["dataTypeObj"].type = "nominal"; //todo: define constants for hardcoded values
-                col["dataTypeObj"].keyCountMap  = freqMap;
+                col["dataTypeObj"].type = DATATYPE_NOMINAL;
             }
             else{
                 //String can be names of the person so chances are
                 //Print the data is real and the range of the data
-                col["dataTypeObj"].type = "string";
-                col["dataTypeObj"].keyCountMap = freqMap;
-                col["dataTypeObj"].stringMap = stringMap;
+                col["dataTypeObj"].type = DATATYPE_STRING;
             }
 
         }
@@ -538,8 +521,7 @@ DataWrangler.prototype.guessDataType =  function(){
             // keep the type as error i.e. not able to judge and sent
             // define error structure and send the doubtful error
             // location to the server
-
-            col["dataTypeObj"].type = "error";
+            col["dataTypeObj"].type = DATATYPE_ERROR;
 
             // guessing the base data type of the column if base type
             // is numerical than highlight the strings with red color
@@ -547,9 +529,38 @@ DataWrangler.prototype.guessDataType =  function(){
             // 10 numbers and then for base type to be numerical there
             // must be 6,7,8,9 or 10 numbers else its base type change
             // to string
-            col["dataTypeObj"].baseType  = (nNumericCount / nTotalCount) >= 0.5 ? "numerical" : "string";
-            col["dataTypeObj"].numberMap  = numberMap;
-            col["dataTypeObj"].stringMap  = stringMap;
+            col["dataTypeObj"].baseType  = (nNumericCount / nTotalCount) >= 0.5 ? DATATYPE_NUMERICAL : DATATYPE_STRING;
         }
     }
+}
+
+/**
+ * This function is responsible for changing the data type
+ * this will take the col id and the new data type change
+ * required
+ */
+DataWrangler.prototype.changeDataType =  function(colId, newDataType) {
+    var self = this;
+
+    console.log(colId);
+    self.allColumnsDataArray[colId]["dataTypeObj"].type = newDataType;
+    console.log(self.table);
+
+    self.clean();
+
+    //this will keep only one instance of the table class
+    if(!self.table) {
+        self.table = new Table(self.allColumnsDataArray, self);
+    }
+    else {
+        self.table.reload(self.allColumnsDataArray, self);
+    }
+}
+
+/**
+ * This function is responsible adding the new category
+ * in the nominal data
+ */
+DataWrangler.prototype.addNewCategoryInNominal =  function() {
+
 }

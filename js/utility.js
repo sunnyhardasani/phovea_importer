@@ -121,3 +121,12 @@ function CSVToArray( strData, strDelimiter ){
     // Return the parsed data.
     return( arrData );
 }
+
+//defination of the variables
+var DATATYPE_STRING     = "string";
+var DATATYPE_NOMINAL    = "nominal";
+var DATATYPE_NUMERICAL  = "numerical";
+var DATATYPE_ORDINAL    = "ordinal";
+var DATATYPE_ERROR      = "error";
+
+var TOTAL_STRAT_COUNT = 15;

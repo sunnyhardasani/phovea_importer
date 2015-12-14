@@ -76,12 +76,14 @@ FileConfiguration.prototype.addNewFile = function(file){
 FileConfiguration.prototype.loadUI = function(){
     var self = this;
 
+    $("#main").toggle();
+
     //todo move in the new function to initialize UI
     $("#open-configuration-window").click(function(){
-        $(".box").animate({
-            width: "toggle"
-        });
+        $("#main").toggle();
+        $(".box").toggle();
     });
+
     $("#close-configuration-window").click(function(){
         $(".box").animate({
             width: "toggle"

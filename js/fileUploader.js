@@ -73,6 +73,10 @@ FileUploader.prototype.streamFile = function(file, start_byte, end_byte) {
                 data = self.file_data;
             }
 
+            //todo move this call to much better place
+            $("#main").toggle();
+            $(".box").toggle();
+
             //this will initialize the new separator modal
             if(self.dataWrangler == null) {
                 self.dataWrangler = new DataWrangler(data, file, self);
