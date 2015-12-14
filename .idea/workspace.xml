@@ -4,16 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/css/localStyle.css" line="167" mnemonic="8" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="031cbc25-74b6-4b16-87f4-0f0b679551dd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/dataWrangler.js" afterPath="$PROJECT_DIR$/js/dataWrangler.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/fileConfiguration.js" afterPath="$PROJECT_DIR$/js/fileConfiguration.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/fileUploader.js" afterPath="$PROJECT_DIR$/js/fileUploader.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/localStyle.css" afterPath="$PROJECT_DIR$/css/localStyle.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/table.js" afterPath="$PROJECT_DIR$/js/table.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/utility.js" afterPath="$PROJECT_DIR$/js/utility.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="031cbc25-74b6-4b16-87f4-0f0b679551dd" name="Default" comment="" />
     <ignored path="Importer.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
