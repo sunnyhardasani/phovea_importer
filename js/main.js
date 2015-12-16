@@ -1,4 +1,31 @@
+require.config({
+    paths:{
+        "jquery": "bower_components/jquery/dist/jquery.min",
+        "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
+        "d3": "bower_components/d3/d3",
+        "colorbrewer": "bower_components/colorbrewer/colorbrewer",
+        "d3-tip": "bower_components/d3-tip/index",
+        "jquery-resizable-columns": "bower_components/jquery-resizable-columns/dist/jquery.resizableColumns",
+        "store": "bower_components/store/store.min"
+    }
+});
+/*
 
+require(["fileUploader"],function(FileUploader) {
+    console.log("its working");
+    console.log(FileUploader);
+
+    var fileData = {};
+    new FileUploader(fileData, null);
+})
+*/
+
+    /*console.log(FileUploader);
+    //this will initialize the file uploader
+    /!*var fileUploader = *!/*//*
+});
+
+/*
 (function () {
 
     function init(){
@@ -17,6 +44,7 @@
     //this will call the init function
     init();
 })();
+*/
 
 
 /**

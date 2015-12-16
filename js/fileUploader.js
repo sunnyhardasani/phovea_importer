@@ -1,3 +1,5 @@
+define(["fileUploader"],function(_fileData,_table) {
+
 /**
  * FileReader Constructor
  * @param _fileData
@@ -130,3 +132,6 @@ FileUploader.prototype.init = function() {
         submitbutton.style.display = "none";
     }
 };
+
+    return FileUploader;
+});
