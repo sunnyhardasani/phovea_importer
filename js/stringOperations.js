@@ -167,13 +167,14 @@ StringOperations.prototype.printElementsBar = function(data){
         return d.value.match;
     }))
 
-    var tip = d3.tip()
+    //todo open after fixing d3-tip bower error
+    /*var tip = d3.tip()
         .attr('class', 'd3-tip')
         .offset([-10, 0])
         .html(function(d) {
             return "<strong> " + d.value.match + "</strong>";
         });
-    svg.call(tip);
+    svg.call(tip);*/
 
     var barGroups = svg.selectAll(".barGroup")
         // here we tell D3 how to know which objects are the
@@ -233,8 +234,8 @@ StringOperations.prototype.printElementsBar = function(data){
             return Math.abs(xScale(d.value.count) - xScale(0));
         })
         //setting up the tips
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
+        /*.on('mouseover', tip.show)
+        .on('mouseout', tip.hide)*/;
 
     //adding the count
     barGroupsEnter.append("text").text(function (d) {

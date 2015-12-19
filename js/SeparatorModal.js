@@ -11,10 +11,10 @@ function SeparatorModal(_data,_file){
     self.idRow=0; //todo: this will indicate the row identification in the table
 
 
-    //clean all the previous content on the separator modal
+    // clean all the previous content on the separator modal
     self.clean();
 
-    //call the initialize function
+    // call the initialize function
     self.init();
 
     // registering all the events of the

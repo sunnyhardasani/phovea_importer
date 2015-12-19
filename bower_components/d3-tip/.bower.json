@@ -22,7 +22,6 @@
     "commit": "07cf158c54cf1686b3000d784ef55d27b095cc0e"
   },
   "_source": "git://github.com/Caged/d3-tip.git",
-  "_target": "~0.6.7",
-  "_originalSource": "d3-tip",
-  "_direct": true
+  "_target": "*",
+  "_originalSource": "d3-tip"
 }
