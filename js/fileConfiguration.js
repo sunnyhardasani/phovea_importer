@@ -2,7 +2,16 @@
 // JSON Output File to handle output from the class //
 //////////////////////////////////////////////////////
 
-define(["jquery","d3"], function () {
+define(["jquery",
+    "d3",
+    "d3-tip",
+    "colorbrewer",
+    "dataWrangler",
+    "table",
+    "jquery-resizable-columns",
+    "fileConfiguration",
+    "stringOperations"],function () {
+
 
     /**
      * Main function of this class called when JSON Output
@@ -65,8 +74,6 @@ define(["jquery","d3"], function () {
             "size":file.size, // todo change this to total column and row count
             "columns":[]
         };
-
-        console.log(self.outFileData);
     }
 
 
@@ -77,23 +84,6 @@ define(["jquery","d3"], function () {
      */
     FileConfiguration.prototype.loadUI = function(){
         var self = this;
-
-        $("#main").toggle();
-
-        //todo move in the new function to initialize UI
-        $("#open-configuration-window").click(function(){
-            $("#main").toggle();
-            $(".box").toggle();
-        });
-
-        $("#close-configuration-window").click(function(){
-            $(".box").animate({
-                width: "toggle"
-            });
-        });
-        $("#save-conf-button").click(function(){
-            self.saveConfiguration();
-        });
     }
 
     /**
@@ -109,8 +99,6 @@ define(["jquery","d3"], function () {
      */
     FileConfiguration.prototype.saveConfiguration = function() {
         var self = this;
-
-        console.log("save configuration clicked");
 
         //get current table data from the table javascript
 
@@ -161,19 +149,15 @@ define(["jquery","d3"], function () {
                             .style("float","left")
                             .attr("id","#file");
 
-        console.log(fileDivs);
-
-            fileDivs.append("img")
-                    .attr("src","img/recent-file.png")
-                    .style("width","50px")
-                    .style("height","50px");
+            fileDivs.append("span")
+                    .attr("class","glyphicon glyphicon-file")
+                    .style("font-size","50px");
 
             fileDivs.append("div")
                     .style("width","60px")
                     .style("overflow","hidden")
                     .style("text-overflow","ellipsis")
                         .text(function(d){
-                            console.log(d);
                                         return d.path;
                                     });
 
@@ -290,5 +274,4 @@ define(["jquery","d3"], function () {
     }
 
     return FileConfiguration;
-
 });

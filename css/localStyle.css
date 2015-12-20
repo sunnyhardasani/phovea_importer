@@ -262,3 +262,7 @@ ul.pagination {
 }
 
 #paginate ul.pagination li a:hover:not(.active) {background-color: #ddd;}
+
+.glyphicon.glyphicon-folder-open {
+    font-size: 40px;
+}

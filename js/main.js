@@ -28,20 +28,16 @@ define(["require","utility","fileUploader","fileConfiguration"],function (requir
     //machines
     var fileConfigurationInst = new FileConfiguration();
     fileConfigurationInst.init();
+
+    $("#main").toggle();
+
+    //todo move in the new function to initialize UI
+    $("#open-configuration-window").click(function(){
+        $("#main").toggle();
+        $(".box").toggle();
+    });
+
+    $("#save-conf-button").click(function(){
+        self.saveConfiguration();
+    });
 });
-
-
-/**
- *  TODO - Approach for change to the main application:
- *
- *  main image of the application is whenever the file
- *  is loaded it will read the data show the initial data
- *  of the file
- *
- *  application will ask the user to change the data accordingly
- *  and then on click save the data will get loaded on the server
- *
- *  user should be given an option to save all the data in the
- *  json object or only the meta data information is enough
- *
- */

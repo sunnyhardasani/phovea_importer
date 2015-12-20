@@ -16,7 +16,7 @@ function StringOperations(_data,_col,_regex, _parentInstance){
     //default operation when the image is clicked
     //close the div
     //todo move into separate function
-    $("#operations > img").click( function(){
+    $("#operations > span").click( function(){
         $('#table-group').attr("class","col-md-12");
         $('#operations').attr("class","col-md-0 hidden");
     });

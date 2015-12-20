@@ -1,4 +1,10 @@
-define(["jquery","d3","d3-tip","colorbrewer","dataWrangler","table","jquery-resizable-columns","fileConfiguration","stringOperations"],function () {
+define(["jquery",
+    "d3",
+    "d3-tip",
+    "colorbrewer",
+    "dataWrangler",
+    "table",
+    "jquery-resizable-columns"],function () {
 
     // Forces the JavaScript engine into strict mode: http://tinyurl.com/2dondlh
     "use strict";
@@ -81,6 +87,10 @@ define(["jquery","d3","d3-tip","colorbrewer","dataWrangler","table","jquery-resi
                 //todo move this call to much better place
                 $("#main").toggle();
                 $(".box").toggle();
+
+                // requireJS will ensure that the DataWrangler definition is available
+                // to use, we can now import it for use.
+                var DataWrangler = require('dataWrangler');
 
                 //this will initialize the new separator modal
                 if(self.dataWrangler == null) {

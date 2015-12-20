@@ -37,7 +37,7 @@
 </head>
 <body style="height: auto;">
 
-    <div class="box">
+    <div id="file-config" class="box">
         <div class="box-inner">
             <div>
                 <!--<div id="close-configuration-window" style="text-align:right;">
@@ -51,7 +51,7 @@
                         <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
                             <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
                             <!--todo copy this icon to local folder-->
-                            <label for="fileselect"><img src="/Importer/img/add_file.png" width="40" height="40"></label>
+                            <label for="fileselect"><span class="glyphicon glyphicon-folder-open"></span><!--<img src="/Importer/img/add_file.png" width="40" height="40">--></label>
                             <input type="file" id="fileselect" style="display: none" />
                         </form>
                     </div>
@@ -106,7 +106,7 @@
     </div>
 
     <div class="container-fluid" style="border-width: thin; height: 100%;" >
-        <div id="main" class="row" style="margin-top: 20px;border-width: thin;  /*height: 600px;*/ padding: 0 ">
+        <div id="main" class="row" style="margin-top: 20px;border-width: thin;  /*height: 600px;*/ padding: 0;">
             <div id="table-group" class="col-md-12" style="align:left;">
                 <div id="importedTable" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  /*height: 550px; */overflow: auto ">
 
@@ -119,7 +119,7 @@
             <div id = "operations" class="col-md-2 hidden"  style="border: dashed; border-width: thin; /*height: 550px;*/">
                 <!--todo copy this gif to local folder-->
                 <div id="string-opr-menu" style="text-align:right;">
-                <img src="img/CloseWindow.png">
+                    <span class="glyphicon glyphicon-remove-sign"></span>
                 </div>
                 <div style="background-color: lightgrey">
                     <h5><strong>Data Operations</strong></h5>

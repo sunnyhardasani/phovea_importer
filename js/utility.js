@@ -112,7 +112,6 @@ function CSVToArray( strData, strDelimiter ){
             strMatchedValue = arrMatches[ 3 ];
         }
 
-        alert(strMatchedValue);
         // Now that we have our value string, let's add
         // it to the data array.
         arrData[ arrData.length - 1 ].push( strMatchedValue );
