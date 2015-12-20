@@ -13,50 +13,51 @@ define(["jquery",
     "stringOperations"],function () {
 
 
+    // class instance initialized to null
+    var instance = null;
+
     /**
-     * Main function of this class called when JSON Output
-     * button is clicked
-     * @param _data
-     * @param _parentInstance
+     * 1. Check if instance is null then throw error
+     * 2. Calls the load ui related to this class
      * @constructor
      */
-
-    //reference for singleton pattern http://robdodson.me/javascript-design-patterns-singleton/
     function FileConfiguration(){
+        var self = this;
 
-        // the cached instance
-        var instance;
+        //if instance is not null then throw an error
+        if(instance !== null){
+            throw new Error("Cannot instantiate more than one FileConfiguration, use FileConfiguration.getInstance()");
+        }
 
-        // rewrite the constructor
-        FileConfiguration = function() {
-            return instance;
-        };
+        //load the ui
+        self.loadUI();
 
-        // carry over the prototype
-        FileConfiguration.prototype = this;
-
-        // the instance
-        instance = new FileConfiguration();
-
-        // reset the constructor pointer
-        instance.constructor = FileConfiguration;
-
-        //functionality
-        instance.loadUI();
         //read the data from the stored json file
-        instance.localJSONData = [];
-
-        return instance;
+        self.localJSONData = [];
     }
+
+    /**
+     * this function returns the instance of this
+     * class if not created
+     * @returns {*}
+     */
+    FileConfiguration.getInstance = function(){
+        // gets an instance of the singleton. It is better to use
+        if(instance === null){
+            instance = new FileConfiguration();
+        }
+        return instance;
+    };
+
 
     /**
      * This function will get initialized when this class
      * start from the constructor
      */
     FileConfiguration.prototype.init = function(){
-
         var self = this;
 
+        //todo : this function will read the server
         self.readLocalData();
     }
 
@@ -84,6 +85,16 @@ define(["jquery",
      */
     FileConfiguration.prototype.loadUI = function(){
         var self = this;
+
+        //file configuration ui functionality
+        $("#main").toggle();
+        $("#open-configuration-window").click(function(){
+            $("#main").toggle();
+            $(".box").toggle();
+        });
+        $("#save-conf-button").click(function(){
+            self.saveConfiguration();
+        });
     }
 
     /**
@@ -273,5 +284,5 @@ define(["jquery",
         self.tempData = data;
     }
 
-    return FileConfiguration;
+    return FileConfiguration.getInstance();
 });

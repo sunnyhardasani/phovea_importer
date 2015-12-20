@@ -1,5 +1,6 @@
 /**
  * Created by sunny hardasani on 10/14/2015.
+ * CLASS IS NOT IN USE ANYMORE
  */
 function SeparatorModal(_data,_file){
 

@@ -6,24 +6,69 @@ define(["jquery",
     "table",
     "jquery-resizable-columns"],function () {
 
-    // Forces the JavaScript engine into strict mode: http://tinyurl.com/2dondlh
     "use strict";
 
+    //singleton instance of the class
+    var instance = null;
+
     /**
-     * FileReader Constructor
-     * @param _fileData
+     * Constructor whether instance is null or
+     * not, if null then throw error
      * @constructor
      */
-    function FileUploader(_fileData,_table){
+    function FileUploader(){
+        if(instance !== null){
+            throw new Error("Cannot instantiate more than one FileUploader, use FileUploader.getInstance()");
+        }
+    }
+
+    /**
+     * This function returns instance of the class
+     * @returns {*}
+     */
+    FileUploader.getInstance = function(){
+
+        // gets an instance of the singleton
+        if(instance === null){
+            instance = new FileUploader();
+        }
+        return instance;
+    };
+
+    /**
+     * Initialize function of File Uploader
+     * @param _fileData
+     * @param _table
+     */
+    FileUploader.prototype.init = function(_fileData,_table) {
         var self = this;
 
+        //make the data global
         self.reader = _fileData;
         self.table = _table;
 
-        if (window.File && window.FileList && window.FileReader){
-            self.init();
+        //taking required html element
+        var fileselect = $id("fileselect");
+        var filedrag = $id("filedrag");
+        var submitbutton = $id("submitbutton");
+
+        // file select
+        fileselect.addEventListener("change", self.fileSelectHandler.bind(self), false);
+
+        // is XHR2 available?
+        var xhr = new XMLHttpRequest();
+        if (xhr.upload) {
+
+            // file drop
+            filedrag.addEventListener("dragover", self.fileDragHover.bind(self), false);
+            filedrag.addEventListener("dragleave", self.fileDragHover.bind(self), false);
+            filedrag.addEventListener("drop", self.fileSelectHandler.bind(self), false);
+            filedrag.style.display = "block";
+
+            // remove submit button
+            submitbutton.style.display = "none";
         }
-    }
+    };
 
     /**
      * this function will select the file
@@ -48,7 +93,9 @@ define(["jquery",
         self.streamFile(self.files[0], INITIAL_START_BYTE, INITIAL_END_BYTE);
     };
 
-
+    /**
+     *
+     */
     FileUploader.prototype.streamNextFrame = function(){
         var self = this;
     }
@@ -88,17 +135,10 @@ define(["jquery",
                 $("#main").toggle();
                 $(".box").toggle();
 
-                // requireJS will ensure that the DataWrangler definition is available
-                // to use, we can now import it for use.
-                var DataWrangler = require('dataWrangler');
-
-                //this will initialize the new separator modal
-                if(self.dataWrangler == null) {
-                    self.dataWrangler = new DataWrangler(data, file, self);
-                }
-                else {
-                    self.dataWrangler.reload(data, file, self);
-                }
+                // requireJS will ensure that the DataWrangler definition
+                // is available to use, we can now import it for use.
+                self.dataWrangler = require('dataWrangler');
+                self.dataWrangler.reload(data, file, self);
             }
         };
 
@@ -106,7 +146,10 @@ define(["jquery",
         reader.readAsText(blob);
     };
 
-    // file drag hover
+    /**
+     *
+     * @param e
+     */
     FileUploader.prototype.fileDragHover = function(e) {
 
         var self = this;
@@ -116,35 +159,5 @@ define(["jquery",
         e.target.className = (e.type == "dragover" ? "hover" : "");
     };
 
-
-    /**
-     * Initialize function of File Reader
-     */
-    FileUploader.prototype.init = function() {
-        var self = this;
-
-        //taking up the
-        var fileselect = $id("fileselect");
-        var filedrag = $id("filedrag");
-        var submitbutton = $id("submitbutton");
-
-        // file select
-        fileselect.addEventListener("change", self.fileSelectHandler.bind(self), false);
-
-        // is XHR2 available?
-        var xhr = new XMLHttpRequest();
-        if (xhr.upload) {
-
-            // file drop
-            filedrag.addEventListener("dragover", self.fileDragHover.bind(self), false);
-            filedrag.addEventListener("dragleave", self.fileDragHover.bind(self), false);
-            filedrag.addEventListener("drop", self.fileSelectHandler.bind(self), false);
-            filedrag.style.display = "block";
-
-            // remove submit button
-            submitbutton.style.display = "none";
-        }
-    };
-
-    return FileUploader;
+    return FileUploader.getInstance();
 });

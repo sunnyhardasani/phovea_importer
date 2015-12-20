@@ -7,37 +7,26 @@ requirejs.config({
         "d3-tip": "../bower_components/d3-tip/index",
         "jquery-resizable-columns": "../bower_components/jquery-resizable-columns/dist/jquery.resizableColumns.min",
         "store": "../bower_components/store/store.min"
-    },
-    shim: { d3Tip: ['d3']}
+    }
 });
 
 define(["require","utility","fileUploader","fileConfiguration"],function (require) {
 
     // requireJS will ensure that the FileUploader, FileConfiguration definition is available
     // to use, we can now import it for use.
-    var FileUploader = require('fileUploader');
-    var FileConfiguration = require('fileConfiguration');
+    this.fileUploaderIns = require('fileUploader');
+    this.fileConfigurationIns = require('fileConfiguration');
 
     //this will initialize the file uploader
     var fileData = {};
-    var fileUploader = new FileUploader(fileData,null);
+    this.fileUploaderIns.init(fileData,null);
 
     //on the start of the application load the file configuration instance
     //this will initialize the file configuration data, attach all the UI
     //relation operations and load the already read files from the local
     //machines
-    var fileConfigurationInst = new FileConfiguration();
-    fileConfigurationInst.init();
+    this.fileConfigurationIns.init();
 
-    $("#main").toggle();
+    //todo need to move to the proper function
 
-    //todo move in the new function to initialize UI
-    $("#open-configuration-window").click(function(){
-        $("#main").toggle();
-        $(".box").toggle();
-    });
-
-    $("#save-conf-button").click(function(){
-        self.saveConfiguration();
-    });
 });

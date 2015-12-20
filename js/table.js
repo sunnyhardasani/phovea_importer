@@ -12,23 +12,30 @@ define(["jquery",
         "fileConfiguration",
         "stringOperations"],function () {
 
+    //instance of the class
+    var instance = null;
+
     /**
-     *
-     * @param _fileData
+     * if class is reinitilized then throws an eror
      * @constructor
      */
-    function Table(_data, _parentInstance) {
-        var self = this;
-
-        self.data = _data;
-        self.displayRowCount = DISPLAY_ROW_COUNT;
-        self.currPage = 1;
-        self.dataToDisplay = [];
-        self.parentInstance = _parentInstance;
-
-        //load file data and call initialize
-        self.init();
+    function Table(){
+        if(instance !== null){
+            throw new Error("Cannot instantiate more than one Table, use Table.getInstance()");
+        }
     }
+
+    /**
+     * returns an instance of the class
+     * @returns {*}
+     */
+    Table.getInstance = function(){
+        // summary: Gets an instance of the singleton. It is better to use
+        if(instance === null){
+            instance = new Table();
+        }
+        return instance;
+    };
 
     /**
      * this function will called when new file
@@ -49,7 +56,7 @@ define(["jquery",
     }
 
     /**
-     * Only constructor or reload function call
+     * only constructor or reload function call
      * this function this will load the data and
      * update the pagination, update table and
      * print charts
@@ -79,11 +86,7 @@ define(["jquery",
         // requireJS will ensure that the DataWrangler definition is available
         // to use, we can now import it for use.
         var FileConfiguration = require('fileConfiguration');
-
-        //todo remove this calling the file configuration load data function
-        //by making this class singleton
-        var fileConfig = new FileConfiguration();
-        fileConfig.tempDataLoad(self.data);
+        FileConfiguration.tempDataLoad(self.data);
     }
 
 
@@ -833,38 +836,6 @@ define(["jquery",
                 }
             }
         }
-
-        /*//color change operations
-         var colRect = osvg.selectAll(".colChangeBtn")
-         .data(columns)
-         .attr("class","colChangeBtn");
-         colRect.enter().append("rect")
-         .style("fill","red")
-         .attr("x",function(d,i){return d.x - 130;})
-         .attr("y",1)
-         .attr("height",(height-2)/2)
-         .attr("width",(height-2)/2);
-         colRect.enter()
-         .append("rect")
-         .style("fill","green")
-         .attr("x",function(d,i){return d.x - 130 + (height-2)/2;})
-         .attr("y",1)
-         .attr("height",(height-2)/2)
-         .attr("width",(height-2)/2);
-         colRect.enter()
-         .append("rect")
-         .style("fill","blue")
-         .attr("x",function(d,i){return d.x - 130;})
-         .attr("y",1 + (height-2)/2)
-         .attr("height",(height-2)/2)
-         .attr("width",(height-2)/2);
-         colRect.enter()
-         .append("rect")
-         .style("fill","yellow")
-         .attr("x",function(d,i){return d.x - 130 + (height-2)/2;})
-         .attr("y",1 + (height-2)/2)
-         .attr("height",(height-2)/2)
-         .attr("width",(height-2)/2);*/
     }
 
     /**
@@ -991,14 +962,11 @@ define(["jquery",
             //this function will highlight regex text on that particular column
             self.highlightColumn(col);
 
-            // this function will show the hidden div
-            // on the right side of the table
-            if (self.stringOperations == null) {
-                self.stringOperations = new StringOperations(self.data, col, self.regex, self);
-            }
-            else {
-                self.stringOperations.reload(self.data, col, self.regex, self);
-            }
+            // requireJS will ensure that the StringOperations definition is available
+            // to use, we can now import it for use.
+            self.stringOperations = require('stringOperations');
+            self.stringOperations.reload(self.data, col, self.regex, self);
+
         }
     }
 
@@ -1093,5 +1061,5 @@ define(["jquery",
         $(window).trigger('resize');
     }
 
-    return Table;
+    return Table.getInstance();
 });

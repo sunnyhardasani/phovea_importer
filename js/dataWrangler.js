@@ -7,34 +7,43 @@ define(["jquery",
         "jquery-resizable-columns",
         "stringOperations"],function () {
 
+    //initialize the instance with the null
+    var instance = null;
 
     /**
-     * Created by sunny hardasani on 10/14/2015.
+     * this function will check instance is null then
+     * throw an error and register the required html
+     * elements
+     * @constructor
      */
-//make it data wrangler
-    function DataWrangler(_data, _file, _mainInstance) {
-
-        var self = this;
-        self.data = _data;
-        self.file = _file;
-        self.delimiter = {};
-        self.mainInstance = _mainInstance;
-        self.idColumn = 0; //todo: this variable will indicate the column row in the data, need to guess automatically
-        self.idRow = 0; //todo: this will indicate the row identification in the table
-
-
-        //clean all the previous content on the separator modal
-        self.clean();
-
-        //call the initialize function
-        self.init();
+    function DataWrangler(){
+        if(instance !== null){
+            throw new Error("Cannot instantiate more than one DataWrangler, use DataWrangler.getInstance()");
+        }
 
         // registering all the events of the check box
         // and input box on the separator modal
-        self.registerSepEvents();
+        this.registerSepEvents();
+    }
 
+    /**
+     *
+     * @returns {*}
+     */
+    DataWrangler.getInstance = function(){
+        // summary: Gets an instance of the singleton. It is better to use
+        if(instance === null){
+            instance = new DataWrangler();
+        }
+        return instance;
     };
 
+    /**
+     * Initialize the instance with the new data
+     * @param data
+     * @param file
+     * @param _mainInstance
+     */
     DataWrangler.prototype.reload = function (data, file, _mainInstance) {
 
         var self = this;
@@ -61,25 +70,10 @@ define(["jquery",
 
         var self = this;
 
-
         //now guess the separator in the file
         self.guessAndCheckDelimiter();
 
-        //todo changes should be made to new function
-        //get the selected delimiter from the separator modal
-        /*self.getDelimiter();
-
-         //this data
-         var text = self.data;
-         var dsv = d3.dsv(self.delimiter, "text/plain");
-         self.importedData = dsv.parseRows(text);*/
-
-
         self.saveClicked();
-
-        //this will open the modal with the file details in it
-        //$("#separatorModal").modal('show');
-
     };
 
     /**
@@ -106,7 +100,6 @@ define(["jquery",
     DataWrangler.prototype.registerSepEvents = function () {
 
         var self = this;
-
 
         // registering all the events of the
         // check box and input box on the separator
@@ -234,6 +227,10 @@ define(["jquery",
 
     }
 
+    /**
+     * this function will change the global delimiter
+     * with the change made on the ui
+     */
     DataWrangler.prototype.getDelimiter = function () {
 
         var self = this;
@@ -294,22 +291,15 @@ define(["jquery",
          *  5. Finally send the data to the table creation
          */
 
-            //self.sliceRowId();    //todo - auto guess - currently guessing that the first row is column id
+        //self.sliceRowId();    //todo - auto guess - currently guessing that the first row is column id
         self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
         self.formColumn();      //working
         self.guessDataType();   //working
 
-        // requireJS will ensure that the DataWrangler definition is available
+        // requireJS will ensure that the Table definition is available
         // to use, we can now import it for use.
-        var Table = require('table');
-
-        //this will keep only one instance of the table class
-        if (!self.table) {
-            self.table = new Table(self.allColumnsDataArray, self);
-        }
-        else {
-            self.table.reload(self.allColumnsDataArray, self);
-        }
+        self.table = require('table');
+        self.table.reload(self.allColumnsDataArray, self);
     }
 
     /**
@@ -333,7 +323,7 @@ define(["jquery",
         });
     }
 
-//todo
+    //todo
     DataWrangler.prototype.sliceColId = function () {
         var self = this;
 
@@ -350,7 +340,7 @@ define(["jquery",
     }
 
 
-//this will form each column data
+    //this will form each column data
     DataWrangler.prototype.formColumn = function () {
 
         var self = this;
@@ -569,5 +559,5 @@ define(["jquery",
 
     }
 
-    return DataWrangler;
+    return DataWrangler.getInstance();
 });
