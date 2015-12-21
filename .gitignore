@@ -1,0 +1,10 @@
+.idea/
+bower_components/
+*.log
+*.pot
+*.pyc
+*.swp
+*.lock
+*.map
+*.css
+*.js
