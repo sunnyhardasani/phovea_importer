@@ -18,12 +18,12 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": null,
-    "colorbrewer": null,
-    "d3-tip": null,
-    "jquery-resizable-columns": null,
+    "bootstrap": "~3.3.6",
+    "colorbrewer": "~1.0.0",
+    "d3-tip": "~0.6.7",
+    "jquery-resizable-columns": "~0.2.3",
     "jquery": null,
-    "store": null,
-    "requirejs": null
+    "store": "~2.3.2",
+    "requirejs": "~2.1.22"
   }
 }
