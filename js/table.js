@@ -208,6 +208,10 @@ define(["jquery",
         self.updatePagination();
     }
 
+    /**
+     * this function will create the data type box
+     * @param colId
+     */
     Table.prototype.createDataTypeBox = function (colId) {
         var self = this;
 
@@ -232,6 +236,10 @@ define(["jquery",
 
     }
 
+    /**
+     * this fucntion will create the color box
+     * which appear on click of the bar graph
+     */
     Table.prototype.createColorBox = function () {
         var self = this;
 
@@ -246,6 +254,7 @@ define(["jquery",
                 return d.key;
             });
     }
+
     /**
      * this function will print the charts
      */

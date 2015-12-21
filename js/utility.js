@@ -1,14 +1,23 @@
 /**
- * Created by Sunny Hardasani on 10/13/2015.
- */
+* Created by Sunny Hardasani on 10/13/2015.
+*/
 
 // to be moved to some other files having constant
 var MIN_VALUE = 9999999999;
 var MAX_VALUE = -9999999999;
 var RATIO = 0.65;
 var INITIAL_START_BYTE = 0;
-var INITIAL_END_BYTE = 1024*10*10;
+var INITIAL_END_BYTE = 1024 * 10 * 10;
 var DISPLAY_ROW_COUNT = 14;
+
+//defination of the variables
+var DATATYPE_STRING = "string";
+var DATATYPE_NOMINAL = "nominal";
+var DATATYPE_NUMERICAL = "numerical";
+var DATATYPE_ORDINAL = "ordinal";
+var DATATYPE_ERROR = "error";
+
+var TOTAL_STRAT_COUNT = 15;
 
 // getElementById
 function $id(id) {
@@ -31,12 +40,10 @@ function Output(msg) {
  * this function will return an array of delimiter found in the string
  * @param text
  */
-function returnAllDelimiter(text)
-{
+function returnAllDelimiter(text) {
     //considering following delimiter in the string
-    var delimiter = [",",";"," ","\t"];
+    var delimiter = [",", ";", " ", "\t"];
 }
-
 
 
 // ref: http://stackoverflow.com/questions/1293147/javascript-code-to-parse-csv-data
@@ -44,7 +51,7 @@ function returnAllDelimiter(text)
 // This will parse a delimited string into an array of
 // arrays. The default delimiter is the comma, but this
 // can be overriden in the second argument.
-function CSVToArray( strData, strDelimiter ){
+function CSVToArray(strData, strDelimiter) {
     // Check to see if the delimiter is defined. If not,
     // then default to comma.
     strDelimiter = (strDelimiter || ",");
@@ -76,21 +83,21 @@ function CSVToArray( strData, strDelimiter ){
 
     // Keep looping over the regular expression matches
     // until we can no longer find a match.
-    while (arrMatches = objPattern.exec( strData )){
+    while (arrMatches = objPattern.exec(strData)) {
 
         // Get the delimiter that was found.
-        var strMatchedDelimiter = arrMatches[ 1 ];
+        var strMatchedDelimiter = arrMatches[1];
 
         // Check to see if the given delimiter has a length
         // (is not the start of string) and if it matches
         // field delimiter. If id does not, then we know
         // that this delimiter is a row delimiter.
-        if ( strMatchedDelimiter.length &&
-             strMatchedDelimiter !== strDelimiter ){
+        if (strMatchedDelimiter.length &&
+            strMatchedDelimiter !== strDelimiter) {
 
             // Since we have reached a new row of data,
             // add an empty row to our data array.
-            arrData.push( [] );
+            arrData.push([]);
         }
 
         var strMatchedValue;
@@ -98,34 +105,25 @@ function CSVToArray( strData, strDelimiter ){
         // Now that we have our delimiter out of the way,
         // let's check to see which kind of value we
         // captured (quoted or unquoted).
-        if (arrMatches[ 2 ]){
+        if (arrMatches[2]) {
 
             // We found a quoted value. When we capture
             // this value, unescape any double quotes.
-            strMatchedValue = arrMatches[ 2 ].replace(
-                new RegExp( "\"\"", "g" ),
+            strMatchedValue = arrMatches[2].replace(
+                new RegExp("\"\"", "g"),
                 "\""
             );
 
         } else {
             // We found a non-quoted value.
-            strMatchedValue = arrMatches[ 3 ];
+            strMatchedValue = arrMatches[3];
         }
 
         // Now that we have our value string, let's add
         // it to the data array.
-        arrData[ arrData.length - 1 ].push( strMatchedValue );
+        arrData[arrData.length - 1].push(strMatchedValue);
     }
 
     // Return the parsed data.
-    return( arrData );
+    return ( arrData );
 }
-
-//defination of the variables
-var DATATYPE_STRING     = "string";
-var DATATYPE_NOMINAL    = "nominal";
-var DATATYPE_NUMERICAL  = "numerical";
-var DATATYPE_ORDINAL    = "ordinal";
-var DATATYPE_ERROR      = "error";
-
-var TOTAL_STRAT_COUNT = 15;

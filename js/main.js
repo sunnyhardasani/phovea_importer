@@ -27,6 +27,4 @@ define(["require","utility","fileUploader","fileConfiguration"],function (requir
     //machines
     this.fileConfigurationIns.init();
 
-    //todo need to move to the proper function
-
 });
