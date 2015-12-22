@@ -1,7 +1,17 @@
-define(["jquery", "dataWrangler"],
-    function ($,dataWrangler) {
+/**
+ * This class is responsible for file uploading
+ * to the application either through drag and
+ * drop or through select file.
+ */
+
+define(["jquery", "dataWrangler","utility/localSettings"],
+    function ($,dataWrangler,settings) {
 
     "use strict";
+
+    var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
+    var INITIAL_END_BYTE = settings.localSettings().INITIAL_END_BYTE;
+
 
     //singleton instance of the class
     var instance = null;
@@ -17,7 +27,16 @@ define(["jquery", "dataWrangler"],
         }
     }
 
-    /**
+    // getElementById - helper function
+    function $id(id) {
+        return document.getElementById(id);
+    }
+
+    /*var INITIAL_START_BYTE = 0;
+    var INITIAL_END_BYTE = 1024 * 10 * 10;*/
+
+
+        /**
      * This function returns instance of the class
      * @returns {*}
      */

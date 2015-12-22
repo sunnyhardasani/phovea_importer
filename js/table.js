@@ -4,12 +4,18 @@
 
 define(["jquery", "d3", "d3-tip", "colorbrewer",
         "jquery-resizable-columns", "fileConfiguration",
-        "stringOperations"],
+        "stringOperations","utility/localSettings"],
     function ($, d3, d3Tip, colorbrewer,
               jqueryResizableColumns, fileConfiguration,
-              stringOperations) {
+              stringOperations,settings) {
 
-    //console.log(jqueryResizableColumns);
+    //defination of the variables
+    var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
+    var DATATYPE_NOMINAL = settings.localSettings().DATATYPE_NOMINAL;
+    var DATATYPE_NUMERICAL = settings.localSettings().DATATYPE_NUMERICAL;
+    var DATATYPE_ORDINAL = settings.localSettings().DATATYPE_ORDINAL;
+    var DATATYPE_ERROR = settings.localSettings().DATATYPE_ERROR;
+    var DISPLAY_ROW_COUNT = settings.localSettings().DISPLAY_ROW_COUNT;
 
     //instance of the class
     var instance = null;
@@ -136,7 +142,6 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
 
         }
 
-        console.log(d3);
         var pagination = d3.select("#paginate").selectAll(".pagination");
         var page = pagination.selectAll("li").data(pageData);
 

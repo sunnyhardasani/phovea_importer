@@ -11,12 +11,8 @@ requirejs.config({
 });
 
 define(["require",
-        "jquery",
-        "colorbrewer",
-        "d3-tip",
         "fileUploader",
-        "fileConfiguration",
-        "utility"],
+        "fileConfiguration"],
 
     function (require,fileUploader,fileConfiguration) {
 

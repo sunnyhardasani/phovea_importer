@@ -1,5 +1,18 @@
-define(["jquery", "d3", "table"],
-        function ($,d3,table) {
+define(["jquery", "d3", "table","utility/localSettings"],
+        function ($,d3,table,settings) {
+
+    // default values
+    var MIN_VALUE = settings.localSettings().MIN_VALUE;
+    var MAX_VALUE = settings.localSettings().MAX_VALUE;
+    var RATIO = settings.localSettings().RATIO;
+    var TOTAL_STRAT_COUNT = settings.localSettings().TOTAL_STRAT_COUNT;
+
+    // defination of the variables
+    var DATATYPE_STRING =  settings.localSettings().DATATYPE_STRING;
+    var DATATYPE_NOMINAL =  settings.localSettings().DATATYPE_NOMINAL;
+    var DATATYPE_NUMERICAL =  settings.localSettings().DATATYPE_NUMERICAL;
+    var DATATYPE_ORDINAL =  settings.localSettings().DATATYPE_ORDINAL;
+    var DATATYPE_ERROR =  settings.localSettings().DATATYPE_ERROR;
 
     //initialize the instance with the null
     var instance = null;
@@ -21,7 +34,8 @@ define(["jquery", "d3", "table"],
     }
 
     /**
-     *
+     * this function will return the instance of
+     * the class
      * @returns {*}
      */
     DataWrangler.getInstance = function(){
@@ -31,6 +45,11 @@ define(["jquery", "d3", "table"],
         }
         return instance;
     };
+
+    // getElementById - helper function
+    function $id(id) {
+        return document.getElementById(id);
+    }
 
     /**
      * Initialize the instance with the new data

@@ -7,7 +7,6 @@ legend {
   font-weight: bold;
 }
 
-
 img {
   max-width: 100%;
 }
@@ -25,7 +24,6 @@ pre {
   overflow: auto;
 }
 
-
 table {
   table-layout: fixed;
   width: 100%;
@@ -38,12 +36,10 @@ table {
   }
 }
 
-
 line {
   stroke: #ccc;
   shape-rendering: crispEdges;
 }
-
 
 .bar {
   fill: orange;
@@ -77,7 +73,6 @@ line {
   }
 }
 
-
 .right {
   position: absolute;
   right: 0px;
@@ -94,8 +89,6 @@ line {
   overflow: hidden;
   background: white;
 }
-
-
 
 .allcolor {
   background: white;
@@ -124,11 +117,9 @@ ul.pagination {
   margin: 0;
 }
 
-
 .glyphicon.glyphicon-folder-open {
   font-size: 40px;
 }
-
 
 /* Add padding and border to inner content
 for better animation effect */

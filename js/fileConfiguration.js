@@ -147,7 +147,11 @@ define(["jquery","d3"],
         //todo make it using exit and remove
         d3.select("#recentFiles").selectAll("*").remove();
 
-        var recentFiles = d3.select("#recentFiles").style("width","400px").style("overflow","auto").selectAll("#file");
+        var recentFiles = d3.select("#recentFiles")
+                            .style("width","400px")
+                            .style("overflow","auto")
+                            .selectAll("#file");
+
         var fileDivs  = recentFiles.data(self.localJSONData)
                             .enter().append("div")
                             .style("float","left")
