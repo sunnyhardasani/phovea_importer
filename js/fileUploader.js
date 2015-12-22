@@ -1,10 +1,5 @@
-define(["jquery",
-    "d3",
-    "d3-tip",
-    "colorbrewer",
-    "dataWrangler",
-    "table",
-    "jquery-resizable-columns"],function () {
+define(["jquery", "dataWrangler"],
+    function ($,dataWrangler) {
 
     "use strict";
 
@@ -94,7 +89,8 @@ define(["jquery",
     };
 
     /**
-     *
+     *  this function will read the next frame when the
+     *  pagination reaches one of the last pages
      */
     FileUploader.prototype.streamNextFrame = function(){
         var self = this;

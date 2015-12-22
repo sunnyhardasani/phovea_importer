@@ -2,15 +2,14 @@
  * Created by Sunny Hardasani on 13/10/2015
  */
 
-define(["jquery",
-        "d3",
-        "d3-tip",
-        "colorbrewer",
-        "dataWrangler",
-        "table",
-        "jquery-resizable-columns",
-        "fileConfiguration",
-        "stringOperations"],function () {
+define(["jquery", "d3", "d3-tip", "colorbrewer",
+        "jquery-resizable-columns", "fileConfiguration",
+        "stringOperations"],
+    function ($, d3, d3Tip, colorbrewer,
+              jqueryResizableColumns, fileConfiguration,
+              stringOperations) {
+
+    //console.log(jqueryResizableColumns);
 
     //instance of the class
     var instance = null;
@@ -137,6 +136,7 @@ define(["jquery",
 
         }
 
+        console.log(d3);
         var pagination = d3.select("#paginate").selectAll(".pagination");
         var page = pagination.selectAll("li").data(pageData);
 

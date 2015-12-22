@@ -2,15 +2,8 @@
 // JSON Output File to handle output from the class //
 //////////////////////////////////////////////////////
 
-define(["jquery",
-    "d3",
-    "d3-tip",
-    "colorbrewer",
-    "dataWrangler",
-    "table",
-    "jquery-resizable-columns",
-    "fileConfiguration",
-    "stringOperations"],function () {
+define(["jquery","d3"],
+        function ($,d3) {
 
 
     // class instance initialized to null

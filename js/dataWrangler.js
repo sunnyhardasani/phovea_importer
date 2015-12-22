@@ -1,11 +1,5 @@
-define(["jquery",
-        "d3",
-        "d3-tip",
-        "colorbrewer",
-        "dataWrangler",
-        "table",
-        "jquery-resizable-columns",
-        "stringOperations"],function () {
+define(["jquery", "d3", "table"],
+        function ($,d3,table) {
 
     //initialize the instance with the null
     var instance = null;

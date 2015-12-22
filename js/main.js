@@ -10,7 +10,15 @@ requirejs.config({
     }
 });
 
-define(["require","utility","fileUploader","fileConfiguration"],function (require) {
+define(["require",
+        "jquery",
+        "colorbrewer",
+        "d3-tip",
+        "fileUploader",
+        "fileConfiguration",
+        "utility"],
+
+    function (require,fileUploader,fileConfiguration) {
 
     // requireJS will ensure that the FileUploader, FileConfiguration definition is available
     // to use, we can now import it for use.
