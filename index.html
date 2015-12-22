@@ -14,28 +14,25 @@
 
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-<body style="height: auto;">
+<body>
 
     <div id="file-config" class="box">
         <div class="box-inner">
-            <div>
-                <!--<div id="close-configuration-window" style="text-align:right;">
-                    <img src="img/CloseWindow.png">
-                </div>-->
-
-            </div>
+            <div></div>
             <div>
                 <div id="ribbon">
-                    <div id="fileHandler"  style="height: 40px;">
+                    <div id="fileHandler">
                         <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
                             <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
                             <!--todo copy this icon to local folder-->
-                            <label for="fileselect"><span class="glyphicon glyphicon-folder-open"></span><!--<img src="/Importer/img/add_file.png" width="40" height="40">--></label>
-                            <input type="file" id="fileselect" style="display: none" />
+                            <label for="fileselect">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </label>
+                            <input type="file" id="fileselect"/>
                         </form>
                     </div>
-                    <div style="/*position: relative; */">
-                        <div id="filedrag" style="border: solid; width: 500px; height: 70px;">
+                    <div>
+                        <div id="filedrag">
                             or drop file here
                         </div>
                         <div id="submitbutton">
@@ -51,19 +48,13 @@
                         <input id="tab" type="radio" name="sep" value="tab">tab
                         <input id="semicolon" type="radio" name="sep" value="semicolon">semicolon
                         &nbsp; or &nbsp; others
-                        <input id="any" type="text" name="sep" style="width:30px; ">
+                        <input id="any" type="text" name="sep">
                     </div>
                 </div>
             </div>
             <div id = "save-current-conf">
                 <button id="save-conf-button"> Save Current Configuration</button>
             </div>
-           <!-- <div id="par-json-output">
-                <div>JSON Output</div>
-                <div id="json-output"  style="overflow: auto; width: 500px; height: 150px; border: solid; border-width: thin;">
-
-                </div>
-            </div>-->
             <div>
                 <h5>Most Recent Files</h5>
                 <div id = "recentFiles">
@@ -76,30 +67,29 @@
         <div id="open-configuration-window">
             &nbsp;&nbsp;&nbsp;
             <img src="http://caleydo.github.io/assets/images/logos/caleydo_c.svg" width="50" height="50">
-            <span style="font-size: large; color: white"><strong>Caleydo Importer</strong></span>
+            <span id="head-label"><strong>Caleydo Importer</strong></span>
         </div>
     </div>
 
-    <div class="container-fluid" style="border-width: thin; height: 100%;" >
-        <div id="main" class="row" style="margin-top: 20px;border-width: thin;  /*height: 600px;*/ padding: 0;">
-            <div id="table-group" class="col-md-12" style="align:left;">
-                <div id="importedTable" class="col-md-12" style="/*border: dashed;*/ border-width: thin;  /*height: 550px; */overflow: auto ">
-
+    <div class="container-fluid">
+        <div id="main" class="row">
+            <div id="table-group" class="col-md-12">
+                <div id="importedTable" class="col-md-12">
                 </div>
-                <div id="paginate" class="col-md-12 text-center" style="/*border: dashed;*/ border-width: thin;  height: 50px; ">
+                <div id="paginate" class="col-md-12 text-center">
                     <ul class="pagination">
                     </ul>
                 </div>
             </div>
-            <div id = "operations" class="col-md-2 hidden"  style="border: dashed; border-width: thin; /*height: 550px;*/">
+            <div id = "operations" class="col-md-2 hidden">
                 <!--todo copy this gif to local folder-->
-                <div id="string-opr-menu" style="text-align:right;">
+                <div id="string-opr-menu">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </div>
-                <div style="background-color: lightgrey">
+                <div id="data-operations">
                     <h5><strong>Data Operations</strong></h5>
                 </div>
-                <div style="height: 200px;/* border: dashed; border-width: thin;padding: 0;*/ overflow: auto">
+                <div id="semis-wrapper">
                     <svg id = "semis">
 
                     </svg>
@@ -110,18 +100,18 @@
                     <input id="new-col-name" type="text" onfocus="if(this.value == 'Column-1') { this.value = ''; }" value="Column-1" />
                     <br>
                     <strong>Select elements to form new category:</strong>
-                    <div id="elements-selected" style="height: 100px;/* border: dashed; border-width: thin;padding: 0;*/ overflow: auto; font-size: small; background-color: lightgoldenrodyellow">
+                    <div id="elements-selected">
 
                     </div>
-                    <div id="operator" style="font-size: small">
+                    <div id="operator">
                         <input type="checkbox" name="selected-category" checked>Mark remaining as others<br>
-                        <button id="button-new-category" type="button" style="background-color: #1b6d85; color: white">Create new category</button>
+                        <button id="button-new-category" type="button">Create new category</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="footer" class="row" style="/*background: #843534;*/ /*border: dashed;*/ border-width: thin; ">
-            <div id="footer-col" class="col-md-12" style="/*border: dashed;*/ border-width: thin; height: 50px; ">
+        <div id="footer" class="row">
+            <div id="footer-col" class="col-md-12">
                 <!--footer-->
             </div>
         </div>

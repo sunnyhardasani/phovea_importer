@@ -7,27 +7,6 @@ legend {
   font-weight: bold;
 }
 
-#fileHandler {
-  height: 1000px;
-}
-
-#filedrag {
-  /* display: none;*/
-  font-weight: bold;
-  text-align: center;
-  padding: 1em 0;
-  margin: 1em 0;
-  color: #555;
-  border-radius: 7px;
-  cursor: default;
-  height: 100%;
-  &.hover {
-    color: #f00;
-    border-color: #f00;
-    border-style: solid;
-    box-shadow: inset 0 3px 4px #888;
-  }
-}
 
 img {
   max-width: 100%;
@@ -46,33 +25,6 @@ pre {
   overflow: auto;
 }
 
-#messages {
-  padding: 0 10px;
-  margin: 1em 0;
-  border: 1px solid #999;
-}
-
-#progress p {
-  display: block;
-  width: 240px;
-  padding: 2px 5px;
-  margin: 2px 0;
-  border: 1px inset #446;
-  border-radius: 5px;
-  background: #eee/* url("progress.png")*/ 100% 0 repeat-y;
-  &.success {
-    background: #0c0 none 0 0 no-repeat;
-  }
-  &.failed {
-    background: #c00 none 0 0 no-repeat;
-  }
-}
-
-#localConsole {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-}
 
 table {
   table-layout: fixed;
@@ -85,6 +37,13 @@ table {
     text-overflow: ellipsis;
   }
 }
+
+
+line {
+  stroke: #ccc;
+  shape-rendering: crispEdges;
+}
+
 
 .bar {
   fill: orange;
@@ -118,26 +77,6 @@ table {
   }
 }
 
-/* Creates a small triangle extender for the tooltip */
-
-/* Style northward tooltips differently */
-
-.numerical-bar {
-  fill: #c2c2c2;
-  -webkit-transition: fill 0.3s;
-  -moz-transition: fill 0.3s;
-  -o-transition: fill 0.3s;
-  -ms-transition: fill 0.3s;
-  transition: fill 0.3s;
-  &:hover {
-    fill: #777;
-  }
-}
-
-line {
-  stroke: #ccc;
-  shape-rendering: crispEdges;
-}
 
 .right {
   position: absolute;
@@ -156,30 +95,7 @@ line {
   background: white;
 }
 
-/* Add padding and border to inner content
-for better animation effect */
 
-.box-inner {
-  width: 1000px;
-  height: 800px;
-  padding: 10px;
-  /*border: 1px solid #a29415;*/
-}
-
-/* HOVER STYLES */
-
-div#colorbox-pop-up {
-  display: none;
-  position: absolute;
-  width: 218px;
-  height: 185px;
-  padding: 10px;
-  background: white;
-  color: #000000;
-  border: 1px solid #1a1a1a;
-  font-size: 90%;
-  /*overflow-y: auto;*/
-}
 
 .allcolor {
   background: white;
@@ -202,6 +118,190 @@ div#colorbox-pop-up {
   height: 4px;
 }
 
+ul.pagination {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+
+.glyphicon.glyphicon-folder-open {
+  font-size: 40px;
+}
+
+
+/* Add padding and border to inner content
+for better animation effect */
+
+.box-inner {
+  width: 1000px;
+  height: 800px;
+  padding: 10px;
+  /*border: 1px solid #a29415;*/
+}
+
+/* Creates a small triangle extender for the tooltip */
+/* Style northward tooltips differently */
+
+.numerical-bar {
+  fill: #c2c2c2;
+  -webkit-transition: fill 0.3s;
+  -moz-transition: fill 0.3s;
+  -o-transition: fill 0.3s;
+  -ms-transition: fill 0.3s;
+  transition: fill 0.3s;
+  &:hover {
+    fill: #777;
+  }
+}
+
+
+#fileHandler {
+  height: 40px;
+}
+
+#fileselect {
+  display: none;
+}
+
+#any {
+  width: 30px;
+}
+
+#container-fluid {
+  border-width: thin;
+  height: 100%;
+}
+
+#main {
+  margin-top: 20px;
+  border-width: thin;
+  padding: 0;
+}
+
+#table-group {
+  align: left;
+}
+
+#importedTable {
+  border-width: thin;
+  overflow: auto;
+}
+
+#operations {
+  border: dashed;
+  border-width: thin;
+}
+
+#string-opr-menu {
+  text-align: right;
+}
+
+#data-operations {
+  background-color: lightgrey;
+}
+
+#semis-wrapper {
+  height: 200px;
+  overflow: auto;
+}
+
+#elements-selected {
+  height: 100px;
+  overflow: auto;
+  font-size: small;
+  background-color: lightgoldenrodyellow;
+}
+
+#operator {
+  font-size: small;
+}
+
+#button-new-category {
+  background-color: #1b6d85;
+  color: white;
+}
+
+#footer {
+  border-width: thin;
+}
+
+#footer-col {
+  border-width: thin;
+  height: 50px;
+}
+
+#head-label {
+  font-size: large;
+  color: white;
+}
+
+#filedrag {
+  /* display: none;*/
+  border: solid;
+  width: 500px;
+  height: 70px;
+  font-weight: bold;
+  text-align: center;
+  padding: 1em 0;
+  margin: 1em 0;
+  color: #555;
+  border-radius: 7px;
+  cursor: default;
+  &.hover {
+    color: #f00;
+    border-color: #f00;
+    border-style: solid;
+    box-shadow: inset 0 3px 4px #888;
+  }
+}
+
+
+#messages {
+  padding: 0 10px;
+  margin: 1em 0;
+  border: 1px solid #999;
+}
+
+#progress p {
+  display: block;
+  width: 240px;
+  padding: 2px 5px;
+  margin: 2px 0;
+  border: 1px inset #446;
+  border-radius: 5px;
+  background: #eee 100% 0 repeat-y;
+  &.success {
+    background: #0c0 none 0 0 no-repeat;
+  }
+  &.failed {
+    background: #c00 none 0 0 no-repeat;
+  }
+}
+
+#localConsole {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+
+/* HOVER STYLES */
+
+div#colorbox-pop-up {
+  display: none;
+  position: absolute;
+  width: 218px;
+  height: 185px;
+  padding: 10px;
+  background: white;
+  color: #000000;
+  border: 1px solid #1a1a1a;
+  font-size: 90%;
+  /*overflow-y: auto;*/
+}
+
+
 div#datatype-pop-up {
   display: none;
   position: fixed;
@@ -223,13 +323,9 @@ div#datatype-pop-up {
   width: auto;
 }
 
-ul.pagination {
-  display: inline-block;
-  padding: 0;
-  margin: 0;
-}
-
 #paginate {
+  border-width: thin;
+  height: 50px;
   ul.pagination li {
     display: inline;
     a {
@@ -251,6 +347,4 @@ ul.pagination {
   }
 }
 
-.glyphicon.glyphicon-folder-open {
-  font-size: 40px;
-}
+/*# sourceMappingURL=style.css.map */
