@@ -5,7 +5,7 @@
 define(["jquery", "d3", "d3-tip", "colorbrewer",
         "jquery-resizable-columns", "fileConfiguration",
         "stringOperations","utility/localSettings"],
-    function ($, d3, d3Tip, colorbrewer,
+    function ($, d3, d3tip, colorbrewer,
               jqueryResizableColumns, fileConfiguration,
               stringOperations,settings) {
 
@@ -307,19 +307,18 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                     }))
                     .range(colorbrewer.Set1[9]);
 
-                /*var tip = d3.tip()
+                var tip = d3tip()
                  .attr('class', 'd3-tip')
                  .offset([-10, 0])
                  .html(function(d) {
                  return "Freq[&nbsp;" + d.key
                  + "&nbsp;]:  <span style='color:red'>" + d.value.value + "</span>";
-                 })*/
+                 });
 
                 var svg = d3.select(svgArea)
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-                /*svg.call(tip)*/
-                ;
+                svg.call(tip);
 
                 // The following code was contained in the callback function.
                 x.domain(d3FreMap.map(function (d) {
@@ -355,8 +354,8 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                     .attr("height", function (d) {
                         return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value));
                     })
-                    /*.on('mouseover', tip.show)
-                     .on('mouseout', tip.hide)*/
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide)
                     .style("fill", function (d) {
                         return o(d.key);
                     })
@@ -433,12 +432,12 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
 
 
                 //todo d3-tip bower error
-                /*var tip = d3.tip()
+                var tip = d3tip()
                  .attr('class', 'd3-tip')
                  .offset([-10, 0])
                  .html(function(d) {
                  return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d)+" - "+d3.max(d) + "</span><strong>]</strong>";
-                 });*/
+                 });
 
                 var vis = d3.select(svgArea)
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
@@ -446,7 +445,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                     .attr("height", height);
 
                 //todo d3-tip bower error
-                /*vis.call(tip);*/
+                vis.call(tip);
 
                 vis.selectAll("rect")
                     .data(histogram)
@@ -465,8 +464,8 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                         return y(d.y);
                     })
                     //setting up the tips
-                    /*.on('mouseover', tip.show)
-                     .on('mouseout', tip.hide)*/;
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
 
                 // bottom line
                 vis.append("svg:line")
@@ -524,7 +523,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
 
 
                     //todo - fix the d3 tip bower error
-                    /*var tip = d3.tip()
+                    var tip = d3tip()
                      .attr('class', 'd3-tip')
                      .offset([-10, 0])
                      .html(function (d, i) {
@@ -533,7 +532,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                      return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : </strong> <span style='color:red'>" + d.y + "</span><strong></strong>";
 
                      return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
-                     });*/
+                     });
 
                     var vis = d3.select(svgArea)
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
@@ -541,7 +540,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                         .attr("height", height);
 
                     //todo d3-tip error bower error
-                    /*vis.call(tip);*/
+                    vis.call(tip);
 
                     vis.selectAll("rect")
                         .data(histogram)
@@ -565,8 +564,8 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                         })
 
                         //setting up the tips
-                        /*.on('mouseover', tip.show)
-                         .on('mouseout', tip.hide)*/;
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide);
                 }
                 else {
 
@@ -599,7 +598,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                         })])
                         .range([0, height]);
 
-                    /*var tip = d3.tip()
+                    var tip = d3tip()
                      .attr('class', 'd3-tip')
                      .offset([-10, 0])
                      .html(function (d, i) {
@@ -608,14 +607,14 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                      return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : </strong> <span style='color:red'>" + d.y + "</span><strong></strong>";
 
                      return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
-                     });*/
+                     });
 
                     var vis = d3.select(svgArea)
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                         .attr("width", width)
                         .attr("height", height);
 
-                    /*vis.call(tip);*/
+                    vis.call(tip);
 
                     vis.selectAll("rect")
                         .data(histogram)
@@ -639,8 +638,8 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                         })
 
                         //setting up the tips
-                        /*.on('mouseover', tip.show)
-                         .on('mouseout', tip.hide)*/;
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide);
                 }
             }
         }

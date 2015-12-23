@@ -6,12 +6,10 @@
 
 define(["jquery", "dataWrangler","utility/localSettings"],
     function ($,dataWrangler,settings) {
-
     "use strict";
 
     var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
     var INITIAL_END_BYTE = settings.localSettings().INITIAL_END_BYTE;
-
 
     //singleton instance of the class
     var instance = null;
@@ -139,14 +137,14 @@ define(["jquery", "dataWrangler","utility/localSettings"],
                 var data;
                 self.file_data =  evt.target.result;
 
-                //read data line by line
+                // read data line by line
                 if(self.file_data.lastIndexOf("\n")>0) {
                     data = self.file_data.substring(0, self.file_data.lastIndexOf("\n"));
                 } else {
                     data = self.file_data;
                 }
 
-                //todo move this call to much better place
+                // todo move this call to much better place
                 $("#main").toggle();
                 $(".box").toggle();
 
@@ -154,6 +152,8 @@ define(["jquery", "dataWrangler","utility/localSettings"],
                 // is available to use, we can now import it for use.
                 self.dataWrangler = require('dataWrangler');
                 self.dataWrangler.reload(data, file, self);
+
+
             }
         };
 
