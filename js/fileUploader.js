@@ -30,11 +30,8 @@ define(["jquery", "dataWrangler","utility/localSettings"],
         return document.getElementById(id);
     }
 
-    /*var INITIAL_START_BYTE = 0;
-    var INITIAL_END_BYTE = 1024 * 10 * 10;*/
 
-
-        /**
+    /**
      * This function returns instance of the class
      * @returns {*}
      */
@@ -67,7 +64,7 @@ define(["jquery", "dataWrangler","utility/localSettings"],
         // file select
         fileselect.addEventListener("change", self.fileSelectHandler.bind(self), false);
 
-        // is XHR2 available?
+        // is XHR2 available
         var xhr = new XMLHttpRequest();
         if (xhr.upload) {
 
@@ -145,15 +142,13 @@ define(["jquery", "dataWrangler","utility/localSettings"],
                 }
 
                 // todo move this call to much better place
-                $("#main").toggle();
+                /*$("#main").toggle();*/
                 $(".box").toggle();
 
                 // requireJS will ensure that the DataWrangler definition
                 // is available to use, we can now import it for use.
                 self.dataWrangler = require('dataWrangler');
                 self.dataWrangler.reload(data, file, self);
-
-
             }
         };
 

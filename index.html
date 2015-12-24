@@ -14,11 +14,9 @@
         <div class="container-fluid">
             <div id="main" class="row">
                 <div id="table-group" class="col-md-12">
-                    <div id="importedTable" class="col-md-12">
-                    </div>
+                    <div id="importedTable" class="col-md-12"></div>
                     <div id="paginate" class="col-md-12 text-center">
-                        <ul class="pagination">
-                        </ul>
+                        <ul class="pagination"></ul>
                     </div>
                 </div>
                 <div id="operations" class="col-md-2 hidden">
@@ -50,19 +48,6 @@
                     </div>
                 </div>
             </div>
-            <div id="colorbox-pop-up">
-                <!--<p>
-                    This div only appears when the trigger link is hovered over.
-                    Otherwise it is hidden from view.
-                </p>-->
-            </div>
-            <div id="datatype-pop-up">
-
-                <input type="radio" name="datatype" value="string"> String <br>
-                <input type="radio" name="datatype" value="nominal"> Nominal <br>
-                <input type="radio" name="datatype" value="ordinal"> Ordinal <br>
-                <input type="radio" name="datatype" value="numerical"> Numerical <br>
-            </div>
         </div>
     </template>
 
@@ -72,7 +57,11 @@
         /*todo temporary loading of template need to fixed
         by placing at the proper location*/
         window.onload = function() {
-            var xfoo1 = document.createElement('x-importer-template')
+            var xfoo1 = document.createElement('x-importer-template');
+
+            //todo following call needs to be modified like
+            // document.queryselector("#someElement").appendChild()
+            //using javascript currently following call will work
             document.body.appendChild(xfoo1);
         }
     </script>
@@ -133,5 +122,17 @@
         </div>
     </div>
 
+    <div id="colorbox-pop-up">
+        <!--<p>
+            This div only appears when the trigger link is hovered over.
+            Otherwise it is hidden from view.
+        </p>-->
+    </div>
+    <div id="datatype-pop-up">
+        <input type="radio" name="datatype" value="string"> String <br>
+        <input type="radio" name="datatype" value="nominal"> Nominal <br>
+        <input type="radio" name="datatype" value="ordinal"> Ordinal <br>
+        <input type="radio" name="datatype" value="numerical"> Numerical <br>
+    </div>
 </body>
 </html>

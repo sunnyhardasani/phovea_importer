@@ -10,12 +10,12 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
               stringOperations,settings) {
 
     //defination of the variables
-    var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
-    var DATATYPE_NOMINAL = settings.localSettings().DATATYPE_NOMINAL;
-    var DATATYPE_NUMERICAL = settings.localSettings().DATATYPE_NUMERICAL;
-    var DATATYPE_ORDINAL = settings.localSettings().DATATYPE_ORDINAL;
-    var DATATYPE_ERROR = settings.localSettings().DATATYPE_ERROR;
-    var DISPLAY_ROW_COUNT = settings.localSettings().DISPLAY_ROW_COUNT;
+    var DATATYPE_STRING     =   settings.localSettings().DATATYPE_STRING;
+    var DATATYPE_NOMINAL    =   settings.localSettings().DATATYPE_NOMINAL;
+    var DATATYPE_NUMERICAL  =   settings.localSettings().DATATYPE_NUMERICAL;
+    var DATATYPE_ORDINAL    =   settings.localSettings().DATATYPE_ORDINAL;
+    var DATATYPE_ERROR      =   settings.localSettings().DATATYPE_ERROR;
+    var DISPLAY_ROW_COUNT   =   settings.localSettings().DISPLAY_ROW_COUNT;
 
     //instance of the class
     var instance = null;
@@ -25,9 +25,14 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
      * @constructor
      */
     function Table(){
+        var self = this;
+
         if(instance !== null){
             throw new Error("Cannot instantiate more than one Table, use Table.getInstance()");
         }
+
+        //todo this will be updated by taking the constructor parameter
+        self.parentElementName = "x-importer-template";
     }
 
     /**
@@ -82,10 +87,10 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
         self.printCharts();
 
         //this will set on resizable columns
-        $("table").resizableColumns(); //todo to start resizable columns
-        $("#string-opr-menu > img").click(function () {
-            $('#table-group').attr("class", "col-md-12");
-            $('#operations').attr("class", "col-md-0 hidden");
+        $(self.ParentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
+        $(self.ParentElementName + " " + "#string-opr-menu > span").click(function () {
+            $(self.ParentElementName + " " + '#table-group').attr("class", "col-md-12");
+            $(self.ParentElementName + " " + '#operations').attr("class", "col-md-0 hidden");
         });
 
         // requireJS will ensure that the DataWrangler definition is available
@@ -142,7 +147,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
 
         }
 
-        var pagination = d3.select("#paginate").selectAll(".pagination");
+        var pagination = d3.select(self.ParentElementName + " " + "#paginate").selectAll(".pagination");
         var page = pagination.selectAll("li").data(pageData);
 
         page.enter()
@@ -236,7 +241,9 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
                 //self.parentInstance.changeDataType(colId,DATATYPE_ORDINAL);
             }
 
+            console.log($('#datatype-pop-up'));
             $('#datatype-pop-up').hide();
+
         });
 
     }
@@ -274,7 +281,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
             var dataType = dataTypeObj.type;
 
             //add the printing logic per column
-            var svgArea = "#svg-col-" + (col.id - 1);
+            var svgArea = self.ParentElementName + " " + "#svg-col-" + (col.id - 1);
             var temp = svgArea;
             var margin = {top: 5, right: 5, bottom: 0, left: 5},
                 width = 150 - margin.left - margin.right,
@@ -664,7 +671,7 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
         }
         var tableWidth = ind * 150;
 
-        self.table = d3.select("#importedTable").append("table")
+        self.table = d3.select(self.ParentElementName + " " + "#importedTable").append("table")
             .attr("id", "data-table")
             .style("border-collapse", "collapse")
             .style("border", "1px black solid")
@@ -712,6 +719,8 @@ define(["jquery", "d3", "d3-tip", "colorbrewer",
             .on("dblclick", function (d) { // todo move this in the separate function
 
                 self.createDataTypeBox(d.id - 1);
+                console.log(d3.event.pageY);
+                console.log($('#datatype-pop-up'));
 
                 $('#datatype-pop-up')
                     .show()
