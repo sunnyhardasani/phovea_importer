@@ -6,15 +6,17 @@ requirejs.config({
         "colorbrewer": "../bower_components/colorbrewer/colorbrewer",
         "d3-tip": "../bower_components/d3-tip/index",
         "jquery-resizable-columns": "../bower_components/jquery-resizable-columns/dist/jquery.resizableColumns.min",
-        "store": "../bower_components/store/store.min"
+        "store": "../bower_components/store/store.min",
+        "load-component":"utility/loadComponent"
     }
 });
 
 define(["require",
         "fileUploader",
-        "fileConfiguration"],
+        "fileConfiguration",
+        "load-component"],
 
-    function (require,fileUploader,fileConfiguration) {
+    function (require,fileUploader,fileConfiguration,loadComponent) {
 
     // requireJS will ensure that the FileUploader, FileConfiguration definition is available
     // to use, we can now import it for use.
