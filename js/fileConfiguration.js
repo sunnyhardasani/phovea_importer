@@ -105,9 +105,10 @@ define(["jquery","d3"],
         var self = this;
 
         //get current table data from the table javascript
+        var table = require('table');
 
         //convert the table data to the json output format
-        self.outFileData.columns = self.loadData(self.tempData); //todo this will take the data from the table
+        self.outFileData.columns = self.loadData(table.getData()); //todo this will take the data from the table
 
         //push the new file data to the local json dat  a
         self.localJSONData.push(self.outFileData);
