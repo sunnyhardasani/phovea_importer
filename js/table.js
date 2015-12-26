@@ -428,7 +428,6 @@ define(["jquery", "d3", "d3-tip",
                                 var keys = Object.keys(colorbrewer["ordinalScale"][d.key]);
                                 var lastKey = keys[keys.length - 1];
 
-                                console.log("selected", colId);
 
                                 self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
 

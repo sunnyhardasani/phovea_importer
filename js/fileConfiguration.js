@@ -80,7 +80,7 @@ define(["jquery", "d3","dataWrangler"],
             var self = this;
 
             //file configuration ui functionality
-            $("#main").toggle();
+            $("#main").hide();
             $("#open-configuration-window").click(function () {
                 $("#main").toggle();
                 $(".box").toggle();
@@ -97,8 +97,8 @@ define(["jquery", "d3","dataWrangler"],
          */
         FileConfiguration.prototype.switchWindow = function(){
             var self = this;
-            $("#main").toggle();
-            $(".box").toggle();
+            $("#main").show();
+            $(".box").hide();
         }
 
         /**

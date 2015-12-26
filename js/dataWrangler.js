@@ -369,7 +369,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                         self.allColumnsDataArray[colKey] = {
                             //insert if any more column information is required
                             "id": colKey,
-                            "colorScheme": colorbrewer["defaultScale"]["default"][3],
+                            "colorScheme": colorbrewer["defaultScale"]["default"][12], // todo add this 12 into settings
                             "colId": self.colId[colKey],          //head will guess in separate function
                             "dataTypeObj": new Object(),         //data type will be guessed in separate function
                             "data": []
@@ -582,9 +582,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             if(self.allColumnsDataArray[colId].colorScheme !== newColor ) {
                 self.allColumnsDataArray[colId].colorScheme = newColor;
 
-                console.log(self.allColumnsDataArray[colId].colorScheme);
                 for (var obj in self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap) {
-                    console.log(self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap[obj].color);
                     self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap[obj].color = "";
                 }
 
