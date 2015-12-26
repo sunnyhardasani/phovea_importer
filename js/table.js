@@ -60,6 +60,8 @@ define(["jquery", "d3", "d3-tip",
             self.dataToDisplay = [];
             self.parentInstance = _parentInstance;
 
+            d3tip().destroy();
+
             //load file data and call initialize
             self.init();
         }
@@ -282,6 +284,8 @@ define(["jquery", "d3", "d3-tip",
 
             var self = this;
 
+            var d3FreMapArr = {};
+
             for (key in self.data) {
 
                 var col = self.data[key];
@@ -301,6 +305,7 @@ define(["jquery", "d3", "d3-tip",
                     var freqMap = dataTypeObj.keyCountMap;
                     var keys = Object.keys(freqMap);
                     var d3FreMap = d3.entries(freqMap);
+
 
                     var drag = d3.behavior.drag()
                         .origin(function (d) {
@@ -335,6 +340,18 @@ define(["jquery", "d3", "d3-tip",
 
                     svg.call(tip);
 
+                    var index = 0;
+
+                    d3FreMap.sort(function(a,b){
+                        if(a.value.sortIndex > b.value.sortIndex){
+                            return 1;
+                        }
+                        else if(a.value.sortIndex < b.value.sortIndex){
+                            return -1;
+                        }
+                        return 0;
+                    })
+
                     // The following code was contained in the callback function.
                     x.domain(d3FreMap.map(function (d) {
                         return d.key;
@@ -345,19 +362,21 @@ define(["jquery", "d3", "d3-tip",
 
                     d3FreMap.map(function (d) {
 
-                        console.log
-
                         d.x = x(d.key);
                         d.y = y(d.value.value);
 
+                        //add the real freq object to further sort and take the data
+                        d.freObjKey = d.key;
+                        d.freObjValue = d.value;
+
                         // appending the svg area on the bar graph to fetch information for mouse event
+                        d.index = index++;
                         d.svg = svgArea;
                         d.colId = col.id-1;
+
                     });
 
-
-                    console.log(freqMap);
-                    console.log(d3FreMap);
+                    d3FreMapArr[col.id-1] = d3FreMap;
 
                     var bars = svg.selectAll(".bar")
                         .data(d3FreMap)
@@ -379,7 +398,15 @@ define(["jquery", "d3", "d3-tip",
                         .on('mouseover', tip.show)
                         .on('mouseout', tip.hide)
                         .style("fill", function (d) {
-                            return o(d.key);
+
+                            //if color is null the set the
+                            //color and send otherwise send
+                            //the attached color
+                            if(d.freObjValue.color === ""){
+                                d.freObjValue.color = o(d.key);
+                            }
+
+                            return d.freObjValue.color;
                         })
                         .call(drag)
                         .on("dblclick", function (d) {
@@ -421,15 +448,37 @@ define(["jquery", "d3", "d3-tip",
                     }
 
                     function dragmove(d) {
-                        console.log(d);
                         d3.select(this).attr("x", d.x = Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
+                        d3FreMapArr[d.colId][d.index].x = d.x;
                     }
 
                     function dragstop(d) {
-                        svg.selectAll(".bar")
-                            .each(function(d){
-                                console.log(d);
-                            })
+
+                        //this will sort the d3 freq map
+                        d3FreMapArr[d.colId].sort(function(a,b){
+                            if(a.x > b.x){
+                                return 1;
+                            }
+                            else if(a.x < b.x){
+                                return -1;
+                            }
+                            return 0;
+                        })
+
+                        //this will take the sorted data
+                        //and create the new freq map
+                        var newFreqSortedMap = {};
+                        var index = 0;
+                        for(var objInd in d3FreMapArr[d.colId]){
+                            var obj = d3FreMapArr[d.colId][objInd];
+                            obj.freObjValue.sortIndex = index++;
+                            newFreqSortedMap[obj.freObjKey] = obj.freObjValue;
+                        }
+
+                        //tip.destroy();
+
+                        //this will set the new frequency map
+                        self.parentInstance.setNewFreqMap(d.colId,newFreqSortedMap);
                     }
                 }
                 else if (dataType == "numerical") {

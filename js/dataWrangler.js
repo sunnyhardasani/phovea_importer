@@ -1,5 +1,5 @@
-define(["jquery", "d3", "table", "utility/localSettings", "utility/modColorBrewer"],
-    function ($, d3, table, settings, colorbrewer) {
+define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/modColorBrewer"],
+    function ($, d3, d3tip, table, settings, colorbrewer) {
 
         // default values
         var MIN_VALUE = settings.localSettings().MIN_VALUE;
@@ -441,8 +441,9 @@ define(["jquery", "d3", "table", "utility/localSettings", "utility/modColorBrewe
                         if (!freqMap.hasOwnProperty(nData)) {
                             freqMap[nData] = {
                                 value: 1,
-                                //index: index,
-                                type: "numerical"
+                                sortIndex: index,
+                                type: "numerical",
+                                color:""
                             };
                         }
                         else {
@@ -465,8 +466,9 @@ define(["jquery", "d3", "table", "utility/localSettings", "utility/modColorBrewe
                         if (!freqMap.hasOwnProperty(strData)) {
                             freqMap[strData] = {
                                 value: 1,
-                                /*index: index,*/
-                                type: "string"
+                                sortIndex: index,
+                                type: "string",
+                                color:""
                             };
                         }
                         else {
@@ -611,6 +613,27 @@ define(["jquery", "d3", "table", "utility/localSettings", "utility/modColorBrewe
             var self = this;
 
         }
+
+        /**
+         * This new frequency map comes from the
+         * table when column drang and dropped
+         * @param colId
+         * @param freqMap
+         */
+       DataWrangler.prototype.setNewFreqMap = function(colId, freqMap){
+           var self = this;
+
+           //set the new freq map
+           self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap = freqMap;
+
+           //todo the following line of code in the
+           //separate function of table reinitialize
+           self.clean();
+
+           //this will keep only one instance of the table class
+           self.table = require('table');
+           self.table.reload(self.allColumnsDataArray, self);
+       }
 
         return DataWrangler.getInstance();
     });
