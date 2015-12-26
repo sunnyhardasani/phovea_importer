@@ -18,8 +18,9 @@ define(["jquery", "d3", "d3-tip",
 
         //instance of the class
         var instance = null;
+        var tip = null;
 
-        /**
+         /**
          * if class is reinitilized then throws an eror
          * @constructor
          */
@@ -60,7 +61,8 @@ define(["jquery", "d3", "d3-tip",
             self.dataToDisplay = [];
             self.parentInstance = _parentInstance;
 
-            d3tip().destroy();
+            //this will remove all the tips
+            $(".d3-tip").remove();
 
             //load file data and call initialize
             self.init();
@@ -311,6 +313,7 @@ define(["jquery", "d3", "d3-tip",
                         .origin(function (d) {
                             return d;
                         })
+                        .on("dragstart",dragstart)
                         .on("drag", dragmove)
                         .on("dragend", dragstop);
 
@@ -327,13 +330,14 @@ define(["jquery", "d3", "d3-tip",
                         }))
                         .range(selColor);
 
-                    var tip = d3tip()
+                    tip = d3tip()
                         .attr('class', 'd3-tip')
                         .offset([-10, 0])
                         .html(function (d) {
                             return "Freq[&nbsp;" + d.key
                                 + "&nbsp;]:  <span style='color:red'>" + d.value.value + "</span>";
                         });
+
 
                     var svg = d3.select(svgArea)
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -447,6 +451,10 @@ define(["jquery", "d3", "d3-tip",
                         return d;
                     }
 
+                    function dragstart(d){
+                        tip.destroy();
+                    }
+
                     function dragmove(d) {
                         d3.select(this).attr("x", d.x = Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
                         d3FreMapArr[d.colId][d.index].x = d.x;
@@ -474,8 +482,6 @@ define(["jquery", "d3", "d3-tip",
                             obj.freObjValue.sortIndex = index++;
                             newFreqSortedMap[obj.freObjKey] = obj.freObjValue;
                         }
-
-                        //tip.destroy();
 
                         //this will set the new frequency map
                         self.parentInstance.setNewFreqMap(d.colId,newFreqSortedMap);
@@ -530,7 +536,7 @@ define(["jquery", "d3", "d3-tip",
                         .range([0, height/* - settings.bottompad*/]);
 
                     //D3 Tip defined
-                    var tip = d3tip()
+                    tip = d3tip()
                         .attr('class', 'd3-tip')
                         .offset([-10, 0])
                         .html(function (d) {
@@ -669,7 +675,7 @@ define(["jquery", "d3", "d3-tip",
 
 
                         //todo - fix the d3 tip bower error
-                        var tip = d3tip()
+                        tip = d3tip()
                             .attr('class', 'd3-tip')
                             .offset([-10, 0])
                             .html(function (d, i) {
@@ -758,7 +764,7 @@ define(["jquery", "d3", "d3-tip",
                             .range([0, height]);
 
                         //initialize the tip of the bar
-                        var tip = d3tip()
+                        tip = d3tip()
                             .attr('class', 'd3-tip')
                             .offset([-10, 0])
                             .html(function (d, i) {
