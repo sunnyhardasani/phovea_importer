@@ -296,7 +296,7 @@ define(["jquery", "d3", "d3-tip",
                     width = 150 - margin.left - margin.right,
                     height = 100 - margin.top - margin.bottom;
 
-                if (dataType == "nominal") {
+                if (dataType == DATATYPE_NOMINAL) {
 
                     var freqMap = dataTypeObj.keyCountMap;
                     var keys = Object.keys(freqMap);
@@ -345,6 +345,8 @@ define(["jquery", "d3", "d3-tip",
 
                     d3FreMap.map(function (d) {
 
+                        console.log
+
                         d.x = x(d.key);
                         d.y = y(d.value.value);
 
@@ -352,6 +354,10 @@ define(["jquery", "d3", "d3-tip",
                         d.svg = svgArea;
                         d.colId = col.id-1;
                     });
+
+
+                    console.log(freqMap);
+                    console.log(d3FreMap);
 
                     var bars = svg.selectAll(".bar")
                         .data(d3FreMap)
@@ -415,10 +421,15 @@ define(["jquery", "d3", "d3-tip",
                     }
 
                     function dragmove(d) {
+                        console.log(d);
                         d3.select(this).attr("x", d.x = Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
                     }
 
-                    function dragstop() {
+                    function dragstop(d) {
+                        svg.selectAll(".bar")
+                            .each(function(d){
+                                console.log(d);
+                            })
                     }
                 }
                 else if (dataType == "numerical") {
@@ -1131,6 +1142,19 @@ define(["jquery", "d3", "d3-tip",
 
             //calling the resize event to restore the divs
             $(window).trigger('resize');
+        }
+
+        /**
+         * this function will return the current
+         * data requried by the table
+         * @returns {*}
+         */
+        Table.prototype.getTableData = function(){
+            var self = this;
+
+            //returning the current data with
+            //which table is loaded
+            return self.data;
         }
 
         return Table.getInstance();

@@ -441,7 +441,7 @@ define(["jquery", "d3", "table", "utility/localSettings", "utility/modColorBrewe
                         if (!freqMap.hasOwnProperty(nData)) {
                             freqMap[nData] = {
                                 value: 1,
-                                index: index,
+                                //index: index,
                                 type: "numerical"
                             };
                         }
@@ -465,7 +465,7 @@ define(["jquery", "d3", "table", "utility/localSettings", "utility/modColorBrewe
                         if (!freqMap.hasOwnProperty(strData)) {
                             freqMap[strData] = {
                                 value: 1,
-                                index: index,
+                                /*index: index,*/
                                 type: "string"
                             };
                         }
@@ -593,14 +593,22 @@ define(["jquery", "d3", "table", "utility/localSettings", "utility/modColorBrewe
         }
 
         /**
-         * This function will when then color get change on f
+         * This function will return the current data
+         * on which all th operations are performing
          */
+        DataWrangler.prototype.getColumnData = function () {
+            var self = this;
+
+            //this will return the current column data
+            return self.allColumnsDataArray;
+        }
 
         /**
          * This function is responsible adding the new category
          * in the nominal data
          */
         DataWrangler.prototype.addNewCategoryInNominal = function () {
+            var self = this;
 
         }
 
