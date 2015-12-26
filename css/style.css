@@ -79,7 +79,7 @@ line {
 .allcolor {
   background: white;
   width: 200px;
-  height: 100px; }
+  height: auto; }
 
 .palette {
   cursor: pointer;
@@ -243,7 +243,7 @@ div#datatype-pop-up {
   display: none;
   position: fixed;
   width: 100px;
-  height: 100px;
+  height: 75px;
   padding: 10px;
   background: white;
   color: #000000;

@@ -20,7 +20,7 @@ define(["jquery", "d3", "d3-tip",
         var instance = null;
         var tip = null;
 
-         /**
+        /**
          * if class is reinitilized then throws an eror
          * @constructor
          */
@@ -63,6 +63,7 @@ define(["jquery", "d3", "d3-tip",
 
             //this will remove all the tips
             $(".d3-tip").remove();
+            $(".n").remove();
 
             //load file data and call initialize
             self.init();
@@ -94,11 +95,6 @@ define(["jquery", "d3", "d3-tip",
                 $(self.parentElementName + " " + '#table-group').attr("class", "col-md-12");
                 $(self.parentElementName + " " + '#operations').attr("class", "col-md-0 hidden");
             });
-
-            // requireJS will ensure that the FileConfiguration definition is available
-            // to use, we can now import it for use.
-            //var FileConfiguration = require('fileConfiguration');
-            //FileConfiguration.tempDataLoad(self.data);
         }
 
         /**
@@ -263,6 +259,13 @@ define(["jquery", "d3", "d3-tip",
          */
         Table.prototype.createColorBox = function (selectedScale) {
             var self = this;
+
+            if(selectedScale == "ordinalScale"){
+                $('#colorbox-pop-up').css('height', '80');
+            }
+            else if(selectedScale == "linearScale") {
+                $('#colorbox-pop-up').css('height', '130');
+            }
             //remove previously selected child div element
             d3.select("#colorbox-pop-up").select("div").remove();
 
@@ -313,7 +316,7 @@ define(["jquery", "d3", "d3-tip",
                         .origin(function (d) {
                             return d;
                         })
-                        .on("dragstart",dragstart)
+                        .on("dragstart", dragstart)
                         .on("drag", dragmove)
                         .on("dragend", dragstop);
 
@@ -346,11 +349,11 @@ define(["jquery", "d3", "d3-tip",
 
                     var index = 0;
 
-                    d3FreMap.sort(function(a,b){
-                        if(a.value.sortIndex > b.value.sortIndex){
+                    d3FreMap.sort(function (a, b) {
+                        if (a.value.sortIndex > b.value.sortIndex) {
                             return 1;
                         }
-                        else if(a.value.sortIndex < b.value.sortIndex){
+                        else if (a.value.sortIndex < b.value.sortIndex) {
                             return -1;
                         }
                         return 0;
@@ -376,11 +379,11 @@ define(["jquery", "d3", "d3-tip",
                         // appending the svg area on the bar graph to fetch information for mouse event
                         d.index = index++;
                         d.svg = svgArea;
-                        d.colId = col.id-1;
+                        d.colId = col.id - 1;
 
                     });
 
-                    d3FreMapArr[col.id-1] = d3FreMap;
+                    d3FreMapArr[col.id - 1] = d3FreMap;
 
                     var bars = svg.selectAll(".bar")
                         .data(d3FreMap)
@@ -403,25 +406,29 @@ define(["jquery", "d3", "d3-tip",
                         .on('mouseout', tip.hide)
                         .style("fill", function (d) {
 
-                            //if color is null the set the
+                            //if color is null then set the
                             //color and send otherwise send
                             //the attached color
-                            if(d.freObjValue.color === ""){
+                            if (d.freObjValue.color === "") {
                                 d.freObjValue.color = o(d.key);
                             }
 
                             return d.freObjValue.color;
                         })
                         .call(drag)
-                        .on("dblclick", function (d) {
+                        .on("contextmenu", function (d) {
 
                             var selectedSVG = d.svg;
                             var colId = d.colId;
+
                             self.createColorBox("ordinalScale");
+
                             self.colorBox.on("click", function (d) {
 
                                 var keys = Object.keys(colorbrewer["ordinalScale"][d.key]);
                                 var lastKey = keys[keys.length - 1];
+
+                                console.log("selected", colId);
 
                                 self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
 
@@ -444,6 +451,8 @@ define(["jquery", "d3", "d3-tip",
                                 .css('top', d3.event.pageY)
                                 .css('left', d3.event.pageX)
                                 .appendTo('body');
+
+                            d3.event.preventDefault();
                         });
 
                     function type(d) {
@@ -451,7 +460,7 @@ define(["jquery", "d3", "d3-tip",
                         return d;
                     }
 
-                    function dragstart(d){
+                    function dragstart(d) {
                         tip.destroy();
                     }
 
@@ -463,11 +472,11 @@ define(["jquery", "d3", "d3-tip",
                     function dragstop(d) {
 
                         //this will sort the d3 freq map
-                        d3FreMapArr[d.colId].sort(function(a,b){
-                            if(a.x > b.x){
+                        d3FreMapArr[d.colId].sort(function (a, b) {
+                            if (a.x > b.x) {
                                 return 1;
                             }
-                            else if(a.x < b.x){
+                            else if (a.x < b.x) {
                                 return -1;
                             }
                             return 0;
@@ -477,14 +486,14 @@ define(["jquery", "d3", "d3-tip",
                         //and create the new freq map
                         var newFreqSortedMap = {};
                         var index = 0;
-                        for(var objInd in d3FreMapArr[d.colId]){
+                        for (var objInd in d3FreMapArr[d.colId]) {
                             var obj = d3FreMapArr[d.colId][objInd];
                             obj.freObjValue.sortIndex = index++;
                             newFreqSortedMap[obj.freObjKey] = obj.freObjValue;
                         }
 
                         //this will set the new frequency map
-                        self.parentInstance.setNewFreqMap(d.colId,newFreqSortedMap);
+                        self.parentInstance.setNewFreqMap(d.colId, newFreqSortedMap);
                     }
                 }
                 else if (dataType == "numerical") {
@@ -575,7 +584,7 @@ define(["jquery", "d3", "d3-tip",
                         //setting up the tips
                         .on('mouseover', tip.show)
                         .on('mouseout', tip.hide)
-                        .on("dblclick", function (d) {
+                        .on("contextmenu", function (d) {
 
 
                             var selectedSVG = d.svg;
@@ -617,6 +626,8 @@ define(["jquery", "d3", "d3-tip",
                                 .css('top', d3.event.pageY)
                                 .css('left', d3.event.pageX)
                                 .appendTo('body');
+
+                            d3.event.preventDefault();
                         });
 
                     // bottom line
@@ -876,7 +887,7 @@ define(["jquery", "d3", "d3-tip",
                 .style("text-overflow", "ellipsis")
                 .style("width", "50px")
                 .style("float", "left")
-                .on("dblclick", function (d) { // todo move this in the separate function
+                .on("contextmenu", function (d) { // todo move this in the separate function
 
                     self.createDataTypeBox(d.id - 1);
 
@@ -885,6 +896,8 @@ define(["jquery", "d3", "d3-tip",
                         .css('top', d3.event.pageY)
                         .css('left', d3.event.pageX)
                         .appendTo('body');
+
+                    d3.event.preventDefault();
                 });
 
             var closeImg = opr.append("div")
@@ -1204,7 +1217,7 @@ define(["jquery", "d3", "d3-tip",
          * data requried by the table
          * @returns {*}
          */
-        Table.prototype.getTableData = function(){
+        Table.prototype.getTableData = function () {
             var self = this;
 
             //returning the current data with

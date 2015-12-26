@@ -579,18 +579,26 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
         DataWrangler.prototype.changeColColor = function (colId, newColor) {
             var self = this;
 
-            self.allColumnsDataArray[colId].colorScheme = newColor;
+            if(self.allColumnsDataArray[colId].colorScheme !== newColor ) {
+                self.allColumnsDataArray[colId].colorScheme = newColor;
 
-            //todo the following line of code in the
-            //separate function of table reinitialize
-            self.clean();
+                console.log(self.allColumnsDataArray[colId].colorScheme);
+                for (var obj in self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap) {
+                    console.log(self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap[obj].color);
+                    self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap[obj].color = "";
+                }
 
-            //this will keep only one instance of the table class
-            if (!self.table) {
-                self.table = new Table(self.allColumnsDataArray, self);
-            }
-            else {
-                self.table.reload(self.allColumnsDataArray, self);
+                //todo the following line of code in the
+                //separate function of table reinitialize
+                self.clean();
+
+                //this will keep only one instance of the table class
+                if (!self.table) {
+                    self.table = new Table(self.allColumnsDataArray, self);
+                }
+                else {
+                    self.table.reload(self.allColumnsDataArray, self);
+                }
             }
         }
 

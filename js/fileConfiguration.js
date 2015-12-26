@@ -91,6 +91,17 @@ define(["jquery", "d3","dataWrangler"],
         }
 
         /**
+         * This function is responsible for switching
+         * windows between the file configuration ui
+         * and main ui
+         */
+        FileConfiguration.prototype.switchWindow = function(){
+            var self = this;
+            $("#main").toggle();
+            $(".box").toggle();
+        }
+
+        /**
          * This function will get called when save configuration
          * button is clicked on the File Configuration UI,
          * This will save the current JSON Output to the file

@@ -4,8 +4,8 @@
  * drop or through select file.
  */
 
-define(["jquery", "dataWrangler","utility/localSettings"],
-    function ($,dataWrangler,settings) {
+define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
+    function ($,dataWrangler,settings,fileConfiguration) {
     "use strict";
 
     var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
@@ -141,9 +141,9 @@ define(["jquery", "dataWrangler","utility/localSettings"],
                     data = self.file_data;
                 }
 
-                // todo move this call to much better place
-                /*$("#main").toggle();*/
-                $(".box").toggle();
+                // this function will call the file configuration
+                // switch window to switch the window
+                fileConfiguration.switchWindow();
 
                 // requireJS will ensure that the DataWrangler definition
                 // is available to use, we can now import it for use.
