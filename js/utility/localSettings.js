@@ -18,7 +18,9 @@ define(function(){
         DATATYPE_NOMINAL : "nominal",
         DATATYPE_NUMERICAL : "numerical",
         DATATYPE_ORDINAL : "ordinal",
-        DATATYPE_ERROR : "error"
+        DATATYPE_ERROR : "error",
+
+        NUMERICAL_BIN_COUNT: 10
     };
 
     return {

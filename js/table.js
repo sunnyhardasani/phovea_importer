@@ -243,9 +243,9 @@ define(["jquery", "d3", "d3-tip",
                 else if ($(this).val() === DATATYPE_NUMERICAL) {
                     self.parentInstance.changeDataType(colId, DATATYPE_NUMERICAL);
                 }
-                else if ($(this).val() === DATATYPE_ORDINAL) {
-                    //self.parentInstance.changeDataType(colId,DATATYPE_ORDINAL);
-                }
+               /* else if ($(this).val() === DATATYPE_ORDINAL) {
+                 //self.parentInstance.changeDataType(colId,DATATYPE_ORDINAL);
+                 }*/
 
                 $('#datatype-pop-up').hide();
 
@@ -256,16 +256,20 @@ define(["jquery", "d3", "d3-tip",
         /**
          * this fucntion will create the color box
          * which appear on click of the bar graph
+         * @param selectedScale
          */
         Table.prototype.createColorBox = function (selectedScale) {
             var self = this;
 
+            //check which scale is selected and
+            //create the color box accordingly
             if(selectedScale == "ordinalScale"){
                 $('#colorbox-pop-up').css('height', '80');
             }
             else if(selectedScale == "linearScale") {
                 $('#colorbox-pop-up').css('height', '130');
             }
+
             //remove previously selected child div element
             d3.select("#colorbox-pop-up").select("div").remove();
 
@@ -283,13 +287,618 @@ define(["jquery", "d3", "d3-tip",
         }
 
         /**
-         * this function will print the charts
+         * This function will print the nominal
+         * graph and also implement dragndrop
+         * features
+         * @param _col
+         */
+        Table.prototype.printNominalGraph  = function(_col, _svgArea){
+            var self = this;
+
+            //set up the margins of the svg
+            var margin = {top: 5, right: 5, bottom: 0, left: 5},
+                width = 150 - margin.left - margin.right,
+                height = 100 - margin.top - margin.bottom;
+
+            //take the col
+            var col = _col;
+            var svgArea = _svgArea;
+
+            //fetch required data
+            var selColor = col.colorScheme;
+            var dataTypeObj = col.dataTypeObj;
+            var dataType = dataTypeObj.type;
+            var freqMap = dataTypeObj.keyCountMap;
+            var keys = Object.keys(freqMap);
+            var d3FreMap = d3.entries(freqMap);
+            var index = 0;
+
+            //Initialize the drag and drop behaviour on
+            //the bar graph to drag and drop the bars for
+            //nominal to oridinal conversion
+            var drag = d3.behavior.drag()
+                .origin(function (d) {
+                    return d;
+                })
+                .on("dragstart", dragstart)
+                .on("drag", dragmove)
+                .on("dragend", dragstop);
+
+            //Set up the required x, y and
+            //color scales
+            //Reference : http://jsfiddle.net/59vLw/
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+            var y = d3.scale.linear()
+                .range([height, 0]);
+            var o = d3.scale.ordinal()
+                .domain(d3FreMap.map(function (d) {
+                    return d.key;
+                }))
+                .range(selColor);
+
+            //Initialize the d3 tip for displaying
+            //value for each bar on mouse hover
+            var tip = d3tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function (d) {
+                    return "Freq[&nbsp;" + d.key
+                        + "&nbsp;]:  <span style='color:red'>" + d.value.value + "</span>";
+                });
+
+            //Form new svg and attach d3 tip
+            var svg = d3.select(svgArea)
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            svg.call(tip);
+
+            //this will take the take got from the
+            //data wrnagler and sort the data accordingly
+            //to plot on the graph
+            d3FreMap.sort(function (a, b) {
+                if (a.value.sortIndex > b.value.sortIndex) {
+                    return 1;
+                }
+                else if (a.value.sortIndex < b.value.sortIndex) {
+                    return -1;
+                }
+                return 0;
+            })
+
+            // The following code was contained in the callback function.
+            x.domain(d3FreMap.map(function (d) {
+                return d.key;
+            }));
+            y.domain([0, d3.max(d3FreMap, function (d) {
+                return d.value.value;
+            })]);
+
+            // Attach all the data required by the D3
+            d3FreMap.map(function (d) {
+
+                d.x = x(d.key);
+                d.y = y(d.value.value);
+
+                //add the real freq object to further sort and take the data
+                d.freObjKey = d.key;
+                d.freObjValue = d.value;
+
+                // appending the svg area on the bar graph to fetch information for mouse event
+                d.index = index++;
+                d.svg = svgArea;
+                d.colId = col.id - 1;
+
+            });
+
+            self.d3FreMapArr[col.id - 1] = d3FreMap;
+
+            var bars = svg.selectAll(".bar")
+                .data(d3FreMap)
+                .enter().append("rect")
+                .attr("svg-info", function (d) {
+                    return d.svg;
+                }) // appending the svg area on the bar graph to fetch information for mouse event
+                .attr("class", "bar")
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("width", x.rangeBand())
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("height", function (d) {
+                    return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value));
+                })
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide)
+                .style("fill", function (d) {
+
+                    //if color is null then set the
+                    //color and send otherwise send
+                    //the attached color
+                    if (d.freObjValue.color === "") {
+                        d.freObjValue.color = o(d.key);
+                    }
+
+                    return d.freObjValue.color;
+                })
+                .call(drag)
+                .on("contextmenu", function (d) {
+
+                    var selectedSVG = d.svg;
+                    var colId = d.colId;
+
+                    self.createColorBox("ordinalScale");
+
+                    self.colorBox.on("click", function (d) {
+
+                        var keys = Object.keys(colorbrewer["ordinalScale"][d.key]);
+                        var lastKey = keys[keys.length - 1];
+
+
+                        self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
+
+                        $('#colorbox-pop-up').hide();
+                    })
+
+                        //todo need to check the below code whether its required or not
+                        .selectAll(".swatch")
+                        .data(function (d) {
+                            return d.value[d3.keys(d.value).map(Number).sort(d3.descending)[0]];
+                        })
+                        .enter().append("div")
+                        .attr("class", "swatch")
+                        .style("background-color", function (d) {
+                            return d;
+                        });
+
+                    $('#colorbox-pop-up')
+                        .show()
+                        .css('top', d3.event.pageY)
+                        .css('left', d3.event.pageX)
+                        .appendTo('body');
+
+                    d3.event.preventDefault();
+                });
+
+            function type(d) {
+                d.value.value = +d.value.value;
+                return d;
+            }
+
+            function dragstart(d) {
+                tip.destroy();
+            }
+
+            function dragmove(d) {
+                d3.select(this).attr("x", d.x = Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
+                self.d3FreMapArr[d.colId][d.index].x = d.x;
+            }
+
+            function dragstop(d) {
+
+                //this will sort the d3 freq map
+                self.d3FreMapArr[d.colId].sort(function (a, b) {
+                    if (a.x > b.x) {
+                        return 1;
+                    }
+                    else if (a.x < b.x) {
+                        return -1;
+                    }
+                    return 0;
+                })
+
+                //this will take the sorted data
+                //and create the new freq map
+                var newFreqSortedMap = {};
+                var index = 0;
+                for (var objInd in self.d3FreMapArr[d.colId]) {
+                    var obj = self.d3FreMapArr[d.colId][objInd];
+                    obj.freObjValue.sortIndex = index++;
+                    newFreqSortedMap[obj.freObjKey] = obj.freObjValue;
+                }
+
+                //this will set the new frequency map
+                self.parentInstance.setNewFreqMap(d.colId, newFreqSortedMap);
+            }
+        }
+
+        /**
+         * This function will print the numerical
+         * data with histograms
+         * @param _col
+         * @param _svgArea
+         */
+        Table.prototype.printNumericalGraph = function(_col, _svgArea){
+            var self = this;
+
+            //take copy of the required parameter
+            var col = _col;
+            var svgArea = _svgArea;
+            var selColor = col.colorScheme;
+            var dataTypeObj = col.dataTypeObj;
+            var dataType = dataTypeObj.type;
+            var min = dataTypeObj.min;
+            var max = dataTypeObj.max;
+            var binCount = settings.localSettings().NUMERICAL_BIN_COUNT;
+
+            //this will create the margin for numerical svg
+            var margin = {top: 5, right: 5, bottom: 0, left: 5},
+                width = 150 - margin.left - margin.right,
+                height = 100 - margin.top - margin.bottom;
+
+            //this will create the histogram required
+            //for the numerical data, this will also
+            //add the data required when any operations
+            //is performed on the data type
+            var histogram = d3.layout.histogram().bins(binCount)
+            (dataTypeObj.data);
+            var maxVal = d3.max(histogram, function (d) {
+                return d.y;
+            });
+            var minVal = d3.min(histogram, function (d) {
+                return d.y;
+            });
+            histogram.map(function (d) {
+                //appending the svg area on the bar graph to fetch information for mouse event
+                d.svg = svgArea;
+                //min and max value
+                d.max = maxVal;
+                d.min = minVal;
+                //attach the column id
+                d.colId = col.id - 1;
+            });
+
+            //create all the required scale
+            var linearColorScale = d3.scale.linear()
+                .domain([minVal, maxVal])
+                .range(selColor);
+            var x = d3.scale.ordinal()
+                .domain(histogram.map(function (d) {
+                    return d.x;
+                }))
+                .rangeRoundBands([0, width]);
+            var y = d3.scale.linear()
+                .domain([0, d3.max(histogram, function (d) {
+                    return d.y;
+                })])
+                .range([0, height]);
+
+            //D3 Tip defined
+            var tip = d3tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function (d) {
+                    return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
+                });
+
+            //this will select the svg area to print the chart
+            var vis = d3.select(svgArea)
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                .attr("width", width)
+                .attr("height", height);
+
+            //this will initialize the tip
+            //on the svg area
+            vis.call(tip);
+
+            //this will create the rectangle
+            vis.selectAll("rect")
+                .data(histogram)
+                .enter().append("svg:rect")
+                .classed("numerical-bar", true)
+                .classed("numerical-bar:hover", true)
+
+                // move the bars down by their total height, so they animate up (not down)
+                .attr("transform", function (d) {
+                    return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
+                })
+                .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
+                .attr("y", 0)
+                .attr("height", function (d) {
+                    return y(d.y);
+                })
+                .style("fill", function (d) {
+                    return linearColorScale(d.y);
+                })
+                //setting up the tips
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide)
+                .on("contextmenu", function (d) {
+
+                    var selectedSVG = d.svg;
+                    var maxRangeForColor = d.max;
+                    var minRangeForColor = d.min;
+                    var colId = d.colId;
+
+                    //call the function to create the
+                    //color box of the linear scales
+                    self.createColorBox("linearScale");
+
+                    //this function will be called when color box
+                    //will be clicked
+                    self.colorBox.on("click", function (d) {
+
+                        //figure out the last key
+                        var keys = Object.keys(colorbrewer["linearScale"][d.key]);
+                        var lastKey = keys[keys.length - 1];
+
+                        self.parentInstance.changeColColor(colId, colorbrewer["linearScale"][d.key][lastKey]);
+
+                        //finally hide the color box
+                        $('#colorbox-pop-up').hide();
+                    })
+
+                        //todo need to check the below code whether its required or not
+                        .selectAll(".swatch")
+                        .data(function (d) {
+                            return d.value[d3.keys(d.value).map(Number).sort(d3.descending)[0]];
+                        })
+                        .enter().append("div")
+                        .attr("class", "swatch")
+                        .style("background-color", function (d) {
+                            return d;
+                        });
+
+                    //open the colorbox div
+                    $('#colorbox-pop-up')
+                        .show()
+                        .css('top', d3.event.pageY)
+                        .css('left', d3.event.pageX)
+                        .appendTo('body');
+
+                    //stop the default event on the page
+                    d3.event.preventDefault();
+                });
+
+            // bottom line
+            vis.append("svg:line")
+                .attr("x1", 0)
+                .attr("x2", width)
+                .attr("y1", height)
+                .attr("y2", height);
+
+            // bucket numbers
+            vis.selectAll("text")
+                .data(histogram)
+                .enter().append("svg:text")
+                .attr("x", function (d, i) {
+                    return x(d.x) + x.rangeBand() / 2;
+                })
+                .attr("y", height)
+                .attr("width", x.rangeBand());
+
+        }
+
+        /**
+         * This function will figure out whether
+         * the it is error graph or not
+         * @param _col
+         * @param _svgArea
+         */
+        Table.prototype.printErrorGraph = function(_col,_svgArea){
+            var self = this;
+
+            //intialize the local variable
+            var col = _col;
+            var svgArea = _svgArea;
+            var selColor = col.colorScheme;
+            var dataTypeObj = col.dataTypeObj;
+            var dataType = dataTypeObj.type;
+
+            //set up the margins for the svg area
+            var margin = {top: 5, right: 5, bottom: 0, left: 5},
+                width = 150 - margin.left - margin.right,
+                height = 100 - margin.top - margin.bottom;
+
+            if (dataTypeObj.baseType == DATATYPE_NUMERICAL) {
+
+                var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
+                (d3.values(dataTypeObj.numberMap));
+
+
+                //new value added for error histogram
+                histogram[10] = new Array;
+
+                //todo check this logic with other data
+                if (histogram[9].dx == 0) {
+                    histogram[9].x = 0;
+                    histogram[10].x = 50;
+                }
+                else {
+                    histogram[10].x = histogram[9].x + histogram[9].dx;
+                }
+                histogram[10].y = d3.values(dataTypeObj.stringMap).length;
+
+                var x = d3.scale.ordinal()
+                    .domain(histogram.map(function (d) {
+                        return d.x;
+                    }))
+                    .rangeRoundBands([0, width]);
+
+                var y = d3.scale.linear()
+                    .domain([0, d3.max(histogram, function (d) {
+                        return d.y;
+                    })])
+                    .range([0, height]);
+
+
+                //todo - fix the d3 tip bower error
+                tip = d3tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d, i) {
+
+                        if (i == (histogram.length)) {
+                            return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : " +
+                                "</strong> <span style='color:red'>" + d.y +
+                                "</span><strong></strong>";
+                        }
+                        else {
+                            return "<strong>Range: [</strong> <span style='color:red'>" +
+                                d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
+                        }
+                    });
+
+                var vis = d3.select(svgArea)
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                //todo d3-tip error bower error
+                vis.call(tip);
+
+                vis.selectAll("rect")
+                    .data(histogram)
+                    .enter().append("svg:rect")
+                    .classed("numerical-bar", true)
+                    .classed("numerical-bar:hover", true)
+
+                    // move the bars down by their total height, so they animate up (not down)
+                    .attr("transform", function (d) {
+                        return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
+                    })
+                    .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
+                    .attr("y", 0)
+                    .attr("height", function (d) {
+                        return y(d.y);
+                    })
+
+                    //adding separate color for bar graph
+                    .style("fill", function (d, i) {
+                        if (i == (histogram.length - 1)) return "#FF3333";
+                    })
+
+                    //setting up the tips
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+            }
+            else {
+
+
+                var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
+                (d3.values(dataTypeObj.stringMap));
+
+
+                //new value added for error histogram
+                histogram[10] = new Array;
+
+                //todo check this logic with other data
+                if (histogram[9].dx == 0) {
+                    histogram[9].x = 0;
+                    histogram[10].x = 50;
+                }
+                else {
+                    //set the bar horizontally by calculating
+                    //from distance from the previous bar and
+                    //adding up the difference
+                    histogram[10].x = histogram[9].x + histogram[9].dx;
+                }
+
+                //set the vertical limit of the bar
+                histogram[10].y = d3.values(dataTypeObj.numberMap).length;
+
+                //set the x scale of the of the histogram
+                var x = d3.scale.ordinal()
+                    .domain(histogram.map(function (d) {
+                        return d.x;
+                    }))
+                    .rangeRoundBands([0, width]);
+
+                //set the y scale of the histogram
+                var y = d3.scale.linear()
+                    .domain([0, d3.max(histogram, function (d) {
+                        return d.y;
+                    })])
+                    .range([0, height]);
+
+                //initialize the tip of the bar
+                tip = d3tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d, i) {
+                        if (i == (histogram.length - 1)) {
+                            return "<strong>Invalid &nbsp; values &nbsp; frequency" +
+                                " &nbsp; : </strong> <span style='color:red'>" + d.y +
+                                "</span><strong></strong>";
+                        } else {
+                            return "<strong>Range: [</strong> <span style='color:red'>" +
+                                d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
+                        }
+                    });
+
+                var vis = d3.select(svgArea)
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                vis.call(tip);
+
+                vis.selectAll("rect")
+                    .data(histogram)
+                    .enter().append("svg:rect")
+                    .classed("numerical-bar", true)
+                    .classed("numerical-bar:hover", true)
+
+                    // move the bars down by their total height, so they animate up (not down)
+                    .attr("transform", function (d) {
+                        return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
+                    })
+                    .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
+                    .attr("y", 0)
+                    .attr("height", function (d) {
+                        return y(d.y);
+                    })
+
+                    //adding separate color for bar graph
+                    .style("fill", function (d, i) {
+                        if (i == (histogram.length - 1))
+                            return "#FF3333";
+                    })
+
+                    //setting up the tips
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+            }
+        }
+
+        /**
+         * This function will print the string graph
+         *
+         * @param _col
+         * @param _svgArea
+         */
+        Table.prototype.printStringGraph = function(_col,_svgArea){
+            var self = this;
+
+            //intialize the local variable
+            var col = _col;
+            var svgArea = _svgArea;
+            var selColor = col.colorScheme;
+            var dataTypeObj = col.dataTypeObj;
+            var dataType = dataTypeObj.type;
+
+            //set up the margins for the svg area
+            var margin = {top: 5, right: 5, bottom: 0, left: 5},
+                width = 150 - margin.left - margin.right,
+                height = 100 - margin.top - margin.bottom;
+        }
+
+        /**
+         * This function is responsible to print
+         * all the types of chart.
          */
         Table.prototype.printCharts = function () {
 
             var self = this;
 
-            var d3FreMapArr = {};
+            self.d3FreMapArr = {};
+
+            // todo remove this margin and set it each print function
+            var margin = {top: 5, right: 5, bottom: 0, left: 5},
+                width = 150 - margin.left - margin.right,
+                height = 100 - margin.top - margin.bottom;
+
 
             for (key in self.data) {
 
@@ -299,525 +908,20 @@ define(["jquery", "d3", "d3-tip",
                 var dataType = dataTypeObj.type;
 
                 //add the printing logic per column
-                var svgArea = self.parentElementName + " " + "#svg-col-" + (col.id - 1);
-                var temp = svgArea;
-                var margin = {top: 5, right: 5, bottom: 0, left: 5},
-                    width = 150 - margin.left - margin.right,
-                    height = 100 - margin.top - margin.bottom;
+                var svgArea = self.parentElementName + " " +
+                    "#svg-col-" + (col.id - 1);
 
                 if (dataType == DATATYPE_NOMINAL) {
-
-                    var freqMap = dataTypeObj.keyCountMap;
-                    var keys = Object.keys(freqMap);
-                    var d3FreMap = d3.entries(freqMap);
-
-
-                    var drag = d3.behavior.drag()
-                        .origin(function (d) {
-                            return d;
-                        })
-                        .on("dragstart", dragstart)
-                        .on("drag", dragmove)
-                        .on("dragend", dragstop);
-
-                    //refernce : http://jsfiddle.net/59vLw/
-                    var x = d3.scale.ordinal()
-                        .rangeRoundBands([0, width], .1);
-
-                    var y = d3.scale.linear()
-                        .range([height, 0]);
-
-                    var o = d3.scale.ordinal()
-                        .domain(d3FreMap.map(function (d) {
-                            return d.key;
-                        }))
-                        .range(selColor);
-
-                    tip = d3tip()
-                        .attr('class', 'd3-tip')
-                        .offset([-10, 0])
-                        .html(function (d) {
-                            return "Freq[&nbsp;" + d.key
-                                + "&nbsp;]:  <span style='color:red'>" + d.value.value + "</span>";
-                        });
-
-
-                    var svg = d3.select(svgArea)
-                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-                    svg.call(tip);
-
-                    var index = 0;
-
-                    d3FreMap.sort(function (a, b) {
-                        if (a.value.sortIndex > b.value.sortIndex) {
-                            return 1;
-                        }
-                        else if (a.value.sortIndex < b.value.sortIndex) {
-                            return -1;
-                        }
-                        return 0;
-                    })
-
-                    // The following code was contained in the callback function.
-                    x.domain(d3FreMap.map(function (d) {
-                        return d.key;
-                    }));
-                    y.domain([0, d3.max(d3FreMap, function (d) {
-                        return d.value.value;
-                    })]);
-
-                    d3FreMap.map(function (d) {
-
-                        d.x = x(d.key);
-                        d.y = y(d.value.value);
-
-                        //add the real freq object to further sort and take the data
-                        d.freObjKey = d.key;
-                        d.freObjValue = d.value;
-
-                        // appending the svg area on the bar graph to fetch information for mouse event
-                        d.index = index++;
-                        d.svg = svgArea;
-                        d.colId = col.id - 1;
-
-                    });
-
-                    d3FreMapArr[col.id - 1] = d3FreMap;
-
-                    var bars = svg.selectAll(".bar")
-                        .data(d3FreMap)
-                        .enter().append("rect")
-                        .attr("svg-info", function (d) {
-                            return d.svg;
-                        }) // appending the svg area on the bar graph to fetch information for mouse event
-                        .attr("class", "bar")
-                        .attr("x", function (d) {
-                            return d.x;
-                        })
-                        .attr("width", x.rangeBand())
-                        .attr("y", function (d) {
-                            return d.y;
-                        })
-                        .attr("height", function (d) {
-                            return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value));
-                        })
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide)
-                        .style("fill", function (d) {
-
-                            //if color is null then set the
-                            //color and send otherwise send
-                            //the attached color
-                            if (d.freObjValue.color === "") {
-                                d.freObjValue.color = o(d.key);
-                            }
-
-                            return d.freObjValue.color;
-                        })
-                        .call(drag)
-                        .on("contextmenu", function (d) {
-
-                            var selectedSVG = d.svg;
-                            var colId = d.colId;
-
-                            self.createColorBox("ordinalScale");
-
-                            self.colorBox.on("click", function (d) {
-
-                                var keys = Object.keys(colorbrewer["ordinalScale"][d.key]);
-                                var lastKey = keys[keys.length - 1];
-
-
-                                self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
-
-                                $('#colorbox-pop-up').hide();
-                            })
-
-                                //todo need to check the below code whether its required or not
-                                .selectAll(".swatch")
-                                .data(function (d) {
-                                    return d.value[d3.keys(d.value).map(Number).sort(d3.descending)[0]];
-                                })
-                                .enter().append("div")
-                                .attr("class", "swatch")
-                                .style("background-color", function (d) {
-                                    return d;
-                                });
-
-                            $('#colorbox-pop-up')
-                                .show()
-                                .css('top', d3.event.pageY)
-                                .css('left', d3.event.pageX)
-                                .appendTo('body');
-
-                            d3.event.preventDefault();
-                        });
-
-                    function type(d) {
-                        d.value.value = +d.value.value;
-                        return d;
-                    }
-
-                    function dragstart(d) {
-                        tip.destroy();
-                    }
-
-                    function dragmove(d) {
-                        d3.select(this).attr("x", d.x = Math.max(0, Math.min(width - d3.select(this).attr("width"), d3.event.x)))
-                        d3FreMapArr[d.colId][d.index].x = d.x;
-                    }
-
-                    function dragstop(d) {
-
-                        //this will sort the d3 freq map
-                        d3FreMapArr[d.colId].sort(function (a, b) {
-                            if (a.x > b.x) {
-                                return 1;
-                            }
-                            else if (a.x < b.x) {
-                                return -1;
-                            }
-                            return 0;
-                        })
-
-                        //this will take the sorted data
-                        //and create the new freq map
-                        var newFreqSortedMap = {};
-                        var index = 0;
-                        for (var objInd in d3FreMapArr[d.colId]) {
-                            var obj = d3FreMapArr[d.colId][objInd];
-                            obj.freObjValue.sortIndex = index++;
-                            newFreqSortedMap[obj.freObjKey] = obj.freObjValue;
-                        }
-
-                        //this will set the new frequency map
-                        self.parentInstance.setNewFreqMap(d.colId, newFreqSortedMap);
-                    }
+                    self.printNominalGraph(col,svgArea);
                 }
-                else if (dataType == "numerical") {
-
-                    var min = dataTypeObj.min;
-                    var max = dataTypeObj.max;
-
-                    var binCount = 10;
-
-                    var histogram = d3.layout.histogram().bins(binCount)
-                    (dataTypeObj.data);
-
-                    var maxVal = d3.max(histogram, function (d) {
-                        return d.y;
-                    });
-
-                    var minVal = d3.min(histogram, function (d) {
-                        return d.y;
-                    });
-
-                    //create the linear scale for colors
-                    var linearColorScale = d3.scale.linear()
-                        .domain([minVal, maxVal])
-                        .range(selColor);
-
-                    //this will add the svg area to the histogram
-                    histogram.map(function (d) {
-                        // appending the svg area on the bar graph to fetch information for mouse event
-                        d.svg = svgArea;
-
-                        //min and max value
-                        d.max = maxVal;
-                        d.min = minVal;
-
-                        //atatch the column id
-                        d.colId = col.id - 1;
-                    });
-
-                    var x = d3.scale.ordinal()
-                        .domain(histogram.map(function (d) {
-                            return d.x;
-                        }))
-                        .rangeRoundBands([0, width]);
-
-                    var y = d3.scale.linear()
-                        .domain([0, d3.max(histogram, function (d) {
-                            return d.y;
-                        })])
-                        .range([0, height/* - settings.bottompad*/]);
-
-                    //D3 Tip defined
-                    tip = d3tip()
-                        .attr('class', 'd3-tip')
-                        .offset([-10, 0])
-                        .html(function (d) {
-                            return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
-                        });
-
-                    //this will select the svg area to print the chart
-                    var vis = d3.select(svgArea)
-                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                        .attr("width", width)
-                        .attr("height", height);
-
-                    //todo d3-tip bower error
-                    vis.call(tip);
-
-                    //this will create the rectangle
-                    vis.selectAll("rect")
-                        .data(histogram)
-                        .enter().append("svg:rect")
-                        .classed("numerical-bar", true)
-                        .classed("numerical-bar:hover", true)
-
-                        // move the bars down by their total height, so they animate up (not down)
-                        .attr("transform", function (d) {
-                            return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
-                        })
-                        .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
-                        .attr("y", 0)
-
-                        .attr("height", function (d) {
-                            return y(d.y);
-                        })
-                        .style("fill", function (d) {
-                            return linearColorScale(d.y);
-                        })
-                        //setting up the tips
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide)
-                        .on("contextmenu", function (d) {
-
-
-                            var selectedSVG = d.svg;
-                            var maxRangeForColor = d.max;
-                            var minRangeForColor = d.min;
-                            var colId = d.colId;
-
-                            //call the function to create the
-                            //color box of the linear scales
-                            self.createColorBox("linearScale");
-
-                            //this function will be called when color box
-                            //will be clicked
-                            self.colorBox.on("click", function (d) {
-
-                                //figure out the last key
-                                var keys = Object.keys(colorbrewer["linearScale"][d.key]);
-                                var lastKey = keys[keys.length - 1];
-
-                                self.parentInstance.changeColColor(colId, colorbrewer["linearScale"][d.key][lastKey]);
-
-                                //finally hide the color box
-                                $('#colorbox-pop-up').hide();
-                            })
-
-                                //todo need to check the below code whether its required or not
-                                .selectAll(".swatch")
-                                .data(function (d) {
-                                    return d.value[d3.keys(d.value).map(Number).sort(d3.descending)[0]];
-                                })
-                                .enter().append("div")
-                                .attr("class", "swatch")
-                                .style("background-color", function (d) {
-                                    return d;
-                                });
-
-                            $('#colorbox-pop-up')
-                                .show()
-                                .css('top', d3.event.pageY)
-                                .css('left', d3.event.pageX)
-                                .appendTo('body');
-
-                            d3.event.preventDefault();
-                        });
-
-                    // bottom line
-                    vis.append("svg:line")
-                        .attr("x1", 0)
-                        .attr("x2", width)
-                        .attr("y1", height)
-                        .attr("y2", height);
-
-                    // bucket numbers
-                    vis.selectAll("text")
-                        .data(histogram)
-                        .enter().append("svg:text")
-                        .attr("x", function (d, i) {
-                            return x(d.x) + x.rangeBand() / 2;
-                        })
-                        .attr("y", height)
-                        .attr("width", x.rangeBand());
+                else if (dataType == DATATYPE_NUMERICAL) {
+                    self.printNumericalGraph(col,svgArea);
+                }
+                else if (dataType == DATATYPE_STRING) {
 
                 }
-                else if (dataType == "string") {
-
-                }
-                else if (dataType == "error") {
-
-                    if (dataTypeObj.baseType == "numerical") {
-
-                        var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
-                        (d3.values(dataTypeObj.numberMap));
-
-
-                        //new value added for error histogram
-                        histogram[10] = new Array;
-
-                        //todo check this logic with other data
-                        if (histogram[9].dx == 0) {
-                            histogram[9].x = 0;
-                            histogram[10].x = 50;
-                        }
-                        else {
-                            histogram[10].x = histogram[9].x + histogram[9].dx;
-                        }
-                        histogram[10].y = d3.values(dataTypeObj.stringMap).length;
-
-                        var x = d3.scale.ordinal()
-                            .domain(histogram.map(function (d) {
-                                return d.x;
-                            }))
-                            .rangeRoundBands([0, width]);
-
-                        var y = d3.scale.linear()
-                            .domain([0, d3.max(histogram, function (d) {
-                                return d.y;
-                            })])
-                            .range([0, height]);
-
-
-                        //todo - fix the d3 tip bower error
-                        tip = d3tip()
-                            .attr('class', 'd3-tip')
-                            .offset([-10, 0])
-                            .html(function (d, i) {
-
-                                if (i == (histogram.length)) {
-                                    return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : " +
-                                        "</strong> <span style='color:red'>" + d.y +
-                                        "</span><strong></strong>";
-                                }
-                                else {
-                                    return "<strong>Range: [</strong> <span style='color:red'>" +
-                                        d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
-                                }
-                            });
-
-                        var vis = d3.select(svgArea)
-                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                            .attr("width", width)
-                            .attr("height", height);
-
-                        //todo d3-tip error bower error
-                        vis.call(tip);
-
-                        vis.selectAll("rect")
-                            .data(histogram)
-                            .enter().append("svg:rect")
-                            .classed("numerical-bar", true)
-                            .classed("numerical-bar:hover", true)
-
-                            // move the bars down by their total height, so they animate up (not down)
-                            .attr("transform", function (d) {
-                                return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
-                            })
-                            .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
-                            .attr("y", 0)
-                            .attr("height", function (d) {
-                                return y(d.y);
-                            })
-
-                            //adding separate color for bar graph
-                            .style("fill", function (d, i) {
-                                if (i == (histogram.length - 1)) return "#FF3333";
-                            })
-
-                            //setting up the tips
-                            .on('mouseover', tip.show)
-                            .on('mouseout', tip.hide);
-                    }
-                    else {
-
-
-                        var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
-                        (d3.values(dataTypeObj.stringMap));
-
-
-                        //new value added for error histogram
-                        histogram[10] = new Array;
-
-                        //todo check this logic with other data
-                        if (histogram[9].dx == 0) {
-                            histogram[9].x = 0;
-                            histogram[10].x = 50;
-                        }
-                        else {
-                            //set the bar horizontally by calculating
-                            //from distance from the previous bar and
-                            //adding up the difference
-                            histogram[10].x = histogram[9].x + histogram[9].dx;
-                        }
-
-                        //set the vertical limit of the bar
-                        histogram[10].y = d3.values(dataTypeObj.numberMap).length;
-
-                        //set the x scale of the of the histogram
-                        var x = d3.scale.ordinal()
-                            .domain(histogram.map(function (d) {
-                                return d.x;
-                            }))
-                            .rangeRoundBands([0, width]);
-
-                        //set the y scale of the histogram
-                        var y = d3.scale.linear()
-                            .domain([0, d3.max(histogram, function (d) {
-                                return d.y;
-                            })])
-                            .range([0, height]);
-
-                        //initialize the tip of the bar
-                        tip = d3tip()
-                            .attr('class', 'd3-tip')
-                            .offset([-10, 0])
-                            .html(function (d, i) {
-                                if (i == (histogram.length - 1)) {
-                                    return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : </strong> <span style='color:red'>" + d.y + "</span><strong></strong>";
-                                } else {
-                                    return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
-                                }
-                            });
-
-                        var vis = d3.select(svgArea)
-                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                            .attr("width", width)
-                            .attr("height", height);
-
-                        vis.call(tip);
-
-                        vis.selectAll("rect")
-                            .data(histogram)
-                            .enter().append("svg:rect")
-                            .classed("numerical-bar", true)
-                            .classed("numerical-bar:hover", true)
-
-                            // move the bars down by their total height, so they animate up (not down)
-                            .attr("transform", function (d) {
-                                return "translate(" + x(d.x) + "," + (height - y(d.y)) + ")";
-                            })
-                            .attr("width", x.rangeBand() - 1) //-1 for setting difference between bars
-                            .attr("y", 0)
-                            .attr("height", function (d) {
-                                return y(d.y);
-                            })
-
-                            //adding separate color for bar graph
-                            .style("fill", function (d, i) {
-                                if (i == (histogram.length - 1))
-                                    return "#FF3333";
-                            })
-
-                            //setting up the tips
-                            .on('mouseover', tip.show)
-                            .on('mouseout', tip.hide);
-                    }
+                else if (dataType == DATATYPE_ERROR) {
+                    self.printErrorGraph(col,svgArea);
                 }
             }
         }
@@ -861,10 +965,7 @@ define(["jquery", "d3", "d3-tip",
                 .data(columns)
                 .enter()
                 .append("th")
-                .classed("colSvg", true)/*
-             .attr("id",function(d,i){
-             return "col-"+i;
-             })*/
+                .classed("colSvg", true)
                 .style("border", "1px black solid")
                 .style("font-size", "12px")
                 .style("overflow", "hidden")

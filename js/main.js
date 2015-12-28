@@ -2,12 +2,16 @@ requirejs.config({
     paths:{
         "jquery": "../bower_components/jquery/dist/jquery.min",
         "bootstrap": "../bower_components/bootstrap/dist/js/bootstrap.min",
-        "d3": "../bower_components/d3/d3",
         "colorbrewer": "../bower_components/colorbrewer/colorbrewer",
+        "d3": "../bower_components/d3/d3",
         "d3-tip": "../bower_components/d3-tip/index",
         "jquery-resizable-columns": "../bower_components/jquery-resizable-columns/dist/jquery.resizableColumns.min",
         "store": "../bower_components/store/store.min",
-        "load-component":"utility/loadComponent"
+        "load-component":"utility/loadComponent",
+        "dataWrangler":"dataWrangler",
+        "table":"table",
+        "nominalGraphEffects":"effects/graphs/nominalGraphEffects"
+
     }
 });
 
