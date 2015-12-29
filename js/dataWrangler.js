@@ -663,6 +663,35 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             self.table.reload(self.allColumnsDataArray, self);
         }
 
+        DataWrangler.prototype.addNewCategory = function(_colId,newCategoryElement){
+            var self = this;
+
+            var colId = _colId;
+
+            //set the minimum and maximum in the data strcuture
+            var sortIndexForNewCat = Object.keys(self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap).length;
+            if(!self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap.hasOwnProperty(newCategoryElement)){
+                self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap[newCategoryElement] = {
+                    value: 0,
+                    sortIndex: sortIndexForNewCat,
+                    type: "nominal",
+                    color:""
+                };
+            }
+            else{
+                //todo confirm whether to perform any operations or not
+            }
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            self.table = require('table');
+            self.table.reload(self.allColumnsDataArray, self);
+
+        }
+
 
         return DataWrangler.getInstance();
     });

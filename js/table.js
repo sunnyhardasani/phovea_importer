@@ -369,7 +369,7 @@ define(["jquery", "d3", "d3-tip",
             x.domain(d3FreMap.map(function (d) {
                 return d.key;
             }));
-            y.domain([0, d3.max(d3FreMap, function (d) {
+            y.domain([-1, d3.max(d3FreMap, function (d) {
                 return d.value.value;
             })]);
 
@@ -404,9 +404,11 @@ define(["jquery", "d3", "d3-tip",
                 })
                 .attr("width", x.rangeBand())
                 .attr("y", function (d) {
+                    console.log(d,d.y);
                     return d.y;
                 })
                 .attr("height", function (d) {
+                    console.log(d,(height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value)));
                     return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value));
                 })
                 .on('mouseover', tip.show)
@@ -1065,7 +1067,48 @@ define(["jquery", "d3", "d3-tip",
                         self.numericalOpr(d3.select(this),d);
                     }
                     else if(d.dataTypeObj.type == DATATYPE_NOMINAL){
-                        //self.numericalOpr(d3.select(this),d);
+                        self.nominalOpr(d3.select(this),d);
+                    }
+                });
+        }
+
+        /**
+         * This function will handle the nomminal
+         * operation of the data
+         * @param _head
+         * @param _data
+         */
+        Table.prototype.nominalOpr = function(_head,_data){
+            var self = this;
+
+            //fetch the required data
+            var head = _head;
+            var data = _data;
+
+            //this will append the min and max
+            //operation field into the UI for
+            //numerical operations
+            head.append("span")
+                .text("Add new category:");
+            head.append("input")
+                .attr("class","new-category")
+                .attr("name","new-category")
+                .attr("type","text")
+                .attr("size","3")
+                .attr("value","")
+                .style("border","0px");
+
+            head.append("span")
+                .attr("class","glyphicon glyphicon-plus")
+                .style("float","right")
+                .style("font-size","11px")
+                .on("click",function(){
+                    var newCategoryElement = head.select(".new-category").property("value");
+                    if(newCategoryElement) {
+                        self.parentInstance.addNewCategory(data.id - 1, newCategoryElement);
+                    }
+                    else{
+                        alert("Please define category !!!");
                     }
                 });
         }
@@ -1113,6 +1156,7 @@ define(["jquery", "d3", "d3-tip",
                 .on("click",function(){
                     var minElement = Number(head.select(".min").property("value"));
                     var maxElement = Number(head.select(".max").property("value"));
+
                     self.parentInstance.updateNumericalMinAndMax(data.id-1,
                         minElement,maxElement);
                 });
@@ -1285,19 +1329,19 @@ define(["jquery", "d3", "d3-tip",
             cells.text(function (d) {
                 return d;
             })
-                .attr("id", function (d, i) {
-                    return "col-" + i;
-                })
-                .style("border", "1px black solid")
-                .style("padding", "5px")
-                .style("font-size", "12px")
-                .style("overflow", "hidden")
-                .on("mouseover", function () {
-                    d3.select(this).style("background-color", "aliceblue")
-                })
-                .on("mouseout", function () {
-                    d3.select(this).style("background-color", "white")
-                });
+            .attr("id", function (d, i) {
+                return "col-" + i;
+            })
+            .style("border", "1px black solid")
+            .style("padding", "5px")
+            .style("font-size", "12px")
+            .style("overflow", "hidden")
+            .on("mouseover", function () {
+                d3.select(this).style("background-color", "aliceblue")
+            })
+            .on("mouseout", function () {
+                d3.select(this).style("background-color", "white")
+            });
 
 
             //remove in case data is not there
