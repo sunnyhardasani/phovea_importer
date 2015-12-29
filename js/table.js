@@ -88,9 +88,10 @@ define(["jquery", "d3", "d3-tip",
             self.printTableHeaders();
             self.paginate(self.currPage);
             self.printCharts();
+            self.highlightRowType();
 
             //this will set on resizable columns
-            $(self.parentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
+            //  $(self.parentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
             $(self.parentElementName + " " + "#string-opr-menu > span").click(function () {
                 $(self.parentElementName + " " + '#table-group').attr("class", "col-md-12");
                 $(self.parentElementName + " " + '#operations').attr("class", "col-md-0 hidden");
@@ -404,11 +405,9 @@ define(["jquery", "d3", "d3-tip",
                 })
                 .attr("width", x.rangeBand())
                 .attr("y", function (d) {
-                    console.log(d,d.y);
                     return d.y;
                 })
                 .attr("height", function (d) {
-                    console.log(d,(height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value)));
                     return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value));
                 })
                 .on('mouseover', tip.show)
@@ -541,9 +540,6 @@ define(["jquery", "d3", "d3-tip",
             var minVal = d3.min(histogram, function (d) {
                 return d.y;
             });
-
-            console.log(minVal,min);
-            console.log(maxVal,max);
 
             histogram.map(function (d) {
                 //appending the svg area on the bar graph to fetch information for mouse event
@@ -933,6 +929,31 @@ define(["jquery", "d3", "d3-tip",
         }
 
         /**
+         * This function is reposible for the higlighting
+         * of the selected row identifier, this function
+         * works independently with no extra inputs
+         */
+        Table.prototype.highlightRowType = function(){
+            var self = this;
+
+            for (key in self.data) {
+                var col = self.data[key];
+                if(col.isRowType){
+                    var id = col.id-1;
+                    var colId = "col-"+id;
+
+                    //this function will highlight all the column
+                    //whose row identifier is true
+                    var rows = document.getElementsByClassName(colId);
+                    for (var i = 0; i < rows.length ; i++) {
+                        rows[i].style.backgroundColor = "#D3D3D3";
+                        rows[i].innerHTML = "<strong>" + rows[i].innerHTML + "</strong>";
+                    }
+
+                }
+            }
+        }
+        /**
          * update columns
          */
         Table.prototype.printTableHeaders = function () {
@@ -954,12 +975,20 @@ define(["jquery", "d3", "d3-tip",
             self.table = d3.select(self.parentElementName + " " + "#importedTable").append("table")
                 .attr("id", "data-table")
                 .style("border-collapse", "collapse")
-                .style("border", "1px black solid")
+                //.style("border", "1px black solid")
                 .style("width", "" + tableWidth + "px"); //todo string type
 
             // making it global as regularly used by the function to update the cell value
             self.thead = self.table.append("thead");
             self.tbody = self.table.append("tbody");
+
+            //this function will place a new svg
+            // element for the col id type selection
+            self.rowIDSelectionOpr(columns);
+
+            //this function will place a new svg
+            //element for the row id type selection
+            //self.colIDSelectionOpr(columns);
 
             //add svg row in thhead
             var svgRow = self.thead.append("tr")
@@ -1009,12 +1038,12 @@ define(["jquery", "d3", "d3-tip",
             var closeImg = opr.append("div")
                 .style("text-align", "right");
 
-            closeImg.append("span")
-                .attr("class", "glyphicon glyphicon-remove-sign")
-                .style("margin-right", "5px")
-                .on("click", function (d, i) {
-                    self.hideColumn(i);
-                })
+            closeImg.append("input")
+                .attr("type", "checkbox")
+                .attr("name","remove-column")
+                .attr("value",function(d){
+                    return d.id-1;
+                });
 
             //add svg in svg cell
             var svg = svgCells.append("svg")
@@ -1046,6 +1075,120 @@ define(["jquery", "d3", "d3-tip",
                 .style("font-size", "12px");
         }
 
+        /**
+         * This function handles the selection of
+         * of row identifier on the table
+         * @param _columns
+         */
+        Table.prototype.rowIDSelectionOpr = function(_columns){
+            var self = this;
+
+            var columns = _columns;
+            var columnWidth = 150;
+            var intialWidth = 0;
+
+            //calculate intial and start index of the bar
+            var rectStartIndex = 0;
+            var flag = true;
+            for(key in columns){
+                var col = columns[key];
+                if(col.isRowType){
+                    if(flag){
+                        rectStartIndex = col.id - 1;
+                        flag = false;
+                    }
+                    intialWidth = intialWidth + 150;
+                }
+            }
+
+            var width = columnWidth * columns.length,
+                height = 6,
+                dragbarw = height+2;
+
+            var drag = d3.behavior.drag()
+                .origin(Object)
+                .on("drag", dragmove)
+                .on("dragend", dragstop);
+
+            var dragright = d3.behavior.drag()
+                .origin(Object)
+                .on("drag", rdragresize)
+                .on("dragend", rdragstop);
+
+            var rowIdSelSVG = self.thead.append("td")
+                .attr("colspan", columns.length)
+                .style("height", height)
+                .style("border","0px")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            var newg = rowIdSelSVG.append("g")
+                .data([{x: 0}]);
+
+            console.log(rectStartIndex);
+
+            var dragrect = newg.append("rect")
+                .attr("id", "active")
+                .attr("x", function(d) { return d.x = d.x + rectStartIndex * columnWidth; })
+                .attr("height", height)
+                .attr("width", intialWidth)
+                .style("fill","grey")
+                //.style("fill-opacity",0.5)
+                .attr("cursor", "move")
+                .call(drag);
+
+            var dragbarright = newg.append("rect")
+                .attr("x", function(d) { return d.x + intialWidth; })
+                //.attr("y", dragbarw/2)
+                .attr("id", "dragright")
+                .attr("height", dragbarw)
+                .attr("width", dragbarw/4)
+                .attr("fill", "black")
+                //.attr("fill-opacity", .5)
+                .attr("cursor", "ew-resize")
+                .call(dragright);
+
+            function rdragresize(d) {
+
+                console.log(d.x);
+                var stretchRectX = parseInt(d3.event.x / columnWidth);
+                console.log(stretchRectX);
+                var newX = Math.max(0,Math.min(intialWidth + stretchRectX * columnWidth,columnWidth * columns.length));
+                //move the right drag handle
+                dragbarright.attr("x",d.x = newX);
+
+                // resize the drag rectangle
+                // as we are only resizing from the right,
+                // the x coordinate does not need to change
+                dragrect.attr("width", parseInt(dragbarright.attr("x"))-parseInt(dragrect.attr("x")));
+            }
+
+            function dragmove(d) {
+                var rectx = parseInt(d3.event.x / columnWidth);
+                dragrect.attr("x", d.x = Math.min(width - intialWidth, rectx * columnWidth));
+                dragbarright.attr("x",d.x + parseInt(dragrect.attr("width")));
+            }
+
+            function dragstop(d) {
+                var leftIndex = parseInt(dragrect.attr("x"));
+                var rightIndex = parseInt(dragbarright.attr("x"));
+                var leftId = leftIndex / columnWidth;
+                var rightId = rightIndex / columnWidth;
+
+                self.parentInstance.changeRowType(leftId,rightId);
+            }
+
+            function rdragstop(d) {
+                var leftIndex = parseInt(dragrect.attr("x"));
+                var rightIndex = parseInt(dragbarright.attr("x"));
+                var leftId = leftIndex / columnWidth;
+                var rightId = rightIndex / columnWidth;
+
+                self.parentInstance.changeRowType(leftId,rightId);
+            }
+
+        }
         /**
          * This function will show the min/max fields
          * for numerical data and add category for the
@@ -1314,15 +1457,15 @@ define(["jquery", "d3", "d3-tip",
                 .on("mouseup", function (d, i) {
                     if (self.data[i]["dataTypeObj"].type == "string") {
                         // when selection is done on the string column
-                        return self.mouseUpEventTriggered(i);
+                        //return self.mouseUpEventTriggered(i);
                     }
                 })
-                .on("mouseover", function () {
+                /*.on("mouseover", function () {
                     d3.select(this).style("background-color", "aliceblue")
                 })
                 .on("mouseout", function () {
                     d3.select(this).style("background-color", "white")
-                });
+                })*/;
 
 
             //for updating cell values
@@ -1332,16 +1475,19 @@ define(["jquery", "d3", "d3-tip",
             .attr("id", function (d, i) {
                 return "col-" + i;
             })
+            .attr("class", function (d, i) {
+                return "col-" + i;
+            })
             .style("border", "1px black solid")
             .style("padding", "5px")
             .style("font-size", "12px")
             .style("overflow", "hidden")
-            .on("mouseover", function () {
+            /*.on("mouseover", function () {
                 d3.select(this).style("background-color", "aliceblue")
             })
             .on("mouseout", function () {
                 d3.select(this).style("background-color", "white")
-            });
+            })*/;
 
 
             //remove in case data is not there
@@ -1382,8 +1528,8 @@ define(["jquery", "d3", "d3-tip",
 
                 // requireJS will ensure that the StringOperations definition is available
                 // to use, we can now import it for use.
-                self.stringOperations = require('stringOperations');
-                self.stringOperations.reload(self.data, col, self.regex, self);
+                //self.stringOperations = require('stringOperations');
+                //self.stringOperations.reload(self.data, col, self.regex, self);
 
             }
         }

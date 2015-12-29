@@ -304,10 +304,11 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
              *  5. Finally send the data to the table creation
              */
 
-                //self.sliceRowId();    //todo - auto guess - currently guessing that the first row is column id
+
             self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
             self.formColumn();      //working
             self.guessDataType();   //working
+            self.sliceRowId();    //todo - auto guess - currently guessing that the first row is column id
 
             // requireJS will ensure that the Table definition is available
             // to use, we can now import it for use.
@@ -327,13 +328,18 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
              * need to discuss with Alex about this point
              * idea: can use data type for knowing aboubt this col
              */
-            self.rowId = [];
+            /*self.rowId = [];
 
             var key = 0;
             self.importedData.forEach(function (row) {
                 self.rowId[key] = self.importedData[key].shift();
                 key++;
-            });
+            });*/
+
+            //self.allColumnsDataArray[0].isRowType = true;
+            self.allColumnsDataArray[1].isRowType = true;
+            self.allColumnsDataArray[2].isRowType = true;
+            self.allColumnsDataArray[3].isRowType = true;
         }
 
         //todo
@@ -372,6 +378,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                             "colorScheme": colorbrewer["defaultScale"]["default"][12], // todo add this 12 into settings
                             "colId": self.colId[colKey],          //head will guess in separate function
                             "dataTypeObj": new Object(),         //data type will be guessed in separate function
+                            "isRowType":false,
                             "data": []
                         };
                     }
@@ -661,6 +668,39 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             //this will keep only one instance of the table class
             self.table = require('table');
             self.table.reload(self.allColumnsDataArray, self);
+        }
+
+        /**
+         * This function will change the the
+         * row identification type of the
+         * table
+         */
+        DataWrangler.prototype.changeRowType = function(_startIndex,_endIndex){
+            var self = this;
+
+            //this will select the start index and
+            //end index of the application
+            var startIndex = _startIndex;
+            var endIndex = _endIndex;
+
+            for(var key in self.allColumnsDataArray){
+                if(self.allColumnsDataArray[key].id-1 >= startIndex
+                        &&self.allColumnsDataArray[key].id-1 < endIndex){
+                    self.allColumnsDataArray[key].isRowType = true;
+                }
+                else{
+                    self.allColumnsDataArray[key].isRowType = false;
+                }
+            }
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            self.table = require('table');
+            self.table.reload(self.allColumnsDataArray, self);
+
         }
 
         DataWrangler.prototype.addNewCategory = function(_colId,newCategoryElement){

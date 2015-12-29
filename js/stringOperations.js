@@ -281,7 +281,12 @@ define(["jquery","d3", "colorbrewer"],
         barGroups.exit().remove();
     }
 
-
+    /**
+     *
+     * @param element
+     * @param check
+     * @param displayText
+     */
     StringOperations.prototype.onElementSelection = function (element, check, displayText) {
         var self = this;
 
