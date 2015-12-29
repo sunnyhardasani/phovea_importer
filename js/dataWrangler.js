@@ -336,10 +336,8 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                 key++;
             });*/
 
-            //self.allColumnsDataArray[0].isRowType = true;
-            self.allColumnsDataArray[1].isRowType = true;
-            self.allColumnsDataArray[2].isRowType = true;
-            self.allColumnsDataArray[3].isRowType = true;
+            //default selection
+            self.allColumnsDataArray[0].isRowType = true;
         }
 
         //todo
