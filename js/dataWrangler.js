@@ -641,5 +641,28 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
            self.table.reload(self.allColumnsDataArray, self);
        }
 
+        /**
+         * This will update numerical minimum and maximum
+         * value
+         */
+        DataWrangler.prototype.updateNumericalMinAndMax = function(_colId,_min,_max){
+            var self = this;
+
+            var colId = _colId;
+
+            //set the minimum and maximum in the data strcuture
+            self.allColumnsDataArray[colId]["dataTypeObj"].min = _min;
+            self.allColumnsDataArray[colId]["dataTypeObj"].max = _max;
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            self.table = require('table');
+            self.table.reload(self.allColumnsDataArray, self);
+        }
+
+
         return DataWrangler.getInstance();
     });

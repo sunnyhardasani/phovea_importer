@@ -1,0 +1,540 @@
+[
+  {
+    "id": 1,
+    "header": "case_id",
+    "datatype": {
+      "type": "string"
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 2,
+    "header": "accession_no",
+    "datatype": {
+      "type": "string"
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 3,
+    "header": "patient_mrn",
+    "datatype": {
+      "type": "error",
+      "expected_type": "numerical"
+    }
+  },
+  {
+    "id": 4,
+    "header": "patient_age",
+    "datatype": {
+      "type": "numerical",
+      "min": 17,
+      "max": 90
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 5,
+    "header": "patient_sex",
+    "datatype": {
+      "type": "nominal",
+      "categories": [
+        {
+          "name": "F",
+          "freq": {
+            "value": 47,
+            "sortIndex": 0,
+            "type": "string",
+            "color": "#a6cee3"
+          }
+        },
+        {
+          "name": "M",
+          "freq": {
+            "value": 52,
+            "sortIndex": 1,
+            "type": "string",
+            "color": "#1f78b4"
+          }
+        }
+      ]
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 6,
+    "header": "case_creation_date",
+    "datatype": {
+      "type": "string"
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 7,
+    "header": "primary_refmd_full_name",
+    "datatype": {
+      "type": "nominal",
+      "categories": [
+        {
+          "name": "ELIASON MD, MARK JOSEPH",
+          "freq": {
+            "value": 4,
+            "sortIndex": 0,
+            "type": "string",
+            "color": "#a6cee3"
+          }
+        },
+        {
+          "name": "PHO MD, LANA N",
+          "freq": {
+            "value": 5,
+            "sortIndex": 1,
+            "type": "string",
+            "color": "#1f78b4"
+          }
+        },
+        {
+          "name": "WOSETH MD, DOUGLAS",
+          "freq": {
+            "value": 4,
+            "sortIndex": 2,
+            "type": "string",
+            "color": "#b2df8a"
+          }
+        },
+        {
+          "name": "LEWIS MD, BETHANY K",
+          "freq": {
+            "value": 1,
+            "sortIndex": 3,
+            "type": "string",
+            "color": "#33a02c"
+          }
+        },
+        {
+          "name": "LARSEN NP, BROOKE",
+          "freq": {
+            "value": 7,
+            "sortIndex": 4,
+            "type": "string",
+            "color": "#fb9a99"
+          }
+        },
+        {
+          "name": "SHALE, CHRISTOPHER M",
+          "freq": {
+            "value": 1,
+            "sortIndex": 8,
+            "type": "string",
+            "color": "#e31a1c"
+          }
+        },
+        {
+          "name": "SWINYER MD, LEONARD J",
+          "freq": {
+            "value": 3,
+            "sortIndex": 9,
+            "type": "string",
+            "color": "#fdbf6f"
+          }
+        },
+        {
+          "name": "MATIS MD, WENDY L",
+          "freq": {
+            "value": 2,
+            "sortIndex": 10,
+            "type": "string",
+            "color": "#ff7f00"
+          }
+        },
+        {
+          "name": "ALLEN MD, D EDGAR",
+          "freq": {
+            "value": 5,
+            "sortIndex": 11,
+            "type": "string",
+            "color": "#cab2d6"
+          }
+        },
+        {
+          "name": "HULL MD, CHRISTOPHER M",
+          "freq": {
+            "value": 4,
+            "sortIndex": 12,
+            "type": "string",
+            "color": "#6a3d9a"
+          }
+        },
+        {
+          "name": "GROSSMAN MD, DOUGLAS",
+          "freq": {
+            "value": 6,
+            "sortIndex": 13,
+            "type": "string",
+            "color": "#ffff99"
+          }
+        },
+        {
+          "name": "MOSS MD, RICHARD L",
+          "freq": {
+            "value": 2,
+            "sortIndex": 16,
+            "type": "string",
+            "color": "#b15928"
+          }
+        },
+        {
+          "name": "BRADLEY MD, R RALPH",
+          "freq": {
+            "value": 11,
+            "sortIndex": 17,
+            "type": "string",
+            "color": "#a6cee3"
+          }
+        },
+        {
+          "name": "WOLF PA-C, STEVEN",
+          "freq": {
+            "value": 2,
+            "sortIndex": 18,
+            "type": "string",
+            "color": "#1f78b4"
+          }
+        },
+        {
+          "name": "WOODCOCK MD, JAMIE",
+          "freq": {
+            "value": 1,
+            "sortIndex": 20,
+            "type": "string",
+            "color": "#b2df8a"
+          }
+        },
+        {
+          "name": "SUMMERS MD, ERIKA",
+          "freq": {
+            "value": 6,
+            "sortIndex": 21,
+            "type": "string",
+            "color": "#33a02c"
+          }
+        },
+        {
+          "name": "REED MD, KURTIS",
+          "freq": {
+            "value": 2,
+            "sortIndex": 22,
+            "type": "string",
+            "color": "#fb9a99"
+          }
+        },
+        {
+          "name": "HANSEN MD, CHRISTOPHER B",
+          "freq": {
+            "value": 2,
+            "sortIndex": 24,
+            "type": "string",
+            "color": "#e31a1c"
+          }
+        },
+        {
+          "name": "HANSEN MD, C DAVID",
+          "freq": {
+            "value": 1,
+            "sortIndex": 28,
+            "type": "string",
+            "color": "#fdbf6f"
+          }
+        },
+        {
+          "name": "HYDE PA, MARK A",
+          "freq": {
+            "value": 4,
+            "sortIndex": 33,
+            "type": "string",
+            "color": "#ff7f00"
+          }
+        },
+        {
+          "name": "CALLIS DUFFIN MD, KRISTINA P",
+          "freq": {
+            "value": 2,
+            "sortIndex": 42,
+            "type": "string",
+            "color": "#cab2d6"
+          }
+        },
+        {
+          "name": "HYNGSTROM MD, JOHN",
+          "freq": {
+            "value": 1,
+            "sortIndex": 45,
+            "type": "string",
+            "color": "#6a3d9a"
+          }
+        },
+        {
+          "name": "NELSON PA-C, TYLER",
+          "freq": {
+            "value": 1,
+            "sortIndex": 51,
+            "type": "string",
+            "color": "#ffff99"
+          }
+        },
+        {
+          "name": "SONTHEIMER MD, RICHARD D",
+          "freq": {
+            "value": 5,
+            "sortIndex": 52,
+            "type": "string",
+            "color": "#b15928"
+          }
+        },
+        {
+          "name": "NEUENSCHWANDER DO, BRADLEY G",
+          "freq": {
+            "value": 4,
+            "sortIndex": 55,
+            "type": "string",
+            "color": "#a6cee3"
+          }
+        },
+        {
+          "name": "ANDTBACKA MD, ROBERT H",
+          "freq": {
+            "value": 3,
+            "sortIndex": 57,
+            "type": "string",
+            "color": "#1f78b4"
+          }
+        },
+        {
+          "name": "BOWEN MD, GLEN M",
+          "freq": {
+            "value": 1,
+            "sortIndex": 60,
+            "type": "string",
+            "color": "#b2df8a"
+          }
+        },
+        {
+          "name": "MUSE, DEREK D",
+          "freq": {
+            "value": 1,
+            "sortIndex": 71,
+            "type": "string",
+            "color": "#33a02c"
+          }
+        },
+        {
+          "name": "BRIMHALL DO, ANGELA",
+          "freq": {
+            "value": 2,
+            "sortIndex": 73,
+            "type": "string",
+            "color": "#fb9a99"
+          }
+        },
+        {
+          "name": "RAZIANO MD, PhD, RENATA M",
+          "freq": {
+            "value": 1,
+            "sortIndex": 79,
+            "type": "string",
+            "color": "#e31a1c"
+          }
+        },
+        {
+          "name": "CHONG MD, TRACIE",
+          "freq": {
+            "value": 1,
+            "sortIndex": 80,
+            "type": "string",
+            "color": "#fdbf6f"
+          }
+        },
+        {
+          "name": "POWELL MD, DOUGLAS L",
+          "freq": {
+            "value": 1,
+            "sortIndex": 81,
+            "type": "string",
+            "color": "#ff7f00"
+          }
+        },
+        {
+          "name": "BRYNER, JAMES R",
+          "freq": {
+            "value": 1,
+            "sortIndex": 88,
+            "type": "string",
+            "color": "#cab2d6"
+          }
+        },
+        {
+          "name": "JENSEN DO, JESSE",
+          "freq": {
+            "value": 1,
+            "sortIndex": 95,
+            "type": "string",
+            "color": "#6a3d9a"
+          }
+        },
+        {
+          "name": "JENSEN MD, JOSEPH DEAN",
+          "freq": {
+            "value": 1,
+            "sortIndex": 96,
+            "type": "string",
+            "color": "#ffff99"
+          }
+        }
+      ]
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 8,
+    "header": "spec_description",
+    "datatype": {
+      "type": "string"
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 9,
+    "header": "icd9",
+    "datatype": {
+      "type": "numerical",
+      "min": 78,
+      "max": 229
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  },
+  {
+    "id": 10,
+    "header": "diagnosis_text",
+    "datatype": {
+      "type": "string"
+    },
+    "colorSchemeSelected": [
+      "#a6cee3",
+      "#1f78b4",
+      "#b2df8a",
+      "#33a02c",
+      "#fb9a99",
+      "#e31a1c",
+      "#fdbf6f",
+      "#ff7f00",
+      "#cab2d6",
+      "#6a3d9a",
+      "#ffff99",
+      "#b15928"
+    ]
+  }
+]

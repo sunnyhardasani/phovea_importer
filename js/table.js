@@ -539,6 +539,10 @@ define(["jquery", "d3", "d3-tip",
             var minVal = d3.min(histogram, function (d) {
                 return d.y;
             });
+
+            console.log(minVal,min);
+            console.log(maxVal,max);
+
             histogram.map(function (d) {
                 //appending the svg area on the bar graph to fetch information for mouse event
                 d.svg = svgArea;
@@ -1022,6 +1026,7 @@ define(["jquery", "d3", "d3-tip",
                 });
 
             ////////////////////start  - code for drag and drop setting /////////////////////////////////
+            self.addHelperButtons(columns);
             self.addDragNDrop(columns);
             ////////////////////end - code for drag and drop setting /////////////////////////////////
 
@@ -1040,7 +1045,83 @@ define(["jquery", "d3", "d3-tip",
         }
 
         /**
-         * This function will handle all the drag and drop related operations of the table
+         * This function will show the min/max fields
+         * for numerical data and add category for the
+         * nominal data
+         */
+        Table.prototype.addHelperButtons = function(columns){
+            var self = this;
+
+            var thCell  = self.thead.append("tr")
+                .selectAll("th")
+                .data(columns)
+                .enter()
+                .append("th")
+                .style("border", "1px black solid")
+                .style("padding", "5px")
+                .style("font-size", "10px")
+                .each(function(d){
+                    if(d.dataTypeObj.type == DATATYPE_NUMERICAL){
+                        self.numericalOpr(d3.select(this),d);
+                    }
+                    else if(d.dataTypeObj.type == DATATYPE_NOMINAL){
+                        //self.numericalOpr(d3.select(this),d);
+                    }
+                });
+        }
+
+        /**
+         * This function will take care for the
+         * numerical operations perform on the
+         * graph like changing min and max value
+         *
+         * @param _head
+         * @param _data
+         */
+        Table.prototype.numericalOpr = function(_head,_data){
+            var self = this;
+
+            //fetch the require variable
+            var head = _head;
+            var data = _data;
+
+            //this will append the min and max
+            //operation field into the UI for
+            //numerical operations
+            head.append("span")
+                .text("Min:");
+            head.append("input")
+                .attr("class","min")
+                .attr("name","min")
+                .attr("type","text")
+                .attr("size","1.5")
+                .attr("value",data.dataTypeObj.min)
+                .style("border","0px");
+            head.append("span")
+                .text(" - Max:");
+            head.append("input")
+                .attr("name","max")
+                .attr("class","max")
+                .attr("type","text")
+                .attr("size","1.5")
+                .attr("value",data.dataTypeObj.max)
+                .style("border","0px");
+            head.append("span")
+                .attr("class","glyphicon glyphicon-retweet")
+                .style("float","right")
+                .style("font-size","11px")
+                .on("click",function(){
+                    var minElement = Number(head.select(".min").property("value"));
+                    var maxElement = Number(head.select(".max").property("value"));
+                    self.parentInstance.updateNumericalMinAndMax(data.id-1,
+                        minElement,maxElement);
+                });
+
+        }
+
+        /**
+         * This function will handle all the drag
+         * and drop related operations of the table
          *
          */
         Table.prototype.addDragNDrop = function (columns) {
