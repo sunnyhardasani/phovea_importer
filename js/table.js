@@ -370,7 +370,7 @@ define(["jquery", "d3", "d3-tip",
             x.domain(d3FreMap.map(function (d) {
                 return d.key;
             }));
-            y.domain([-1, d3.max(d3FreMap, function (d) {
+            y.domain([0, d3.max(d3FreMap, function (d) {
                 return d.value.value;
             })]);
 
@@ -405,7 +405,7 @@ define(["jquery", "d3", "d3-tip",
                 })
                 .attr("width", x.rangeBand())
                 .attr("y", function (d) {
-                    return d.y;
+                    return d.y-5;
                 })
                 .attr("height", function (d) {
                     return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value));
@@ -423,6 +423,8 @@ define(["jquery", "d3", "d3-tip",
 
                     return d.freObjValue.color;
                 })
+                .style("stroke-width","0.5")
+                .style("stroke","rgb(0,0,0)")
                 .call(drag)
                 .on("contextmenu", function (d) {
 
@@ -603,6 +605,8 @@ define(["jquery", "d3", "d3-tip",
                 .style("fill", function (d) {
                     return linearColorScale(d.y);
                 })
+                .style("stroke-width","0.5")
+                .style("stroke","black")
                 //setting up the tips
                 .on('mouseover', tip.show)
                 .on('mouseout', tip.hide)
@@ -770,7 +774,8 @@ define(["jquery", "d3", "d3-tip",
                     .style("fill", function (d, i) {
                         if (i == (histogram.length - 1)) return "#FF3333";
                     })
-
+                    .style("stroke-width","0.5")
+                    .style("stroke","black")
                     //setting up the tips
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide);
@@ -857,7 +862,8 @@ define(["jquery", "d3", "d3-tip",
                         if (i == (histogram.length - 1))
                             return "#FF3333";
                     })
-
+                    .style("stroke-width","0.5")
+                    .style("stroke","black")
                     //setting up the tips
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide);
