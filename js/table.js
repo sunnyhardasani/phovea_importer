@@ -554,9 +554,10 @@ define(["jquery", "d3", "d3-tip",
             });
 
             //create all the required scale
-            var linearColorScale = d3.scale.linear()
-                .domain([minVal, maxVal])
-                .range(selColor);
+
+
+            console.log(linearColorScale);
+
             var x = d3.scale.ordinal()
                 .domain(histogram.map(function (d) {
                     return d.x;
@@ -568,12 +569,26 @@ define(["jquery", "d3", "d3-tip",
                 })])
                 .range([0, height]);
 
+            console.log(d3.min(histogram, function (d) {
+                return x(d.x);
+            }), d3.max(histogram, function (d) {
+                return x(d.x);
+            }));
+
+            var linearColorScale = d3.scale.linear()
+                .domain([d3.min(histogram, function (d) {
+                    return x(d.x);
+                }), d3.max(histogram, function (d) {
+                    return x(d.x);
+                })])
+                .range([selColor[0],selColor[selColor.length-1]]);
+
             //D3 Tip defined
             var tip = d3tip()
                 .attr('class', 'd3-tip')
                 .offset([-10, 0])
                 .html(function (d) {
-                    return "<strong>Range: [</strong> <span style='color:red'>" + d3.min(d) + " - " + d3.max(d) + "</span><strong>]</strong>";
+                    return "<strong>Range: [</strong>" + d3.min(d) + " - " + d3.max(d) + "<strong>]</strong>";
                 });
 
             //this will select the svg area to print the chart
@@ -603,7 +618,8 @@ define(["jquery", "d3", "d3-tip",
                     return y(d.y);
                 })
                 .style("fill", function (d) {
-                    return linearColorScale(d.y);
+                    console.log(x(d.x));
+                    return linearColorScale(x(d.x));
                 })
                 .style("stroke-width","0.5")
                 .style("stroke","black")
