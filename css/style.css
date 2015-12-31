@@ -131,6 +131,9 @@ for better animation effect */
 #any {
   width: 30px; }
 
+#quote {
+  width: 30px; }
+
 #container-fluid {
   border-width: thin;
   height: 100%; }
@@ -140,8 +143,20 @@ for better animation effect */
   border-width: thin;
   padding: 0; }
 
+
 #table-group {
   align: left; }
+
+#topLeftOperations{
+  height: 75px;
+  overflow: hidden;
+}
+
+#topOperations {
+  height: 75px;
+  overflow-y : auto;
+  overflow-x : hidden;
+}
 
 #importedTable {
   border-width: thin;

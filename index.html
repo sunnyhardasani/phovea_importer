@@ -13,8 +13,22 @@
     <template id="importertemplate">
         <div class="container-fluid">
             <div id="main" class="row">
+                <div id="todelete" class="col-md-12">
+                    <select id="ddlViewBy">
+                        <option value="Set">Set</option>
+                        <option value="Collapse">Collapse</option>
+                        <option value="Copy Settings">Copy Settings</option>
+                        <option value="etc...">etc...</option>
+                    </select>
+                    <input id="dummy-add-button" type="button" value="+">
+                </div>
                 <div id="table-group" class="col-md-12">
-                    <div id="importedTable" class="col-md-12"></div>
+                    <div id="topLeftOperations" class="col-md-2">
+                    </div>
+                    <div id="topOperations" class="col-md-10"></div>
+                    <div id="leftOperations" class="col-md-2"></div>
+                    <div id="importedTable" class="col-md-10"></div>
+
                     <div id="paginate" class="col-md-12 text-center">
                         <ul class="pagination"></ul>
                     </div>
@@ -101,6 +115,10 @@
                         <input id="semicolon" type="radio" name="sep" value="semicolon">semicolon
                         &nbsp; or &nbsp; others
                         <input id="any" type="text" name="sep">
+                    </div>
+                    <div id="stringMarker">
+                        <strong> String marker </strong>
+                        <input id="quote" type="text">
                     </div>
                 </div>
             </div>

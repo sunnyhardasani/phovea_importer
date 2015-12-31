@@ -63,6 +63,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             self.data = data;
             self.file = file;
             self.mainInstance = _mainInstance;
+            self.quote = "";
             self.delimiter = {};
             self.idColumn = 0; //todo: this variable will indicate the column row in the data, need to guess automatically
             self.idRow = 0; //todo: this will indicate the row identification in the table
@@ -150,6 +151,12 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             $('#any').bind('input', function () {
                 // get the current value of the input field.
                 var val = $(this).val();
+                self.saveClicked();
+            });
+
+            // this will read the event on the
+            $('#quote').bind('input', function () {
+                self.saveClicked();
             });
 
             // this will read the event on the
@@ -188,7 +195,10 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             // todo: with all the delimiter
 
             //ref : http://stackoverflow.com/questions/366202/regex-for-splitting-a-string-using-space-when-not-surrounded-by-single-or-double
-            var rxSemi = /(?!\s|;|$)[^;"]*("(\\.|[^\\"])*"[^;"]*)*/g;
+            /*var rxSemi = /(?!\s|;|$)[^;\+]*(\\+(\\.|[^\+])*\\+[^;\+]*)*!/g;*/
+
+            //var rxSemi  = /(?!\s|;|$)[^;\+]*(\\+(\\.|[^\+])*\\+[^;\+]*)*!/g;
+            var rxSemi  = /(?!\s|;|$)[^;+]*(\+(\\.|[^+])*\+[^;+]*)*/g;
             var rxComma = /(?!\s|,|$)[^,"]*("(\\.|[^\\"])*"[^,"]*)*/g;
             var rxTab = /(?!\s|\t|$)[^\t"]*("(\\.|[^\\"])*"[^\t"]*)*/g;
             var rxSpace = /[^\s"']+|"([^"]*)"|'([^']*)'/;
@@ -210,6 +220,8 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             var nCommaCount = arrComma.length;
             var nTabCount = arrTab.length;
             var nSpaceCount = arrSpace.length;
+
+            console.log(nSemiCount,nCommaCount,nTabCount,nSpaceCount);
 
 
             // this will mark the guessed delimiter
@@ -244,24 +256,31 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
          * this function will change the global delimiter
          * with the change made on the ui
          */
-        DataWrangler.prototype.getDelimiter = function () {
+        DataWrangler.prototype.getDelimiterAndQuote = function () {
 
             var self = this;
 
+            //following will insert the quote
+            if ($id('quote').value != "") {
+                self.quote = "\\" + $id('quote').value.charAt(0);
+                console.log(self.quote);
+            }
+
+            //this will handle the delimiter
             if ($id('any').value != "") {
-                this.delimiter = $id('any').value.charAt(0);
+                self.delimiter = $id('any').value.charAt(0);
             }
             else if ($id('comma').checked) {
-                this.delimiter = ",";
+                self.delimiter = ",";
             }
             else if ($id('space').checked) {
-                this.delimiter = "\s";
+                self.delimiter = "\s";
             }
             else if ($id("tab").checked) {
-                this.delimiter = "\t";
+                self.delimiter = "\t";
             }
             else if ($id('semicolon').checked) {
-                this.delimiter = ";";
+                self.delimiter = ";";
             }
         }
 
@@ -277,14 +296,20 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             //clean complete table
             self.clean();
 
-
             //get the selected delimiter from the separator modal
-            self.getDelimiter();
+            self.getDelimiterAndQuote();
 
             //this data
             var text = self.data;
-            var dsv = d3.dsv(self.delimiter, "text/plain");
-            self.importedData = dsv.parseRows(text);
+
+            //todo temporary function call currently going to be used in testing
+            //remove this commnet when the testing is done
+            self.importedData = self.CSVToArray(text,self.delimiter, self.quote);
+
+            //removed d3.dsv implemented own parser
+            //var dsv = d3.dsv(self.delimiter, "text/plain");
+            //self.importedData = dsv.parseRows(text);
+
 
             //this will check if there is any element in the array then add
             //to the imported array
@@ -730,6 +755,82 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
 
         }
 
+        /**
+         * todo move this function to the utility class
+         * This will parse a delimited string into an array of
+         * arrays. The default delimiter is the comma, but this
+         * can be overriden in the second argument.
+         * Reference: http://www.bennadel.com/blog/1504-ask-ben-
+         * parsing-csv-strings-with-javascript-exec-regular-exp
+         * ression-command.htm
+         */
+        DataWrangler.prototype.CSVToArray  =  function( strData, strDelimiter, strQuote ){
+            // Check to see if the delimiter is defined. If not,
+            // then default to comma.
+            strDelimiter = (strDelimiter || ",");
+            strQuote = (strQuote || "\"");
+
+            // Create a regular expression to parse the CSV values.
+            var objPattern = new RegExp(
+                (
+                    // Delimiters.
+                    "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+                        // Quoted fields.
+                    "(?:"+strQuote+"([^"+strQuote+"]*(?:"+strQuote+strQuote+"[^"+strQuote+"]*)*)"+strQuote+"|" +
+                        // Standard fields.
+                    "([^\"\\" + strDelimiter + "\\r\\n]*))"
+                ),
+                "gi"
+            );
+
+            console.log(objPattern);
+
+            // Create an array to hold our data. Give the array
+            // a default empty first row.
+            var arrData = [[]];
+            // Create an array to hold our individual pattern
+            // matching groups.
+            var arrMatches = null;
+            // Keep looping over the regular expression matches
+            // until we can no longer find a match.
+            while (arrMatches = objPattern.exec( strData )){
+                // Get the delimiter that was found.
+                var strMatchedDelimiter = arrMatches[ 1 ];
+                // Check to see if the given delimiter has a length
+                // (is not the start of string) and if it matches
+                // field delimiter. If id does not, then we know
+                // that this delimiter is a row delimiter.
+                if (
+                    strMatchedDelimiter.length &&
+                    (strMatchedDelimiter != strDelimiter)
+                ){
+                    // Since we have reached a new row of data,
+                    // add an empty row to our data array.
+                    arrData.push( [] );
+                }
+                // Now that we have our delimiter out of the way,
+                // let's check to see which kind of value we
+                // captured (quoted or unquoted).
+                if (arrMatches[ 2 ]){
+                    // We found a quoted value. When we capture
+                    // this value, unescape any double quotes.
+                    var strMatchedValue = arrMatches[ 2 ].replace(
+                        new RegExp( "\"\"", "g" ),
+                        "\""
+                    );
+                } else {
+                    // We found a non-quoted value.
+                    var strMatchedValue = arrMatches[ 3 ];
+                }
+                // Now that we have our value string, let's add
+                // it to the data array.
+                arrData[ arrData.length - 1 ].push( strMatchedValue );
+            }
+            // Return the parsed data.
+            return( arrData );
+        }
+
 
         return DataWrangler.getInstance();
     });
+

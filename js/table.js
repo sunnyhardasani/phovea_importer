@@ -1130,7 +1130,6 @@ define(["jquery", "d3", "d3-tip",
                     var rows = document.getElementsByClassName(colId);
                     for (var i = 0; i < rows.length ; i++) {
                         rows[i].style.backgroundColor = "#D3D3D3";
-                        rows[i].innerHTML = "<strong>" + rows[i].innerHTML + "</strong>";
                     }
 
                 }
@@ -1147,13 +1146,71 @@ define(["jquery", "d3", "d3-tip",
             //this will look for the data  in
             var ind = 0;
             var dInd = 0;
+            var columnWidth = 150;
             for (key in self.data) {
                 var col = self.data[key];
                 columns[ind] = col;
-                columns[ind].x = (5 + 130) + (150 * ind); // required for drag and drop selection
+                columns[ind].x = (columnWidth/2 ) + (columnWidth * ind); // required for drag and drop selection
                 ind++;
             }
             var tableWidth = ind * 150;
+
+            //todo move to ui opeations function
+            $('#importedTable').on('scroll', function () {
+                $('#topOperations').scrollLeft($(this).scrollLeft());
+            });
+
+            $('#topOperations').on('scroll', function () {
+                $('#importedTable').scrollLeft($(this).scrollLeft());
+            });
+
+            //todo move to ui opeations function
+            $('#topOperations').on('scroll', function () {
+                $('#topLeftOperations').scrollTop($(this).scrollTop());
+            });
+
+
+
+            self.toptable = d3.select(self.parentElementName + " " + "#topOperations").append("table")
+                .attr("id", "top-table")
+                .style("border-collapse", "collapse")
+                .style("border", "0px black solid")
+                .style("width", "" + tableWidth + 2 * columnWidth + "px"); //todo string type
+            self.topTableHead = self.toptable.append("thead");
+            //self.topTableBody = self.toptable.append("tbody");
+
+            //todo following top left goes into the separate function
+            self.topLeftTable = d3.select(self.parentElementName + " " + "#topLeftOperations").append("table")
+                .attr("id", "top-left-table")
+                .style("border-collapse", "collapse")
+                .style("border", "0px black solid")
+                .style("width", 2 * columnWidth); //todo string type
+            self.topLeftTableHead = self.topLeftTable.append("thead");
+
+            $('#dummy-add-button').click(function(){
+                self.addDragNDrop(columns);
+                var e = document.getElementById("ddlViewBy");
+                var strUser = e.options[e.selectedIndex].value;
+
+                var topLeftTableOpr = self.topLeftTableHead.append("tr");
+                topLeftTableOpr.append("th")
+                    .text(strUser)
+                    .attr("width", columnWidth)
+                    .attr("height", 13);
+
+            });
+
+            //todo following left table goes into separate function
+            self.leftTable = d3.select(self.parentElementName + " " + "#leftOperations").append("table")
+                .attr("id", "left-table")
+                .style("border-collapse", "collapse")
+                .style("border", "0px black solid")
+                .style("width", 2 * columnWidth); //todo string type
+            self.leftTableHead = self.leftTable.append("thead");
+            var leftTableOpr = self.leftTableHead.append("tr");
+            leftTableOpr.append("th")
+                .attr("width", columnWidth)
+                .attr("height", 13);
 
             self.table = d3.select(self.parentElementName + " " + "#importedTable").append("table")
                 .attr("id", "data-table")
@@ -1165,6 +1222,15 @@ define(["jquery", "d3", "d3-tip",
             self.thead = self.table.append("thead");
             self.tbody = self.table.append("tbody");
 
+            //self.addDragNDrop(columns);
+            /*self.addDragNDrop(columns);
+            self.addDragNDrop(columns);
+            self.addDragNDrop(columns);
+            self.addDragNDrop(columns);
+            self.addDragNDrop(columns);*/
+
+            //self.addDragNDrop(columns);
+            //self.addDragNDrop(columns);
             //this function will place a new svg
             // element for the col id type selection
             self.rowIDSelectionOpr(columns);
@@ -1241,7 +1307,7 @@ define(["jquery", "d3", "d3-tip",
 
             ////////////////////start  - code for drag and drop setting /////////////////////////////////
             self.addHelperButtons(columns);
-            self.addDragNDrop(columns);
+            //self.addDragNDrop(columns);
             ////////////////////end - code for drag and drop setting /////////////////////////////////
 
             // add the column id names
@@ -1258,6 +1324,12 @@ define(["jquery", "d3", "d3-tip",
                 .style("font-size", "12px");
         }
 
+        Table.prototype.setCreationOpr = function(_columns){
+            var self = this;
+
+            var columns = _columns;
+            var columnWidth = 150;
+        }
         /**
          * This function handles the selection of
          * of row identifier on the table
@@ -1301,7 +1373,7 @@ define(["jquery", "d3", "d3-tip",
             var rowIdSelSVG = self.thead.append("td")
                 .attr("colspan", columns.length)
                 .style("height", height)
-                .style("border","0px")
+                .style("border","1px")
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height);
@@ -1492,15 +1564,15 @@ define(["jquery", "d3", "d3-tip",
         /**
          * This function will handle all the drag
          * and drop related operations of the table
-         *
          */
         Table.prototype.addDragNDrop = function (columns) {
             var self = this;
 
-            var width = 150 * columns.length,
-                height = 12,
+            var columnWidth = 150;
+            var width = columnWidth * columns.length,
+                height = 13,
                 radius = 3,
-                radio = 5;
+                radio = 6;
 
             var drag = d3.behavior.drag()
                 .origin(function (d) {
@@ -1509,7 +1581,10 @@ define(["jquery", "d3", "d3-tip",
                 .on("drag", dragmove)
                 .on("dragend", dragstop);
 
-            var osvg = self.thead.append("th").attr("colspan", columns.length).append("svg")
+            var rsvg = self.topTableHead.append("tr");
+
+            var osvg = rsvg.append("th").attr("colspan", columns.length)
+                .append("svg")
                 .attr("width", width)
                 .attr("height", height);
 
@@ -1575,7 +1650,8 @@ define(["jquery", "d3", "d3-tip",
             function checkRightRadios(fromLoc, currentLoc) {
                 for (var i = 0; i < c[0].length; i++) {
                     var selectedCircle = d3.select(c[0][i]);
-                    if (currentLoc > selectedCircle.attr("cx") && selectedCircle.attr("cx") >= fromLoc) {
+                    if (currentLoc > selectedCircle.attr("cx")
+                        && selectedCircle.attr("cx") >= fromLoc) {
                         selectedCircle.attr("visibility", "visible");
                     }
                 }
