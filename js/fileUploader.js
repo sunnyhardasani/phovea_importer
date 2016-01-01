@@ -8,6 +8,8 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
     function ($,dataWrangler,settings,fileConfiguration) {
     "use strict";
 
+        console.log(dataWrangler);
+
     var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
     var INITIAL_END_BYTE = settings.localSettings().INITIAL_END_BYTE;
 
@@ -147,8 +149,8 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
 
                 // requireJS will ensure that the DataWrangler definition
                 // is available to use, we can now import it for use.
-                self.dataWrangler = require('dataWrangler');
-                self.dataWrangler.reload(data, file, self);
+                /*self.dataWrangler = require('dataWrangler');
+                self.*/dataWrangler.reload(data, file, self);
             }
         };
 

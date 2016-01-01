@@ -4,9 +4,10 @@
 
 define(["jquery", "d3", "d3-tip",
         "jquery-resizable-columns", "fileConfiguration",
-        "stringOperations", "utility/localSettings", "utility/modColorBrewer"],
-    function ($, d3, d3tip, jqueryResizableColumns, fileConfiguration,
-              stringOperations, settings, colorbrewer) {
+        "stringOperations", "utility/localSettings", "utility/modColorBrewer","topTableView"],
+    function (jquery,d3, d3tip, jqueryResizableColumns, fileConfiguration,
+              stringOperations, settings, colorbrewer,topTableView) {
+
 
         //defination of the variables
         var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
@@ -455,6 +456,13 @@ define(["jquery", "d3", "d3-tip",
             }
         }
 
+        /**
+         * This function is responsible for the
+         * printing of the ordinal graph on the
+         * main table
+         * @param _col
+         * @param _svgArea
+         */
         Table.prototype.printOrdinalGraph  = function(_col, _svgArea){
             var self = this;
 
@@ -716,9 +724,6 @@ define(["jquery", "d3", "d3-tip",
 
             //create all the required scale
 
-
-            console.log(linearColorScale);
-
             var x = d3.scale.ordinal()
                 .domain(histogram.map(function (d) {
                     return d.x;
@@ -730,11 +735,6 @@ define(["jquery", "d3", "d3-tip",
                 })])
                 .range([0, height]);
 
-            console.log(d3.min(histogram, function (d) {
-                return x(d.x);
-            }), d3.max(histogram, function (d) {
-                return x(d.x);
-            }));
 
             var linearColorScale = d3.scale.linear()
                 .domain([d3.min(histogram, function (d) {
@@ -779,7 +779,6 @@ define(["jquery", "d3", "d3-tip",
                     return y(d.y);
                 })
                 .style("fill", function (d) {
-                    console.log(x(d.x));
                     return linearColorScale(x(d.x));
                 })
                 .style("stroke-width","0.5")
@@ -1131,7 +1130,6 @@ define(["jquery", "d3", "d3-tip",
                     for (var i = 0; i < rows.length ; i++) {
                         rows[i].style.backgroundColor = "#D3D3D3";
                     }
-
                 }
             }
         }
@@ -1155,29 +1153,8 @@ define(["jquery", "d3", "d3-tip",
             }
             var tableWidth = ind * 150;
 
-            //todo move to ui opeations function
-            $('#importedTable').on('scroll', function () {
-                $('#topOperations').scrollLeft($(this).scrollLeft());
-            });
-
-            $('#topOperations').on('scroll', function () {
-                $('#importedTable').scrollLeft($(this).scrollLeft());
-            });
-
-            //todo move to ui opeations function
-            $('#topOperations').on('scroll', function () {
-                $('#topLeftOperations').scrollTop($(this).scrollTop());
-            });
-
-
-
-            self.toptable = d3.select(self.parentElementName + " " + "#topOperations").append("table")
-                .attr("id", "top-table")
-                .style("border-collapse", "collapse")
-                .style("border", "0px black solid")
-                .style("width", "" + tableWidth + 2 * columnWidth + "px"); //todo string type
-            self.topTableHead = self.toptable.append("thead");
-            //self.topTableBody = self.toptable.append("tbody");
+            //var topTableView = require("topTableView");
+            topTableView.reload(columns);
 
             //todo following top left goes into the separate function
             self.topLeftTable = d3.select(self.parentElementName + " " + "#topLeftOperations").append("table")
@@ -1186,19 +1163,6 @@ define(["jquery", "d3", "d3-tip",
                 .style("border", "0px black solid")
                 .style("width", 2 * columnWidth); //todo string type
             self.topLeftTableHead = self.topLeftTable.append("thead");
-
-            $('#dummy-add-button').click(function(){
-                self.addDragNDrop(columns);
-                var e = document.getElementById("ddlViewBy");
-                var strUser = e.options[e.selectedIndex].value;
-
-                var topLeftTableOpr = self.topLeftTableHead.append("tr");
-                topLeftTableOpr.append("th")
-                    .text(strUser)
-                    .attr("width", columnWidth)
-                    .attr("height", 13);
-
-            });
 
             //todo following left table goes into separate function
             self.leftTable = d3.select(self.parentElementName + " " + "#leftOperations").append("table")
@@ -1222,18 +1186,9 @@ define(["jquery", "d3", "d3-tip",
             self.thead = self.table.append("thead");
             self.tbody = self.table.append("tbody");
 
-            //self.addDragNDrop(columns);
-            /*self.addDragNDrop(columns);
-            self.addDragNDrop(columns);
-            self.addDragNDrop(columns);
-            self.addDragNDrop(columns);
-            self.addDragNDrop(columns);*/
-
-            //self.addDragNDrop(columns);
-            //self.addDragNDrop(columns);
-            //this function will place a new svg
+            // this function will place a new svg
             // element for the col id type selection
-            self.rowIDSelectionOpr(columns);
+            //self.rowIDSelectionOpr(columns);
 
             //this function will place a new svg
             //element for the row id type selection
@@ -1324,6 +1279,10 @@ define(["jquery", "d3", "d3-tip",
                 .style("font-size", "12px");
         }
 
+        /**
+         *
+         * @param _columns
+         */
         Table.prototype.setCreationOpr = function(_columns){
             var self = this;
 
@@ -1370,7 +1329,8 @@ define(["jquery", "d3", "d3-tip",
                 .on("drag", rdragresize)
                 .on("dragend", rdragstop);
 
-            var rowIdSelSVG = self.thead.append("td")
+            var s = self.topTableHead.append("tr");
+            var rowIdSelSVG = s.append("td")
                 .attr("colspan", columns.length)
                 .style("height", height)
                 .style("border","1px")
@@ -1380,8 +1340,6 @@ define(["jquery", "d3", "d3-tip",
 
             var newg = rowIdSelSVG.append("g")
                 .data([{x: 0}]);
-
-            console.log(rectStartIndex);
 
             var dragrect = newg.append("rect")
                 .attr("id", "active")
@@ -1406,9 +1364,7 @@ define(["jquery", "d3", "d3-tip",
 
             function rdragresize(d) {
 
-                console.log(d.x);
                 var stretchRectX = parseInt(d3.event.x / columnWidth);
-                console.log(stretchRectX);
                 var newX = Math.max(0,Math.min(intialWidth + stretchRectX * columnWidth,columnWidth * columns.length));
                 //move the right drag handle
                 dragbarright.attr("x",d.x = newX);
@@ -1431,7 +1387,7 @@ define(["jquery", "d3", "d3-tip",
                 var leftId = leftIndex / columnWidth;
                 var rightId = rightIndex / columnWidth;
 
-                self.parentInstance.changeRowType(leftId,rightId);
+                self.parentInstance.changeRowType(leftId,rightId,rowNumber);
             }
 
             function rdragstop(d) {
@@ -1559,103 +1515,6 @@ define(["jquery", "d3", "d3-tip",
                         minElement,maxElement);
                 });
 
-        }
-
-        /**
-         * This function will handle all the drag
-         * and drop related operations of the table
-         */
-        Table.prototype.addDragNDrop = function (columns) {
-            var self = this;
-
-            var columnWidth = 150;
-            var width = columnWidth * columns.length,
-                height = 13,
-                radius = 3,
-                radio = 6;
-
-            var drag = d3.behavior.drag()
-                .origin(function (d) {
-                    return d;
-                })
-                .on("drag", dragmove)
-                .on("dragend", dragstop);
-
-            var rsvg = self.topTableHead.append("tr");
-
-            var osvg = rsvg.append("th").attr("colspan", columns.length)
-                .append("svg")
-                .attr("width", width)
-                .attr("height", height);
-
-            var rad1 = osvg.selectAll(".rad")
-                .data(columns).enter().append("circle")
-                .attr("r", radio)
-                .attr("class", "rad")
-                .style("fill", "white")
-                .style("stroke", "black")
-                .style("fill-opacity", 0)
-                .attr("cx", function (d, i) {
-                    return d.x;
-                })
-                .attr("cy", height / 2)
-                .on("click", function (d, i) {
-                    if (d3.select(c[0][i]).attr("visibility") == "hidden") {
-                        d3.select(c[0][i]).attr("visibility", "visible");
-                    }
-                    else {
-                        d3.select(c[0][i]).attr("visibility", "hidden");
-                    }
-                });
-
-            var c = osvg.selectAll(".dot")
-                .data(columns).enter().append("circle")
-                .attr("class", "dot")
-                .attr("r", radius)
-                .style("fill", "black")
-                //.style("fill-opacity","0.3")
-                .attr("visibility", "hidden")
-                .attr("cx", function (d, i) {
-                    return d.x;
-                })
-                .attr("cy", height / 2)
-                .call(drag);
-
-            var r = osvg.selectAll(".high")
-                .data(columns).enter().append("rect")
-                .attr("class", "high")
-                .style("fill", "black")
-                .style("fill-opacity", "0.3")
-                .attr("x", function (d, i) {
-                    return d.x;
-                })
-                .attr("y", height / 2 - radius)
-                .attr("height", radius * 2).call(drag);
-
-            function dragmove(d) {
-                var selRecLen = 0;
-                d3.select(this)
-                    .attr("cx", selRecLen = Math.max(d.x, Math.min(width - radius, d3.event.x)));
-                d3.select(r[0][d.id - 1]).attr("width", selRecLen - d.x);
-
-                checkRightRadios(d.x, selRecLen);
-
-            }
-
-            function dragstop(d) {
-                d3.select(r[0][d.id - 1]).attr("width", 0);
-                d3.select(this).attr("cx", d.x)
-            }
-
-            function checkRightRadios(fromLoc, currentLoc) {
-                for (var i = 0; i < c[0].length; i++) {
-                    var selectedCircle = d3.select(c[0][i]);
-                    if (currentLoc > selectedCircle.attr("cx")
-                        && selectedCircle.attr("cx") >= fromLoc) {
-                        selectedCircle.attr("visibility", "visible");
-                    }
-                }
-            }
         }
 
         /**

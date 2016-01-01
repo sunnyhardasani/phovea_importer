@@ -1,5 +1,12 @@
-define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/modColorBrewer"],
-    function ($, d3, d3tip, table, settings, colorbrewer) {
+define(["require","jquery", "table", "d3",
+        "utility/localSettings", "utility/modColorBrewer"],
+    function (require) {
+
+        var $ = require("jquery");
+        var d3 = require("d3");
+        var table =  require("table");
+        var settings =  require("utility/localSettings");
+        var colorbrewer =  require("utility/modColorBrewer");
 
         // default values
         var MIN_VALUE = settings.localSettings().MIN_VALUE;
@@ -105,7 +112,10 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
          */
         DataWrangler.prototype.clean = function () {
             d3.select("#colorbox-pop-up").selectAll("*").remove();
+            d3.select("#leftOperations").selectAll("*").remove();
+            d3.select("#topOperations").selectAll("*").remove();
             d3.select("#importedTable").selectAll("*").remove();
+
         }
 
         /**
@@ -198,7 +208,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             /*var rxSemi = /(?!\s|;|$)[^;\+]*(\\+(\\.|[^\+])*\\+[^;\+]*)*!/g;*/
 
             //var rxSemi  = /(?!\s|;|$)[^;\+]*(\\+(\\.|[^\+])*\\+[^;\+]*)*!/g;
-            var rxSemi  = /(?!\s|;|$)[^;+]*(\+(\\.|[^+])*\+[^;+]*)*/g;
+            var rxSemi = /(?!\s|;|$)[^;+]*(\+(\\.|[^+])*\+[^;+]*)*/g;
             var rxComma = /(?!\s|,|$)[^,"]*("(\\.|[^\\"])*"[^,"]*)*/g;
             var rxTab = /(?!\s|\t|$)[^\t"]*("(\\.|[^\\"])*"[^\t"]*)*/g;
             var rxSpace = /[^\s"']+|"([^"]*)"|'([^']*)'/;
@@ -221,7 +231,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             var nTabCount = arrTab.length;
             var nSpaceCount = arrSpace.length;
 
-            console.log(nSemiCount,nCommaCount,nTabCount,nSpaceCount);
+            console.log(nSemiCount, nCommaCount, nTabCount, nSpaceCount);
 
 
             // this will mark the guessed delimiter
@@ -304,7 +314,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
 
             //todo temporary function call currently going to be used in testing
             //remove this commnet when the testing is done
-            self.importedData = self.CSVToArray(text,self.delimiter, self.quote);
+            self.importedData = self.CSVToArray(text, self.delimiter, self.quote);
 
             //removed d3.dsv implemented own parser
             //var dsv = d3.dsv(self.delimiter, "text/plain");
@@ -337,8 +347,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
 
             // requireJS will ensure that the Table definition is available
             // to use, we can now import it for use.
-            self.table = require('table');
-            self.table.reload(self.allColumnsDataArray, self);
+            table.reload(self.allColumnsDataArray, self);
         }
 
         /**
@@ -355,11 +364,11 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
              */
             /*self.rowId = [];
 
-            var key = 0;
-            self.importedData.forEach(function (row) {
-                self.rowId[key] = self.importedData[key].shift();
-                key++;
-            });*/
+             var key = 0;
+             self.importedData.forEach(function (row) {
+             self.rowId[key] = self.importedData[key].shift();
+             key++;
+             });*/
 
             //default selection
             self.allColumnsDataArray[0].isRowType = true;
@@ -401,7 +410,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                             "colorScheme": colorbrewer["defaultScale"]["default"][12], // todo add this 12 into settings
                             "colId": self.colId[colKey],          //head will guess in separate function
                             "dataTypeObj": new Object(),         //data type will be guessed in separate function
-                            "isRowType":false,
+                            "isRowType": false,
                             "data": []
                         };
                     }
@@ -473,7 +482,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                                 value: 1,
                                 sortIndex: index,
                                 type: "numerical",
-                                color:""
+                                color: ""
                             };
                         }
                         else {
@@ -498,7 +507,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                                 value: 1,
                                 sortIndex: index,
                                 type: "string",
-                                color:""
+                                color: ""
                             };
                         }
                         else {
@@ -592,12 +601,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             self.clean();
 
             //this will keep only one instance of the table class
-            if (!self.table) {
-                self.table = new Table(self.allColumnsDataArray, self);
-            }
-            else {
-                self.table.reload(self.allColumnsDataArray, self);
-            }
+            table.reload(self.allColumnsDataArray, self);
         }
 
         /**
@@ -609,7 +613,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
         DataWrangler.prototype.changeColColor = function (colId, newColor) {
             var self = this;
 
-            if(self.allColumnsDataArray[colId].colorScheme !== newColor ) {
+            if (self.allColumnsDataArray[colId].colorScheme !== newColor) {
                 self.allColumnsDataArray[colId].colorScheme = newColor;
 
                 for (var obj in self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap) {
@@ -621,12 +625,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                 self.clean();
 
                 //this will keep only one instance of the table class
-                if (!self.table) {
-                    self.table = new Table(self.allColumnsDataArray, self);
-                }
-                else {
-                    self.table.reload(self.allColumnsDataArray, self);
-                }
+                table.reload(self.allColumnsDataArray, self);
             }
         }
 
@@ -656,26 +655,26 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
          * @param colId
          * @param freqMap
          */
-       DataWrangler.prototype.setNewFreqMap = function(colId, freqMap){
-           var self = this;
+        DataWrangler.prototype.setNewFreqMap = function (colId, freqMap) {
+            var self = this;
 
-           //set the new freq map
-           self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap = freqMap;
+            //set the new freq map
+            self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap = freqMap;
 
-           //todo the following line of code in the
-           //separate function of table reinitialize
-           self.clean();
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
 
-           //this will keep only one instance of the table class
-           self.table = require('table');
-           self.table.reload(self.allColumnsDataArray, self);
-       }
+            //this will keep only one instance of the table class
+            self.table = require('table');
+            self.table.reload(self.allColumnsDataArray, self);
+        }
 
         /**
          * This will update numerical minimum and maximum
          * value
          */
-        DataWrangler.prototype.updateNumericalMinAndMax = function(_colId,_min,_max){
+        DataWrangler.prototype.updateNumericalMinAndMax = function (_colId, _min, _max) {
             var self = this;
 
             var colId = _colId;
@@ -698,21 +697,31 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
          * row identification type of the
          * table
          */
-        DataWrangler.prototype.changeRowType = function(_startIndex,_endIndex){
+        DataWrangler.prototype.changeRowType = function (_oprIdArr) {
             var self = this;
 
-            //this will select the start index and
-            //end index of the application
-            var startIndex = _startIndex;
-            var endIndex = _endIndex;
+            var oprIdArr = _oprIdArr;
 
-            for(var key in self.allColumnsDataArray){
-                if(self.allColumnsDataArray[key].id-1 >= startIndex
-                        &&self.allColumnsDataArray[key].id-1 < endIndex){
-                    self.allColumnsDataArray[key].isRowType = true;
-                }
-                else{
-                    self.allColumnsDataArray[key].isRowType = false;
+            for (var key in self.allColumnsDataArray) {
+                self.allColumnsDataArray[key].isRowType = false;
+            }
+
+            for (var key in self.allColumnsDataArray) {
+
+                for(opr in oprIdArr) {
+
+                    if(oprIdArr[opr].type === "ID") {
+
+                        //this will select the start index and
+                        //end index of the application
+                        var startIndex = oprIdArr[opr].obj.left;
+                        var endIndex = oprIdArr[opr].obj.right;
+
+                        if (self.allColumnsDataArray[key].id - 1 >= startIndex
+                            && self.allColumnsDataArray[key].id - 1 < endIndex) {
+                            self.allColumnsDataArray[key].isRowType = true;
+                        }
+                    }
                 }
             }
 
@@ -721,27 +730,26 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             self.clean();
 
             //this will keep only one instance of the table class
-            self.table = require('table');
-            self.table.reload(self.allColumnsDataArray, self);
+            table.reload(self.allColumnsDataArray, self);
 
         }
 
-        DataWrangler.prototype.addNewCategory = function(_colId,newCategoryElement){
+        DataWrangler.prototype.addNewCategory = function (_colId, newCategoryElement) {
             var self = this;
 
             var colId = _colId;
 
             //set the minimum and maximum in the data strcuture
             var sortIndexForNewCat = Object.keys(self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap).length;
-            if(!self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap.hasOwnProperty(newCategoryElement)){
+            if (!self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap.hasOwnProperty(newCategoryElement)) {
                 self.allColumnsDataArray[colId]["dataTypeObj"].keyCountMap[newCategoryElement] = {
                     value: 0,
                     sortIndex: sortIndexForNewCat,
                     type: "nominal",
-                    color:""
+                    color: ""
                 };
             }
-            else{
+            else {
                 //todo confirm whether to perform any operations or not
             }
 
@@ -750,8 +758,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             self.clean();
 
             //this will keep only one instance of the table class
-            self.table = require('table');
-            self.table.reload(self.allColumnsDataArray, self);
+            table.reload(self.allColumnsDataArray, self);
 
         }
 
@@ -764,7 +771,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
          * parsing-csv-strings-with-javascript-exec-regular-exp
          * ression-command.htm
          */
-        DataWrangler.prototype.CSVToArray  =  function( strData, strDelimiter, strQuote ){
+        DataWrangler.prototype.CSVToArray = function (strData, strDelimiter, strQuote) {
             // Check to see if the delimiter is defined. If not,
             // then default to comma.
             strDelimiter = (strDelimiter || ",");
@@ -776,7 +783,7 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                     // Delimiters.
                     "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
                         // Quoted fields.
-                    "(?:"+strQuote+"([^"+strQuote+"]*(?:"+strQuote+strQuote+"[^"+strQuote+"]*)*)"+strQuote+"|" +
+                    "(?:" + strQuote + "([^" + strQuote + "]*(?:" + strQuote + strQuote + "[^" + strQuote + "]*)*)" + strQuote + "|" +
                         // Standard fields.
                     "([^\"\\" + strDelimiter + "\\r\\n]*))"
                 ),
@@ -793,9 +800,9 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
             var arrMatches = null;
             // Keep looping over the regular expression matches
             // until we can no longer find a match.
-            while (arrMatches = objPattern.exec( strData )){
+            while (arrMatches = objPattern.exec(strData)) {
                 // Get the delimiter that was found.
-                var strMatchedDelimiter = arrMatches[ 1 ];
+                var strMatchedDelimiter = arrMatches[1];
                 // Check to see if the given delimiter has a length
                 // (is not the start of string) and if it matches
                 // field delimiter. If id does not, then we know
@@ -803,33 +810,56 @@ define(["jquery", "d3", "d3-tip", "table", "utility/localSettings", "utility/mod
                 if (
                     strMatchedDelimiter.length &&
                     (strMatchedDelimiter != strDelimiter)
-                ){
+                ) {
                     // Since we have reached a new row of data,
                     // add an empty row to our data array.
-                    arrData.push( [] );
+                    arrData.push([]);
                 }
                 // Now that we have our delimiter out of the way,
                 // let's check to see which kind of value we
                 // captured (quoted or unquoted).
-                if (arrMatches[ 2 ]){
+                if (arrMatches[2]) {
                     // We found a quoted value. When we capture
                     // this value, unescape any double quotes.
-                    var strMatchedValue = arrMatches[ 2 ].replace(
-                        new RegExp( "\"\"", "g" ),
+                    var strMatchedValue = arrMatches[2].replace(
+                        new RegExp("\"\"", "g"),
                         "\""
                     );
                 } else {
                     // We found a non-quoted value.
-                    var strMatchedValue = arrMatches[ 3 ];
+                    var strMatchedValue = arrMatches[3];
                 }
                 // Now that we have our value string, let's add
                 // it to the data array.
-                arrData[ arrData.length - 1 ].push( strMatchedValue );
+                arrData[arrData.length - 1].push(strMatchedValue);
             }
             // Return the parsed data.
-            return( arrData );
+            return ( arrData );
         }
 
+        /**
+         * copy settings
+         */
+        DataWrangler.prototype.copySettings = function (fromCol, arrSelectedCol) {
+            var self = this;
+
+            var copyColData = self.allColumnsDataArray[fromCol];
+            for (var key in self.allColumnsDataArray) {
+                if(arrSelectedCol[key]){
+                    self.allColumnsDataArray[key].colorScheme = copyColData.colorScheme;
+                    self.allColumnsDataArray[key]["dataTypeObj"].min = copyColData["dataTypeObj"].min;
+                    self.allColumnsDataArray[key]["dataTypeObj"].max  = copyColData["dataTypeObj"].max;
+                    self.allColumnsDataArray[key]["dataTypeObj"].type = copyColData["dataTypeObj"].type;
+                }
+            }
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            table.reload(self.allColumnsDataArray, self);
+        }
 
         return DataWrangler.getInstance();
     });

@@ -10,8 +10,9 @@ requirejs.config({
         "load-component":"utility/loadComponent",
         "dataWrangler":"dataWrangler",
         "table":"table",
-        "nominalGraphEffects":"effects/graphs/nominalGraphEffects"
-
+        "nominalGraphEffects":"effects/graphs/nominalGraphEffects",
+        "topTableData":"topTableData",
+        "topTableView":"topTableView"
     }
 });
 
@@ -20,7 +21,7 @@ define(["require",
         "fileConfiguration",
         "load-component"],
 
-    function (require,fileUploader,fileConfiguration,loadComponent) {
+    function (require) {
 
     // requireJS will ensure that the FileUploader,
     // FileConfiguration definition is available
