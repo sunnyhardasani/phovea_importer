@@ -75,6 +75,7 @@ define(["require","jquery", "table", "d3",
             self.idColumn = 0; //todo: this variable will indicate the column row in the data, need to guess automatically
             self.idRow = 0; //todo: this will indicate the row identification in the table
             self.arrRowTypes = [];
+            self.arrIgnoreRows = [];
 
             //clean all the previous content on the separator modal
             self.clean();
@@ -112,11 +113,12 @@ define(["require","jquery", "table", "d3",
          * @param msg
          */
         DataWrangler.prototype.clean = function () {
+            var self = this;
+
             d3.select("#colorbox-pop-up").selectAll("*").remove();
             d3.select("#leftOperations").selectAll("*").remove();
             d3.select("#topOperations").selectAll("*").remove();
             d3.select("#importedTable").selectAll("*").remove();
-
         }
 
         /**
@@ -232,8 +234,6 @@ define(["require","jquery", "table", "d3",
             var nTabCount = arrTab.length;
             var nSpaceCount = arrSpace.length;
 
-            console.log(nSemiCount, nCommaCount, nTabCount, nSpaceCount);
-
 
             // this will mark the guessed delimiter
             // on the ui of the separator modal
@@ -274,7 +274,6 @@ define(["require","jquery", "table", "d3",
             //following will insert the quote
             if ($id('quote').value != "") {
                 self.quote = "\\" + $id('quote').value.charAt(0);
-                console.log(self.quote);
             }
 
             //this will handle the delimiter
@@ -341,7 +340,7 @@ define(["require","jquery", "table", "d3",
              */
 
 
-            self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
+            //self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
             self.formColumn();      //working
             self.guessDataType();   //working
             self.sliceRowId();    //todo - auto guess - currently guessing that the first row is column id
@@ -386,7 +385,6 @@ define(["require","jquery", "table", "d3",
              * compare with the data type if all the column have either string or int data type then
              */
 
-
             self.colId = self.importedData.shift();
 
         }
@@ -398,8 +396,8 @@ define(["require","jquery", "table", "d3",
             var self = this;
 
             self.allColumnsDataArray = {};
+            var rowCount = 0;
             self.importedData.forEach(function (row) {
-
                 var colKey = 0;
                 row.forEach(function (cell) {
 
@@ -409,7 +407,7 @@ define(["require","jquery", "table", "d3",
                             //insert if any more column information is required
                             "id": colKey,
                             "colorScheme": colorbrewer["defaultScale"]["default"][12], // todo add this 12 into settings
-                            "colId": self.colId[colKey],          //head will guess in separate function
+                            //"colId": self.colId[colKey],          //head will guess in separate function
                             "dataTypeObj": new Object(),         //data type will be guessed in separate function
                             "isRowType": false,
                             "data": []
@@ -419,13 +417,20 @@ define(["require","jquery", "table", "d3",
                     // as the column key start from zero this is the starting key
                     self.allColumnsDataArray[colKey].id = colKey + 1;
 
+
                     // push the cell content into repective array
                     // this data is use for printing
-                    self.allColumnsDataArray[colKey].data.push(cell);
+                    //if(self.arrIgnoreRows[rowCount] !== undefined ) {
+                        if(self.arrIgnoreRows[rowCount] !== 1) {
+                            self.allColumnsDataArray[colKey].data.push(cell);
+                        }
+                    //}
 
                     //increase the key
                     colKey++;
                 });
+
+                rowCount++;
             });
         }
 
@@ -791,7 +796,6 @@ define(["require","jquery", "table", "d3",
                 "gi"
             );
 
-            console.log(objPattern);
 
             // Create an array to hold our data. Give the array
             // a default empty first row.
@@ -891,6 +895,21 @@ define(["require","jquery", "table", "d3",
             //before setting new this will clear
             //all the previous set values
             return self.arrRowTypes;
+        }
+
+        DataWrangler.prototype.setRowsToIgnore = function(arrIgnoreRows){
+            var self = this;
+
+            self.arrIgnoreRows = arrIgnoreRows;
+
+            self.saveClicked(null);
+
+        }
+
+        DataWrangler.prototype.getRowsToIgnore = function(){
+            var self = this;
+
+            return self.arrIgnoreRows;
         }
 
         return DataWrangler.getInstance();

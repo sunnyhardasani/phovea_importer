@@ -71,21 +71,27 @@ define(["require","jquery"],function(require){
             obj:_obj
         };
 
-        //this will take all the operations
-        //and give to datawrangler to set
-        //todo make similar changes in the topTableData
-        var arr=[];
-        for(key in self.operations) {
-            var type = self.operations[key].type;
-            var obj = self.operations[key].obj;
-            if (type === "ID") {
-                for (var index = obj.topIndex; index < obj.bottomIndex; index++) {
-                    arr[index] = true;
+        if(_type == "ID") {
+            //this will take all the operations
+            //and give to datawrangler to set
+            //todo make similar changes in the topTableData
+            var arr = [];
+            for (key in self.operations) {
+                var type = self.operations[key].type;
+                var obj = self.operations[key].obj;
+                if (type === "ID") {
+                    for (var index = obj.topIndex; index < obj.bottomIndex; index++) {
+                        arr[index] = true;
+                    }
                 }
             }
-        }
 
-        self.dataWranglerIns.setRowTypeID(arr);
+            self.dataWranglerIns.setRowTypeID(arr);
+        }
+        else if(_type == "REMOVE"){
+            var arrVisibilityStatus = _obj;
+            self.dataWranglerIns.setRowsToIgnore(arrVisibilityStatus);
+        }
     }
 
     LeftTableData.prototype.getAllOperations = function () {

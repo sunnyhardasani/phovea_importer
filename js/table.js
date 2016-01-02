@@ -35,6 +35,7 @@ define(["jquery", "d3", "d3-tip",
 
             //todo this will be updated by taking the constructor parameter
             self.parentElementName = "x-importer-template";
+            self.originalDataFlag = true;
         }
 
         /**
@@ -63,6 +64,13 @@ define(["jquery", "d3", "d3-tip",
             self.dataToDisplay = [];
             self.parentInstance = _parentInstance;
 
+            if(self.originalDataFlag){
+                self.originalData = _data;
+                self.originalDataFlag = false;
+                self.rowCount = self.originalData[0]["data"].length;
+            }
+
+
             //this will remove all the tips
             $(".d3-tip").remove();
             $(".n").remove();
@@ -81,7 +89,6 @@ define(["jquery", "d3", "d3-tip",
             var self = this;
 
             //take the row count and col count
-            self.rowCount = self.data[0]["data"].length;
             self.colCount = Object.keys(self.data).length;
             self.totalPages = Math.ceil(self.rowCount / DISPLAY_ROW_COUNT);
 
@@ -92,6 +99,7 @@ define(["jquery", "d3", "d3-tip",
             self.printCharts();
             self.highlightRowType();
             self.highlightColType();
+            self.highlightIgnoreRows();
 
             //this will set on resizable columns
             //  $(self.parentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
@@ -1146,10 +1154,27 @@ define(["jquery", "d3", "d3-tip",
 
                 //this function will highlight all the row ids
                 var rows = document.getElementsByClassName(rowId);
-                console.log(rows);
-
                 for (var i = 0; i < rows.length ; i++) {
                     rows[i].style.backgroundColor = "#D3D3D3";
+                }
+            }
+        }
+
+        Table.prototype.highlightIgnoreRows = function(){
+            var self = this;
+
+            var arr = self.parentInstance.getRowsToIgnore();
+            for(key in arr) {
+                if (arr[key] == 1) {
+                    var id = key;
+                    var rowId = "row-" + id;
+
+                    //this function will highlight all the row ids
+                    var rows = document.getElementsByClassName(rowId);
+
+                    for (var i = 0; i < rows.length; i++) {
+                        rows[i].style.backgroundColor = "#FF3333";
+                    }
                 }
             }
         }
@@ -1185,7 +1210,8 @@ define(["jquery", "d3", "d3-tip",
             self.topLeftTableHead = self.topLeftTable.append("thead");
 
             //todo following left table goes into separate function
-           leftTableView.reload(columns);
+            var rowsToCreateLeftView = (self.rowCount / DISPLAY_ROW_COUNT >= 1) ? DISPLAY_ROW_COUNT : self.rowCount;
+           leftTableView.reload(columns,rowsToCreateLeftView);
 
             self.table = d3.select(self.parentElementName + " " + "#importedTable").append("table")
                 .attr("id", "data-table")
@@ -1276,7 +1302,7 @@ define(["jquery", "d3", "d3-tip",
             //self.addDragNDrop(columns);
             ////////////////////end - code for drag and drop setting /////////////////////////////////
 
-            // add the column id names
+        /*    // add the column id names
             self.thead.append("tr")
                 .selectAll("th")
                 .data(columns)
@@ -1287,7 +1313,7 @@ define(["jquery", "d3", "d3-tip",
                 })
                 .style("border", "1px black solid")
                 .style("padding", "5px")
-                .style("font-size", "12px");
+                .style("font-size", "12px");*/
         }
 
         /**
@@ -1427,6 +1453,7 @@ define(["jquery", "d3", "d3-tip",
                 .style("border", "1px black solid")
                 .style("padding", "5px")
                 .style("font-size", "10px")
+                .attr("height","24.44")//todo think some permananet solution
                 .each(function(d){
                     if(d.dataTypeObj.type == DATATYPE_NUMERICAL){
                         self.numericalOpr(d3.select(this),d);
@@ -1543,11 +1570,15 @@ define(["jquery", "d3", "d3-tip",
             var rowIndex = 0;
             // this will create the data 2d array which
             // will be used to print the data
-            for (var index = (pageNum - 1) * DISPLAY_ROW_COUNT; index < ((pageNum - 1) * DISPLAY_ROW_COUNT) + DISPLAY_ROW_COUNT && index < self.rowCount; index++) {
+            for (var index = (pageNum - 1) * DISPLAY_ROW_COUNT;
+                 index < ((pageNum - 1) * DISPLAY_ROW_COUNT) + DISPLAY_ROW_COUNT && index < self.rowCount;
+                 index++) {
+
                 self.dataToDisplay[rowIndex] = [];
                 for (var colIndex = 0; colIndex < self.colCount; colIndex++) {
-                    self.dataToDisplay[rowIndex][colIndex] = self.data[colIndex]["data"][index];
+                    self.dataToDisplay[rowIndex][colIndex] = self.originalData[colIndex]["data"][index];
                 }
+                console.log(rowIndex);
                 rowIndex++;
             }
         }
