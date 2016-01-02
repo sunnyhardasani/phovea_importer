@@ -2,21 +2,22 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(["jquery","d3","topTableData"],
-        function($,d3,topTableData){
+define(["jquery","d3","leftTableData"/*,"localSettings"*/],
+        function($,d3,leftTableData/*,settings*/){
 
     //instance of the class
     var instance = null;
+    var DISPLAY_ROW_COUNT = 14 + 1//header;// settings.localSettings().DISPLAY_ROW_COUNT;
 
     /**
      * if class is reinitialized then throws an eror
      * @constructor
      */
-    function TopTableView() {
+    function LeftTableView() {
         var self = this;
 
         if (instance !== null) {
-            throw new Error("Cannot instantiate more than one TopTableView, use TopTableView.getInstance()");
+            throw new Error("Cannot instantiate more than one LeftTableView, use LeftTableView.getInstance()");
         }
 
         self.parentElementName = "x-importer-template";
@@ -29,37 +30,20 @@ define(["jquery","d3","topTableData"],
      * will be called once on the initialiaztion
      * of the application
      */
-    TopTableView.prototype.initUI = function () {
+    LeftTableView.prototype.initUI = function () {
         var self = this;
 
+        console.log("left table");
+
         $('#importedTable').on('scroll', function () {
-            $('#topOperations').scrollLeft($(this).scrollLeft());
-        });
-
-        $('#topOperations').on('scroll', function () {
-            $('#importedTable').scrollLeft($(this).scrollLeft());
-        });
-
-        $('#topOperations').on('scroll', function () {
-            $('#topLeftOperations').scrollTop($(this).scrollTop());
+            $('#leftOperations').scrollLeft($(this).scrollLeft());
         });
 
         //temoparary button to keep the rows
-        $('#add-col-id-button').click(function(){
-            self.oprCount++;
-            topTableData.insertNewOpr(self.oprCount,"ID",{"left":0,"right":1});
-        });
-
-        $('#copy-id-button').click(function(){
+        $('#add-row-id-button').click(function(){
             self.oprCount++;
 
-            self.selectedCol = [];
-            //check for all the button whose radio buttons are marked
-            //and take action against it
-            for (var i = 0; i < self.columns.length; i++) {
-                self.selectedCol.push(false);
-            }
-            topTableData.insertNewOpr(self.oprCount,"COPY_SETTINGS",{"fromCol":0 ,"arr":self.selectedCol});
+            leftTableData.insertNewOpr(self.oprCount,"ID",{topIndex:0,bottomIndex:1});
         });
     }
 
@@ -67,11 +51,12 @@ define(["jquery","d3","topTableData"],
      * returns an instance of the class
      * @returns {*}
      */
-    TopTableView.getInstance = function () {
+    LeftTableView.getInstance = function () {
         // summary: Gets an instance of the singleton. It is better to use
         if (instance === null) {
-            instance = new TopTableView();
+            instance = new LeftTableView();
         }
+
         return instance;
     };
 
@@ -80,14 +65,16 @@ define(["jquery","d3","topTableData"],
      * is loaded on the same session
      * @param _data
      */
-    TopTableView.prototype.reload = function (_columns) {
+    LeftTableView.prototype.reload = function (_columns) {
         var self = this;
 
         self.dataWranglerIns = require("dataWrangler");
         //self.topTableData =  require("topTableData");
-        topTableData.reload();
+        leftTableData.reload();
         self.columns = _columns;
+
         self.init();
+
     }
 
     /**
@@ -96,21 +83,58 @@ define(["jquery","d3","topTableData"],
      * update the pagination, update table and
      * print charts
      */
-    TopTableView.prototype.init = function () {
+    LeftTableView.prototype.init = function () {
         var self = this;
 
         self.loadTopTable();
+    }
 
-        var allOpr = topTableData.getAllOperations();
-        console.log(allOpr);
-        for(key in allOpr){
-            if(allOpr[key].type === "ID"){//todo define id in local settings
-                self.addIDOperation(key,                    //row
-                                    allOpr[key].obj.left,   //left index
-                                    allOpr[key].obj.right); //right index
-            }
-            else if(allOpr[key].type === "COPY_SETTINGS"){
-                self.addDragNDropOperation(key,allOpr[key].obj.arr);
+    /**
+     * this function is responsible to initialize
+     * the user interface for performing selection
+     * operations on the table
+     */
+    LeftTableView.prototype.loadTopTable = function () {
+        var self = this;
+
+        var columnWidth = 150;
+        var colCount = 1;
+
+        self.leftTable = d3.select(self.parentElementName + " " + "#leftOperations")
+            .append("table")
+            .attr("id", "left-table")
+            .style("border-collapse", "collapse")
+            .style("border", "1px black solid")
+            .style("width", 2 * columnWidth); //todo string type
+        self.leftTableHead = self.leftTable.append("thead");
+
+
+        var header  = self.leftTableHead.append("tr")
+            .style("border", "1px black solid")
+            .style("padding", "5px")
+            .style("border", "1px black solid");
+
+        var allOpr = leftTableData.getAllOperations();
+
+        for(key in allOpr) {
+            header.append("th").style("width",columnWidth/3).style("height", "148.88px"); // todo get some permanent solution for that
+        }
+
+        var rowHeight = 26.66;
+        var row  = self.leftTableHead.append("tr");
+
+        self.cells = [];
+        for(key in allOpr) {
+            var svgCol = row.append("td")
+                    .style("height", rowHeight * DISPLAY_ROW_COUNT)
+                    .style("border", "1px")
+                    .append("svg")
+                    .attr("width", columnWidth/3)
+                    .attr("height", rowHeight * DISPLAY_ROW_COUNT);
+            self.cells.push(svgCol);
+
+            if(allOpr[key].type === "ID") {//todo define id in local settings
+                self.addRowIDOperation(key,svgCol,allOpr[key].obj);
             }
         }
     }
@@ -120,128 +144,98 @@ define(["jquery","d3","topTableData"],
      * the user interface for performing selection
      * operations on the table
      */
-    TopTableView.prototype.loadTopTable = function () {
-        var self = this;
-
-
-        var tableWidth = self.columns.length * 150;
-
-        //this function will initialize the table
-        self.toptable = d3.select(self.parentElementName + " " + "#topOperations")
-            .append("table")
-            .attr("id", "top-table")
-            .style("border-collapse", "collapse")
-            .style("border", "0px black solid")
-            .style("width", "" + tableWidth + "px"); //todo string type
-        self.topTableHead = self.toptable.append("thead");
-
-    }
-
-    /**
-     * this function is responsible to initialize
-     * the user interface for performing selection
-     * operations on the table
-     */
-    TopTableView.prototype.addIDOperation = function (opr,startIndex,endIndex) {
+    LeftTableView.prototype.addRowIDOperation = function (opr,svgCol,obj) {
         var self = this;
 
         var columns = self.columns;
         var columnWidth = 150;//todo take this from setting option
-
-        //calculate intial and start index of the bar
-        var rectStartIndex = startIndex;
-        var intialWidth = (endIndex-startIndex) * columnWidth;
-
         var width = columnWidth * columns.length,
             height = 6,
             dragbarw = height+2;
+        var rowHeight = 26.66;
+
+        //calculate intial and start index of the bar
+        var rectStartIndex = obj.topIndex;
+        var initialHeight = (obj.bottomIndex-obj.topIndex) * rowHeight;
+
+        console.log(initialHeight);
 
         var drag = d3.behavior.drag()
             .origin(Object)
             .on("drag", dragmove)
             .on("dragend", dragstop);
 
-        var dragright = d3.behavior.drag()
+        var dragdown = d3.behavior.drag()
             .origin(Object)
-            .on("drag", rdragresize)
-            .on("dragend", rdragstop);
+            .on("drag", bdragresize)
+            .on("dragend", bdragstop);
 
-        var svgRow = self.topTableHead.append("tr");
-        var rowIdSelSVG = svgRow.append("td")
-            .attr("colspan", columns.length)
-            .style("height", height)
-            .style("border","1px")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
-
-        var newg = rowIdSelSVG.append("g")
-            .data([{x: 0}]);
+        var newg = svgCol.append("g")
+            .data([{y: 0}]);
 
         var dragrect = newg.append("rect")
             .attr("id", "active")
-            .attr("x", function(d) { return d.x = d.x + rectStartIndex * columnWidth; })
-            .attr("height", height)
-            .attr("width", intialWidth)
+            .attr("y", function(d) { return d.y = d.y + rectStartIndex * rowHeight; })
+            .attr("height", initialHeight)
+            .attr("width", 6)
             .style("fill","grey")
             //.style("fill-opacity",0.5)
             .attr("cursor", "move")
             .call(drag);
 
-        var dragbarright = newg.append("rect")
-            .attr("x", function(d) { return d.x + intialWidth; })
+        var dragbardown = newg.append("rect")
+            .attr("y", function(d) { return d.y + initialHeight; })
             //.attr("y", dragbarw/2)
-            .attr("id", "dragright")
+            .attr("id", "dragdown")
             .attr("height", dragbarw)
             .attr("width", dragbarw/4)
             .attr("fill", "black")
-            //.attr("fill-opacity", .5)
-            .attr("cursor", "ew-resize")
-            .call(dragright);
+            .attr("cursor", "ns-resize")
+            .call(dragdown);
 
-        function rdragresize(d) {
+        function bdragresize(d) {
 
-            var stretchRectX = parseInt(d3.event.x / columnWidth);
-            var newX = Math.max(0,Math.min(intialWidth + stretchRectX * columnWidth,columnWidth * columns.length));
+            var stretchRectY = parseInt(d3.event.y / rowHeight);
+            var newY = Math.max(0,Math.min(initialHeight + stretchRectY * rowHeight,rowHeight * DISPLAY_ROW_COUNT));
+
             //move the right drag handle
-            dragbarright.attr("x",d.x = newX);
+            dragbardown.attr("y",d.y = newY);
 
             // resize the drag rectangle
             // as we are only resizing from the right,
             // the x coordinate does not need to change
-            dragrect.attr("width", parseInt(dragbarright.attr("x"))-parseInt(dragrect.attr("x")));
+            dragrect.attr("height", parseInt(dragbardown.attr("y"))-parseInt(dragrect.attr("y")));
         }
 
         function dragmove(d) {
-            var rectx = parseInt(d3.event.x / columnWidth);
-            dragrect.attr("x", d.x = Math.min(width - intialWidth, rectx * columnWidth));
-            dragbarright.attr("x",d.x + parseInt(dragrect.attr("width")));
+            var recty = parseInt(d3.event.y / rowHeight);
+            dragrect.attr("y", d.y = Math.min(rowHeight * DISPLAY_ROW_COUNT - initialHeight, recty * rowHeight));
+            dragbardown.attr("y",d.y + parseInt(dragrect.attr("height")));
         }
 
         function dragstop(d) {
-            var leftIndex = parseInt(dragrect.attr("x"));
-            var rightIndex = parseInt(dragbarright.attr("x"));
-            var leftId = leftIndex / columnWidth;
-            var rightId = rightIndex / columnWidth;
+            var topIndex = parseInt(dragrect.attr("y"));
+            var bottomIndex = parseInt(dragbardown.attr("y"));
+            var topId = Math.ceil(topIndex / rowHeight);
+            var bottomId = Math.ceil(bottomIndex / rowHeight);
 
-            topTableData.insertNewOpr(opr,"ID",{"left":leftId,"right":rightId});
+            leftTableData.insertNewOpr(opr,"ID",{topIndex:topId,bottomIndex:bottomId});
         }
 
-        function rdragstop(d) {
-            var leftIndex = parseInt(dragrect.attr("x"));
-            var rightIndex = parseInt(dragbarright.attr("x"));
-            var leftId = leftIndex / columnWidth;
-            var rightId = rightIndex / columnWidth;
+        function bdragstop(d) {
+            var topIndex = parseInt(dragrect.attr("y"));
+            var bottomIndex = parseInt(dragbardown.attr("y"));
+            var topId = Math.ceil(topIndex / rowHeight);
+            var bottomId = Math.ceil(bottomIndex / rowHeight);
 
-            topTableData.insertNewOpr(opr,"ID",{"left":leftId,"right":rightId});
-        }
+            leftTableData.insertNewOpr(opr,"ID",{topIndex:topId,bottomIndex:bottomId});        }
     }
 
     /**
      * This function will handle all the drag
      * and drop related operations of the table
      */
-    TopTableView.prototype.addDragNDropOperation = function (opr,arrColVisibleStatus) {
+    LeftTableView.prototype.addDragNDropOperation = function (opr,arrColVisibleStatus) {
         var self = this;
 
         var columns = self.columns;
@@ -336,18 +330,6 @@ define(["jquery","d3","topTableData"],
             d3.select(this).attr("cx", d.x)
 
             var selectedCol = [];
-            //check for all the button whose radio buttons are marked
-            //and take action against it
-            /*for (var i = 0; i < c[0].length; i++) {
-                self.selectedCircle = d3.select(c[0][i]);
-                console.log(selectedCircle);
-                if("visible" == selectedCircle.attr("visibility")){
-                    selectedCol.push(true);
-                }
-                else{
-                    selectedCol.push(false);
-                }
-            }*/
             topTableData.insertNewOpr(opr,"COPY_SETTINGS",{"fromCol":fromCol,"arr":self.selectedCol});
         }
 
@@ -365,6 +347,6 @@ define(["jquery","d3","topTableData"],
 
     //this will return the single instance
     //of the singleton class
-    return TopTableView.getInstance();
+    return LeftTableView.getInstance();
 
 });

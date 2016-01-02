@@ -4,9 +4,10 @@
 
 define(["jquery", "d3", "d3-tip",
         "jquery-resizable-columns", "fileConfiguration",
-        "stringOperations", "utility/localSettings", "utility/modColorBrewer","topTableView"],
+        "stringOperations", "utility/localSettings", "utility/modColorBrewer",
+        "topTableView","leftTableView"],
     function (jquery,d3, d3tip, jqueryResizableColumns, fileConfiguration,
-              stringOperations, settings, colorbrewer,topTableView) {
+              stringOperations, settings, colorbrewer,topTableView,leftTableView) {
 
 
         //defination of the variables
@@ -90,6 +91,7 @@ define(["jquery", "d3", "d3-tip",
             self.paginate(self.currPage);
             self.printCharts();
             self.highlightRowType();
+            self.highlightColType();
 
             //this will set on resizable columns
             //  $(self.parentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
@@ -1133,6 +1135,24 @@ define(["jquery", "d3", "d3-tip",
                 }
             }
         }
+
+        Table.prototype.highlightColType = function(){
+            var self = this;
+
+            var arr = self.parentInstance.getRowTypeID();
+            for(key in arr){
+                var id = key;
+                var rowId = "row-"+id;
+
+                //this function will highlight all the row ids
+                var rows = document.getElementsByClassName(rowId);
+                console.log(rows);
+
+                for (var i = 0; i < rows.length ; i++) {
+                    rows[i].style.backgroundColor = "#D3D3D3";
+                }
+            }
+        }
         /**
          * update columns
          */
@@ -1165,16 +1185,7 @@ define(["jquery", "d3", "d3-tip",
             self.topLeftTableHead = self.topLeftTable.append("thead");
 
             //todo following left table goes into separate function
-            self.leftTable = d3.select(self.parentElementName + " " + "#leftOperations").append("table")
-                .attr("id", "left-table")
-                .style("border-collapse", "collapse")
-                .style("border", "0px black solid")
-                .style("width", 2 * columnWidth); //todo string type
-            self.leftTableHead = self.leftTable.append("thead");
-            var leftTableOpr = self.leftTableHead.append("tr");
-            leftTableOpr.append("th")
-                .attr("width", columnWidth)
-                .attr("height", 13);
+           leftTableView.reload(columns);
 
             self.table = d3.select(self.parentElementName + " " + "#importedTable").append("table")
                 .attr("id", "data-table")
@@ -1548,6 +1559,8 @@ define(["jquery", "d3", "d3-tip",
 
             var self = this;
             var tableData = self.data;
+            var rowId = 0;
+            var colCount = self.dataToDisplay[0].length;
 
             // create a row for each object in the data
             var rows = self.tbody.selectAll("tr")
@@ -1558,7 +1571,7 @@ define(["jquery", "d3", "d3-tip",
 
             // create a cell in each row for each column
             var cells = rows.selectAll("td")
-                .data(function (d) {
+                .data(function (d,i) {
                     return d;
                 });
 
@@ -1594,7 +1607,7 @@ define(["jquery", "d3", "d3-tip",
                 return "col-" + i;
             })
             .attr("class", function (d, i) {
-                return "col-" + i;
+                return "row-"+ Math.floor(rowId++ / colCount) +" "+"col-" + i;
             })
             .style("border", "1px black solid")
             .style("padding", "5px")

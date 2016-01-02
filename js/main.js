@@ -11,8 +11,11 @@ requirejs.config({
         "dataWrangler":"dataWrangler",
         "table":"table",
         "nominalGraphEffects":"effects/graphs/nominalGraphEffects",
-        "topTableData":"topTableData",
-        "topTableView":"topTableView"
+        "topTableData":"top_table/topTableData",
+        "topTableView":"top_table/topTableView",
+        "leftTableData":"left_table/leftTableData",
+        "leftTableView":"left_table/leftTableView",
+        "localSettings":"utility/localSettings"
     }
 });
 

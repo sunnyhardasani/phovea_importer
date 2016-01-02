@@ -74,6 +74,7 @@ define(["require","jquery", "table", "d3",
             self.delimiter = {};
             self.idColumn = 0; //todo: this variable will indicate the column row in the data, need to guess automatically
             self.idRow = 0; //todo: this will indicate the row identification in the table
+            self.arrRowTypes = [];
 
             //clean all the previous content on the separator modal
             self.clean();
@@ -859,6 +860,37 @@ define(["require","jquery", "table", "d3",
 
             //this will keep only one instance of the table class
             table.reload(self.allColumnsDataArray, self);
+        }
+
+        /**
+         * this function will take the row ids
+         * and store it with the class
+         * this data will get returned by the
+         * table request to highlight the rows
+         */
+        DataWrangler.prototype.setRowTypeID= function(arr){
+            var self = this;
+
+            //before setting new this will clear
+            //all the previous set values
+            self.arrRowTypes = arr;
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            table.reload(self.allColumnsDataArray, self);
+
+        }
+
+        //this will return the row type identification array
+        DataWrangler.prototype.getRowTypeID= function(arr){
+            var self = this;
+
+            //before setting new this will clear
+            //all the previous set values
+            return self.arrRowTypes;
         }
 
         return DataWrangler.getInstance();

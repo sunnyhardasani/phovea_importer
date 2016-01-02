@@ -152,6 +152,10 @@ for better animation effect */
   overflow: hidden;
 }
 
+#leftOperations{
+  overflow : auto;
+}
+
 #topOperations {
   height: 75px;
   overflow-y : auto;
