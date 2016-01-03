@@ -109,7 +109,7 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
             .attr("id", "left-table")
             .style("border-collapse", "collapse")
             .style("border", "0px black solid")
-            .style("width", 2 * columnWidth); //todo string type
+            .attr("width", 2 * columnWidth); //todo string type
         self.leftTableHead = self.leftTable.append("thead");
 
 
@@ -121,8 +121,8 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
 
         for(key in allOpr) {
             header.append("th")
-                .style("width",columnWidth/3)
-                .style("height", "148.88px"); // todo get some permanent solution for that
+                .attr("width",columnWidth/3)
+                .attr("height", "148.88px"); // todo get some permanent solution for that
         }
 
         var rowHeight = 26.66;
@@ -131,11 +131,12 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
         self.cells = [];
         for(key in allOpr) {
             var svgCol = row.append("td")
-                    .style("height", rowHeight * self.rowCount)
+                    .attr("height", rowHeight * self.rowCount)
+                    .attr("width", columnWidth/3)
                     .style("border", "0px")
                     .append("svg")
-                    .attr("width", columnWidth/3)
-                    .attr("height", rowHeight * self.rowCount);
+                    .style("width", columnWidth/3)
+                    .style("height", rowHeight * self.rowCount);
             self.cells.push(svgCol);
 
             if(allOpr[key].type === "ID") {//todo define id in local settings

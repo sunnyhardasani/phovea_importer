@@ -6,7 +6,7 @@ define(["jquery", "d3", "d3-tip",
         "jquery-resizable-columns", "fileConfiguration",
         "stringOperations", "utility/localSettings", "utility/modColorBrewer",
         "topTableView","leftTableView"],
-    function (jquery,d3, d3tip, jqueryResizableColumns, fileConfiguration,
+    function ($,d3, d3tip, jqueryResizableColumns, fileConfiguration,
               stringOperations, settings, colorbrewer,topTableView,leftTableView) {
 
 
@@ -1253,28 +1253,40 @@ define(["jquery", "d3", "d3-tip",
                     d3.select(this).style("background-color", "white")
                 });
 
-            var opr = svgCells.append("div").style("height", "20px")
+            var dataTypeArray = [   DATATYPE_NUMERICAL,
+                                    DATATYPE_NOMINAL,
+                                    DATATYPE_ORDINAL,
+                                    DATATYPE_STRING,
+                                    DATATYPE_ERROR  ];
 
-            var datatype = opr.append("div")
-                .text(function (d) {
-                    return d.dataTypeObj.type;
-                })
-                .style("overflow", "hidden")
-                .style("text-overflow", "ellipsis")
-                .style("width", "50px")
-                .style("float", "left")
-                .on("contextmenu", function (d) { // todo move this in the separate function
-
-                    self.createDataTypeBox(d.id - 1);
-
-                    $('#datatype-pop-up')
-                        .show()
-                        .css('top', d3.event.pageY)
-                        .css('left', d3.event.pageX)
-                        .appendTo('body');
-
-                    d3.event.preventDefault();
-                });
+            var opr = svgCells.append("div").style("height", "20px");
+            var select = opr.append("div")
+                            .style("float", "left")
+                            .style("width","100px")
+                            .append("select")
+                            .attr("id",function(d){
+                                var strId = "drop-down-" + (d.id-1);
+                                return strId;
+                            })
+                            .on("change",function(d){
+                                var strId = "#drop-down-" + (d.id-1);
+                                var datatype = $(strId).val();
+                                self.parentInstance.changeDataType((d.id-1), datatype);
+                            });
+            var opt = select.selectAll("option")
+                            .data(dataTypeArray)
+                            .enter().append("option")
+                            .attr("selected",function(d,i){
+                                if(d3.select(this.parentNode).data()[0].dataTypeObj.type === d){
+                                    return "selected";
+                                }
+                            })
+                            .attr("value",function (d) {
+                                return d;
+                            })
+                            .text(function (d) {
+                                return d;
+                            });
 
             var closeImg = opr.append("div")
                 .style("text-align", "right");
