@@ -160,8 +160,7 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
 
                 // requireJS will ensure that the DataWrangler definition
                 // is available to use, we can now import it for use.
-                /*self.dataWrangler = require('dataWrangler');
-                self.*/dataWrangler.reload(data, file, self);
+                dataWrangler.reload(data, file, self);
 
                 //this will initialize the ui
                 self.initUI();

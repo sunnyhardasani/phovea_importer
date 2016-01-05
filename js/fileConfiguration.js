@@ -58,18 +58,66 @@ define(["jquery", "d3","dataWrangler"],
          * This function will get initialized when this class
          * start from the constructor
          */
-        FileConfiguration.prototype.addNewFile = function (file) {
+        FileConfiguration.prototype.addNewFile = function () {
 
             var self = this;
+            var settings = require("utility/localSettings");
+            var allColData = self.dataWranglerIns.getColumnData();
+            var file = require("fileUploader").files[0];
 
+
+            //fetch the column count
+            var columnCount = Object.keys(self.dataWranglerIns.getColumnData()).length;
+
+            //fetch the row count of the object
+            var rowCount = self.dataWranglerIns.getColumnData()[0].data.length;
+            if(file.size > settings.localSettings().INITIAL_END_BYTE){
+                rowCount = "NA";
+            }
+
+            //iterate all the columns and check the
+            var colIds = [];
+            for(key in allColData){
+                var col = allColData[key];
+                if(col.isColType){
+                    colIds.push(parseInt(col.id-1));
+                }
+            }
+
+            //take the left operations and select the
+            var rowTypeIds = [];
+            var rowTypeDataArr = self.dataWranglerIns.getRowTypeID();
+            for(key in rowTypeDataArr){
+                if(rowTypeDataArr[key]){
+                    rowTypeIds.push(parseInt(key));
+                }
+            }
+
+            //take the rows to ignore operation from
+            //rows to ignore
+            var rowsToIgnore = [];
+            var rowToIgnoreArr = self.dataWranglerIns.getRowsToIgnore();
+            for(key in rowToIgnoreArr){
+                if(rowToIgnoreArr[key] == 1){
+                    rowsToIgnore.push(parseInt(key));
+                }
+            }
+
+            //prepare the file data
             self.outFileData = {
                 "name": file.name.substr(0, file.name.lastIndexOf('.')),
                 "path": file.name,
-                "size": file.size, // todo change this to total column and row count
-                "columns": []
+                "size": {
+                    "col_count":columnCount,
+                    "row_count":rowCount
+                },
+                "type":"table",
+                "rowtype":rowTypeIds,
+                "coltype":colIds,
+                "ignorerows": rowsToIgnore,
+                "columns": self.loadData(self.dataWranglerIns.getColumnData())
             };
         }
-
 
         /**
          * This function will get loaded only once
@@ -115,19 +163,21 @@ define(["jquery", "d3","dataWrangler"],
         FileConfiguration.prototype.saveConfiguration = function () {
             var self = this;
 
-            var dataWranglerIns =  require("dataWrangler");
+            self.dataWranglerIns =  require("dataWrangler");
+
+            self.addNewFile();
 
             //convert the table data to the json output format
-            /*self.outFileData.columns = */self.loadData(dataWranglerIns.getColumnData());
+            //self.outFileData.columns = self.loadData(self.dataWranglerIns.getColumnData());
 
             //push the new file data to the local json dat  a
-/*            self.localJSONData.push(self.outFileData);
+            //self.localJSONData.push(self.outFileData);
 
             //write the json output to file
-            self.writeJsonToFile(self.localJSONData);
+            self.writeJsonToFile(self.outFileData);
 
             //reload the fresh data
-            self.readLocalData();*/
+            //self.readLocalData();
         }
 
         /**
@@ -135,9 +185,16 @@ define(["jquery", "d3","dataWrangler"],
          * and save the data for the future refernce
          */
         FileConfiguration.prototype.writeJsonToFile = function (data) {
-            //todo showing json output tempoaray on the screen
-            //remove this and save it on the server
-            $("#json-output").html(JSON.stringify(data));
+            var self = this;
+
+            //now print the json output and save the configuration file
+            var json = JSON.stringify(data);
+            var blob = new Blob([json], {type: "application/json"});
+            var url  = URL.createObjectURL(blob);
+
+            var url = 'data:text/json;charset=utf8,' + encodeURIComponent(json);
+            window.open(url, '_blank');
+            window.focus();
 
             var self = this;
         }
@@ -226,10 +283,15 @@ define(["jquery", "d3","dataWrangler"],
                 //for numerical data type
                 if (dataTypeObj.type === "numerical") {
                     var outNumericalDTType = {
-                        type: dataTypeObj.type,
-                        min: dataTypeObj.min,
-                        max: dataTypeObj.max
+                        "type": dataTypeObj.type,
+                        "min": dataTypeObj.min,
+                        "max": dataTypeObj.max
                     };
+
+                    if(dataTypeObj.isDataCenter){
+                        outNumericalDTType["center"] = dataTypeObj.center;
+                    }
+
                     outColumnArray.push({
                         "id": outId,
                         "header": outHeader,
@@ -237,7 +299,6 @@ define(["jquery", "d3","dataWrangler"],
                         "colorSchemeSelected": outColor
                     });
                 }
-
                 //for nominal data type
                 else if (dataTypeObj.type === "nominal") {
                     var outCategories = [];
@@ -283,9 +344,6 @@ define(["jquery", "d3","dataWrangler"],
                     });
                 }
             }
-
-            //now push this col to new
-            console.log(JSON.stringify(outColumnArray));
 
             return outColumnArray;
         }

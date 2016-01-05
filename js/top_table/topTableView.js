@@ -89,7 +89,6 @@ define(["jquery","d3","topTableData"],
         var self = this;
 
         self.dataWranglerIns = require("dataWrangler");
-        //self.topTableData =  require("topTableData");
         topTableData.reload();
         self.columns = _columns;
         self.initUI();

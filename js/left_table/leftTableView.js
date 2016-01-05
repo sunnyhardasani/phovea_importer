@@ -310,10 +310,12 @@ define(["jquery","d3","leftTableData"],
                     d.visible = 0;
                 }
 
+                //var baseRowIndex = (require("table").getCurrentPage() - 1) * self.rowCount;
+
                 var arrVisibilityStatus = [];
                 var allDotData = allDot.data();
                 for(key in allDotData){
-                    arrVisibilityStatus.push(allDotData[key].visible);
+                    arrVisibilityStatus[/*parseInt(baseRowIndex) + */parseInt(key)] = allDotData[key].visible;
                 }
                 leftTableData.insertNewOpr(opr,"REMOVE",arrVisibilityStatus);
             })

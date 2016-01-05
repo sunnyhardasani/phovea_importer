@@ -234,6 +234,25 @@ define(["jquery", "d3", "d3-tip",
             self.fetchPageData(self.currPage);
             self.updateTable();
             self.updatePagination();
+
+            //changing the default color of the table
+            for(key in self.data){
+                var col = self.data[key];
+                var id = col.id-1;
+                var colId = "col-"+id;
+
+                //this function will highlight all the column
+                //whose row identifier is true
+                var rows = document.getElementsByClassName(colId);
+                for (var i = 0; i < rows.length ; i++) {
+                    rows[i].style.backgroundColor = "white";
+                }
+            }
+
+            //this will update the requried highlight on the table
+            self.highlightRowType();
+            self.highlightColType();
+            self.highlightIgnoreRows();
         }
 
         /**
@@ -1126,15 +1145,16 @@ define(["jquery", "d3", "d3-tip",
          * of the selected row identifier, this function
          * works independently with no extra inputs
          */
-        Table.prototype.highlightRowType = function(){
+        Table.prototype.highlightColType = function(){
             var self = this;
 
             for (key in self.data) {
                 var col = self.data[key];
-                if(col.isRowType){
+                if(col.isColType){
                     var id = col.id-1;
                     var colId = "col-"+id;
 
+                    console.log("coltype called");
                     //this function will highlight all the column
                     //whose row identifier is true
                     var rows = document.getElementsByClassName(colId);
@@ -1145,7 +1165,7 @@ define(["jquery", "d3", "d3-tip",
             }
         }
 
-        Table.prototype.highlightColType = function(){
+        Table.prototype.highlightRowType = function(){
             var self = this;
 
             var arr = self.parentInstance.getRowTypeID();
@@ -1169,7 +1189,7 @@ define(["jquery", "d3", "d3-tip",
                 if (arr[key] == 1) {
                     var id = key;
                     var rowId = "row-" + id;
-
+                    console.log("ignore rows called");
                     //this function will highlight all the row ids
                     var rows = document.getElementsByClassName(rowId);
 
@@ -1356,7 +1376,7 @@ define(["jquery", "d3", "d3-tip",
             var flag = true;
             for(key in columns){
                 var col = columns[key];
-                if(col.isRowType){
+                if(col.isColType){
                     if(flag){
                         rectStartIndex = col.id - 1;
                         flag = false;
@@ -1615,7 +1635,6 @@ define(["jquery", "d3", "d3-tip",
                 for (var colIndex = 0; colIndex < self.colCount; colIndex++) {
                     self.dataToDisplay[rowIndex][colIndex] = self.originalData[colIndex]["data"][index];
                 }
-                console.log(rowIndex);
                 rowIndex++;
             }
         }
@@ -1653,6 +1672,7 @@ define(["jquery", "d3", "d3-tip",
                 .style("padding", "5px")
                 .style("font-size", "12px")
                 .style("overflow", "hidden")
+                .attr("bgcolor","white")
                 .on("mouseup", function (d, i) {
                     if (self.data[i]["dataTypeObj"].type == "string") {
                         // when selection is done on the string column
@@ -1675,12 +1695,13 @@ define(["jquery", "d3", "d3-tip",
                 return "col-" + i;
             })
             .attr("class", function (d, i) {
-                return "row-"+ Math.floor(rowId++ / colCount) +" "+"col-" + i;
+                return "row-"+ (Math.floor(rowId++ / colCount) + (self.currPage-1)*DISPLAY_ROW_COUNT) +" "+"col-" + i;
             })
             .style("border", "1px black solid")
             .style("padding", "5px")
             .style("font-size", "12px")
-            .style("overflow", "hidden")
+            .style("overflow", "hidden");
+
             /*.on("mouseover", function () {
                 d3.select(this).style("background-color", "aliceblue")
             })
@@ -1794,6 +1815,19 @@ define(["jquery", "d3", "d3-tip",
             //which table is loaded
             return self.data;
         }
+
+        /**
+         * This function will return the current page
+         * and this will be used by the lefttableview
+         * to arrange the circle for selection
+         * @returns {number|*}
+         */
+        Table.prototype.getCurrentPage = function(){
+            var self = this;
+
+            return self.currPage;
+        }
+
 
         return Table.getInstance();
     });

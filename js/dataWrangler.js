@@ -116,6 +116,7 @@ define(["require","jquery", "table", "d3",
             var self = this;
 
             //todo make the solution for this one urgently !!!
+
             d3.select("#colorbox-pop-up").selectAll("*").remove();
             d3.select("#leftOperations").selectAll("*").remove();
             d3.select("#topOperations").selectAll("*").remove();
@@ -340,7 +341,6 @@ define(["require","jquery", "table", "d3",
              *  5. Finally send the data to the table creation
              */
 
-
             //self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
             self.formColumn();      //working
             self.guessDataType();   //working
@@ -372,7 +372,7 @@ define(["require","jquery", "table", "d3",
              });*/
 
             //default selection
-            self.allColumnsDataArray[0].isRowType = true;
+            self.allColumnsDataArray[0].isColType = true;
         }
 
         //todo
@@ -410,7 +410,7 @@ define(["require","jquery", "table", "d3",
                             "colorScheme": colorbrewer["defaultScale"]["default"][12], // todo add this 12 into settings
                             //"colId": self.colId[colKey],          //head will guess in separate function
                             "dataTypeObj": new Object(),         //data type will be guessed in separate function
-                            "isRowType": false,
+                            "isColType": false,
                             "data": []
                         };
                     }
@@ -717,7 +717,7 @@ define(["require","jquery", "table", "d3",
             var oprIdArr = _oprIdArr;
 
             for (var key in self.allColumnsDataArray) {
-                self.allColumnsDataArray[key].isRowType = false;
+                self.allColumnsDataArray[key].isColType = false;
             }
 
             for (var key in self.allColumnsDataArray) {
@@ -733,7 +733,7 @@ define(["require","jquery", "table", "d3",
 
                         if (self.allColumnsDataArray[key].id - 1 >= startIndex
                             && self.allColumnsDataArray[key].id - 1 < endIndex) {
-                            self.allColumnsDataArray[key].isRowType = true;
+                            self.allColumnsDataArray[key].isColType = true;
                         }
                     }
                 }
