@@ -2,8 +2,8 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(["jquery","d3","leftTableData"/*,"localSettings"*/],
-        function($,d3,leftTableData/*,settings*/){
+define(["jquery","d3","leftTableData"],
+        function($,d3,leftTableData){
 
     //instance of the class
     var instance = null;
@@ -21,7 +21,6 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
 
         self.parentElementName = "x-importer-template";
         self.oprCount = 0;
-        self.initUI();
     }
 
     /**
@@ -32,20 +31,28 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
     LeftTableView.prototype.initUI = function () {
         var self = this;
 
-        $('#importedTable').on('scroll', function () {
-            $('#leftOperations').scrollLeft($(this).scrollLeft());
+        $(self.parentElementName + " " +'#importedTable').on('scroll', function (event) {
+            $(self.parentElementName + " " +'#leftOperations').scrollLeft($(this).scrollLeft());
+            $( this ).off( event );
         });
 
-        //temoparary button to keep the rows
-        $('#add-row-id-button').click(function(){
+
+        //first unbind the previous initialized events and then reinitialize it again
+        $(self.parentElementName + " " +'#add-row-id-button').unbind("click");
+        $(self.parentElementName + " " +'#remove-row-button').unbind("click");
+
+        //temporary button to keep the rows
+        $(self.parentElementName + " " +'#add-row-id-button').bind("click",function(event){
             self.oprCount++;
 
             leftTableData.insertNewOpr(self.oprCount,"ID",{topIndex:0,bottomIndex:1});
+            $( this ).off( event );
         });
 
-        $('#remove-row-button').click(function(){
+        $(self.parentElementName + " " +'#remove-row-button').bind("click",function(event){
             self.oprCount++;
             leftTableData.insertNewOpr(self.oprCount,"REMOVE",Array.apply(null, new Array(self.rowCount)).map(Number.prototype.valueOf,0));
+            $( this ).off( event );
         });
         //leftTableData.insertNewOpr(self.oprCount,"ID",{topIndex:0,bottomIndex:1});
     }
@@ -77,6 +84,8 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
         self.columns = _columns;
         self.rowCount = _rowCount;
 
+
+        self.initUI();
         self.init();
 
     }
@@ -106,12 +115,12 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
 
         self.leftTable = d3.select(self.parentElementName + " " + "#leftOperations")
             .append("table")
+            .attr("class","leftTable")
             .attr("id", "left-table")
             .style("border-collapse", "collapse")
-            .style("border", "0px black solid")
-            .attr("width", 2 * columnWidth); //todo string type
-        self.leftTableHead = self.leftTable.append("thead");
+            .style("border", "0px black solid");
 
+        self.leftTableHead = self.leftTable.append("tbody");
 
         var header  = self.leftTableHead.append("tr")
             .style("border", "0px black solid")
@@ -120,22 +129,24 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
         var allOpr = leftTableData.getAllOperations();
 
         for(key in allOpr) {
-            header.append("th")
-                .attr("width",columnWidth/3)
+            header.append("td")
+                .attr("width",columnWidth/4)
                 .attr("height", "148.88px"); // todo get some permanent solution for that
         }
 
-        var rowHeight = 26.66;
-        var row  = self.leftTableHead.append("tr");
+        var rowHeight = 26.66;//todo get the permananent solution for this
+        var row  = self.leftTableHead.append("tr").attr("width",columnWidth/4);
 
         self.cells = [];
         for(key in allOpr) {
             var svgCol = row.append("td")
                     .attr("height", rowHeight * self.rowCount)
-                    .attr("width", columnWidth/3)
-                    .style("border", "0px")
+                    .style("border", "7px white solid")
+                    .attr("bgcolor","#D1D0CE")                          //these are the styling
+                    .attr("onMouseover","this.bgColor='#FFE5B4'")
+                    .attr("onMouseout","this.bgColor='#D1D0CE'")
                     .append("svg")
-                    .style("width", columnWidth/3)
+                    .style("width", columnWidth/4)
                     .style("height", rowHeight * self.rowCount);
             self.cells.push(svgCol);
 
@@ -185,8 +196,7 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
             .attr("y", function(d) { return d.y = d.y + rectStartIndex * rowHeight; })
             .attr("height", initialHeight)
             .attr("width", 6)
-            .style("fill","grey")
-            //.style("fill-opacity",0.5)
+            .style("fill","black")
             .attr("cursor", "move")
             .call(drag);
 
@@ -255,13 +265,13 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
         var width = columnWidth * columns.length,
             height = rowHeight * self.rowCount,
             radius = 3,
-            radio = 5;
+            radio = 6;
 
         var data = [];
         for(var index = 0; index < self.rowCount ;index++)
         {
             data.push({ id:index,
-                        x:radio,
+                        x: columnWidth/8,
                         y: (index * rowHeight) + rowHeight/2,
                         visible: arrVisibilityStatus[index]
                         });
@@ -275,6 +285,7 @@ define(["jquery","d3","leftTableData"/*,"localSettings"*/],
             .attr("class", "rad")
             .style("fill", "white")
             .style("stroke", "black")
+            .style("stroke-width", "2")
             .style("fill-opacity", 0)
             .attr("cx", function(d){return d.x})
             .attr("cy", function(d){return d.y});

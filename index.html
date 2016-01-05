@@ -13,18 +13,29 @@
     <template id="importertemplate">
         <div class="container-fluid">
             <div id="main" class="row">
-                <div id="todelete" class="col-md-12">
-                    <input id="add-col-id-button" type="button" value="col-id">
-                    <input id="copy-id-button" type="button" value="copy">
-                    <input id="add-row-id-button" type="button" value="row-id">
-                    <input id="remove-row-button" type="button" value="remove-row-id">
+                <div id="tool-required" class="col-md-12">
+                    <button id="tool-id-button" type="button" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </button>
                 </div>
                 <div id="table-group" class="col-md-12">
                     <div id="topLeftOperations" class="col-md-2">
+                        <button id="add-col-id-button" type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-option-vertical"></span>
+                        </button>
+                        <button id="copy-id-button" type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-copy"></span>
+                        </button>
+                        <button id="add-row-id-button" type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-option-horizontal"></span>
+                        </button>
+                        <button id="remove-row-button" type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-compressed"></span>
+                        </button>
                     </div>
-                    <div id="topOperations" class="col-md-10"></div>
-                    <div id="leftOperations" class="col-md-2"></div>
-                    <div id="importedTable" class="col-md-10"></div>
+                    <div id="topOperations" class="col-md-10">&nbsp;</div>
+                    <div id="leftOperations" class="col-md-2" align="right">&nbsp;</div>
+                    <div id="importedTable" class="col-md-10">&nbsp;</div>
 
                     <div id="paginate" class="col-md-12 text-center">
                         <ul class="pagination"></ul>

@@ -251,6 +251,7 @@ define(["jquery", "d3", "d3-tip",
                 }
                 else if ($(this).val() === DATATYPE_NOMINAL) {
                     self.parentInstance.changeDataType(colId, DATATYPE_NOMINAL);
+                    self.parentInstance.changeDataType(colId, DATATYPE_NOMINAL);
                 }
                 else if ($(this).val() === DATATYPE_NUMERICAL) {
                     self.parentInstance.changeDataType(colId, DATATYPE_NUMERICAL);
@@ -1173,7 +1174,7 @@ define(["jquery", "d3", "d3-tip",
                     var rows = document.getElementsByClassName(rowId);
 
                     for (var i = 0; i < rows.length; i++) {
-                        rows[i].style.backgroundColor = "#FF3333";
+                        rows[i].style.backgroundColor = "#F9966B";
                     }
                 }
             }
@@ -1536,23 +1537,47 @@ define(["jquery", "d3", "d3-tip",
             //operation field into the UI for
             //numerical operations
             head.append("span")
-                .text("Min:");
+                .style("font-size","12")
+                .text("Min");
+
             head.append("input")
                 .attr("class","min")
                 .attr("name","min")
                 .attr("type","text")
                 .attr("size","1.5")
                 .attr("value",data.dataTypeObj.min)
-                .style("border","0px");
-            head.append("span")
-                .text(" - Max:");
+                .style("border","1px solid");
+
+            if(data.dataTypeObj.isDataCenter){
+                head.append("span")
+                    .style("font-size","12")
+                    .text("-");
+                head.append("input")
+                    .attr("class","min")
+                    .attr("name","min")
+                    .attr("type","text")
+                    .attr("size","1.5")
+                    .attr("value",data.dataTypeObj.center)
+                    .style("border","1px solid");
+
+                head.append("span")
+                    .style("font-size","12")
+                    .text("-");
+            }
+
             head.append("input")
                 .attr("name","max")
                 .attr("class","max")
                 .attr("type","text")
                 .attr("size","1.5")
                 .attr("value",data.dataTypeObj.max)
-                .style("border","0px");
+                .style("border","1px solid");
+
+            head.append("span")
+                .style("font-size","12")
+                .text("Max");
+
+
             head.append("span")
                 .attr("class","glyphicon glyphicon-retweet")
                 .style("float","right")

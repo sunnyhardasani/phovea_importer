@@ -115,6 +115,7 @@ define(["require","jquery", "table", "d3",
         DataWrangler.prototype.clean = function () {
             var self = this;
 
+            //todo make the solution for this one urgently !!!
             d3.select("#colorbox-pop-up").selectAll("*").remove();
             d3.select("#leftOperations").selectAll("*").remove();
             d3.select("#topOperations").selectAll("*").remove();
@@ -533,6 +534,13 @@ define(["require","jquery", "table", "d3",
                 col["dataTypeObj"].data = colData;
                 col["dataTypeObj"].min = min;
                 col["dataTypeObj"].max = max;
+                col["dataTypeObj"].isDataCenter = false;
+                col["dataTypeObj"].center = 0; //set center to zero
+
+                if(max > 0 && min < 0){
+                    col["dataTypeObj"].isDataCenter = true;
+                    col["dataTypeObj"].center = 0; //set center to zero
+                }
 
                 //finding out the total key count in the frequency data map
                 var nKeyCount = Object.keys(freqMap).length;

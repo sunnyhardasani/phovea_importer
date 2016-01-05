@@ -25,10 +25,13 @@ table {
   width: 100%;
   white-space: nowrap; }
   table td, table th {
-    /*width: 200px;*/
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; }
+
+  .leftTable{
+    width: auto;
+  }
 
 line {
   stroke: #ccc;

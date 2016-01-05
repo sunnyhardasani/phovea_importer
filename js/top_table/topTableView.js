@@ -21,7 +21,6 @@ define(["jquery","d3","topTableData"],
 
         self.parentElementName = "x-importer-template";
         self.oprCount = 0;
-        self.initUI();
     }
 
     /**
@@ -32,25 +31,30 @@ define(["jquery","d3","topTableData"],
     TopTableView.prototype.initUI = function () {
         var self = this;
 
-        $('#importedTable').on('scroll', function () {
+        $(self.parentElementName + " " +'#importedTable').on('scroll', function () {
             $('#topOperations').scrollLeft($(this).scrollLeft());
         });
 
-        $('#topOperations').on('scroll', function () {
+        $(self.parentElementName + " " +'#topOperations').on('scroll', function () {
             $('#importedTable').scrollLeft($(this).scrollLeft());
         });
 
-        $('#topOperations').on('scroll', function () {
+        $(self.parentElementName + " " +'#topOperations').on('scroll', function () {
             $('#topLeftOperations').scrollTop($(this).scrollTop());
         });
 
+        //this will unbind the event for reinitialization
+        $(self.parentElementName + " " +'#add-col-id-button').unbind("click");
+        $(self.parentElementName + " " +'#copy-id-button').unbind("click")
+
         //temoparary button to keep the rows
-        $('#add-col-id-button').click(function(){
+        $(self.parentElementName + " " +'#add-col-id-button').bind("click",function(event){
             self.oprCount++;
             topTableData.insertNewOpr(self.oprCount,"ID",{"left":0,"right":1});
+            $( this ).off( event );
         });
 
-        $('#copy-id-button').click(function(){
+        $(self.parentElementName + " " +'#copy-id-button').bind("click",function(event){
             self.oprCount++;
 
             self.selectedCol = [];
@@ -60,6 +64,7 @@ define(["jquery","d3","topTableData"],
                 self.selectedCol.push(false);
             }
             topTableData.insertNewOpr(self.oprCount,"COPY_SETTINGS",{"fromCol":0 ,"arr":self.selectedCol});
+            $( this ).off( event );
         });
     }
 
@@ -87,6 +92,7 @@ define(["jquery","d3","topTableData"],
         //self.topTableData =  require("topTableData");
         topTableData.reload();
         self.columns = _columns;
+        self.initUI();
         self.init();
     }
 
@@ -130,8 +136,8 @@ define(["jquery","d3","topTableData"],
         self.toptable = d3.select(self.parentElementName + " " + "#topOperations")
             .append("table")
             .attr("id", "top-table")
-            .style("border-collapse", "collapse")
-            .style("border", "0px black solid")
+            //.style("border-collapse", "collapse")
+            .style("border", "0px white solid")
             .style("width", "" + tableWidth + "px"); //todo string type
         self.topTableHead = self.toptable.append("thead");
 
@@ -169,21 +175,25 @@ define(["jquery","d3","topTableData"],
         var svgRow = self.topTableHead.append("tr");
         var rowIdSelSVG = svgRow.append("td")
             .attr("colspan", columns.length)
-            .style("height", height)
-            .style("border","1px")
+            .style("height", columnWidth/8)
+            .style("border", "7px white solid")
+            //.attr("border","1")
+            .attr("bgcolor","#D1D0CE")
+            .attr("onMouseover","this.bgColor='#FFE5B4'")
+            .attr("onMouseout","this.bgColor='#D1D0CE'")
             .append("svg")
             .attr("width", width)
             .attr("height", height);
 
         var newg = rowIdSelSVG.append("g")
-            .data([{x: 0}]);
+                            .data([{x: 0}]);
 
         var dragrect = newg.append("rect")
             .attr("id", "active")
             .attr("x", function(d) { return d.x = d.x + rectStartIndex * columnWidth; })
             .attr("height", height)
             .attr("width", intialWidth)
-            .style("fill","grey")
+            .style("fill","black")
             //.style("fill-opacity",0.5)
             .attr("cursor", "move")
             .call(drag);
@@ -249,7 +259,7 @@ define(["jquery","d3","topTableData"],
         var fromCol;
 
         var width = columnWidth * columns.length,
-            height = 13,
+            height = 15,
             radius = 3,
             radio = 6;
 
@@ -262,7 +272,13 @@ define(["jquery","d3","topTableData"],
 
         var rsvg = self.topTableHead.append("tr");
 
-        var osvg = rsvg.append("th").attr("colspan", columns.length)
+        var osvg = rsvg.append("td")
+            .attr("colspan", columns.length)
+            .style("border", "7px white solid")
+            .style("height", columnWidth/8)
+            .attr("bgcolor","#D1D0CE")                          //these are the styling
+            .attr("onMouseover","this.bgColor='#FFE5B4'")
+            .attr("onMouseout","this.bgColor='#D1D0CE'")
             .append("svg")
             .attr("width", width)
             .attr("height", height);
@@ -273,11 +289,12 @@ define(["jquery","d3","topTableData"],
             .attr("class", "rad")
             .style("fill", "white")
             .style("stroke", "black")
+            .style("stroke-width", "2")
             .style("fill-opacity", 0)
             .attr("cx", function (d, i) {
                 return d.x;
             })
-            .attr("cy", height / 2)
+            .attr("cy", (height / 2) + 1)
             .on("click", function (d, i) {
                 if (d3.select(c[0][i]).attr("visibility") == "hidden") {
                     d3.select(c[0][i]).attr("visibility", "visible");
@@ -308,7 +325,7 @@ define(["jquery","d3","topTableData"],
             .attr("cx", function (d, i) {
                 return d.x;
             })
-            .attr("cy", height / 2)
+            .attr("cy", (height / 2) + 1)
             .call(drag);
 
         var r = osvg.selectAll(".high")

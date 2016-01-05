@@ -46,6 +46,17 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
         return instance;
     };
 
+    FileUploader.prototype.initUI = function() {
+        var self = this;
+
+        $("#tool-id-button").bind("click",function(){
+            //alert("ui called");
+            $( "#topLeftOperations" ).toggleClass( "hide" );
+            $( "#leftOperations" ).toggleClass( "hide" );
+            $( "#topOperations" ).toggleClass( "hide" );
+            $( "#importedTable" ).toggleClass( "col-md-10", "col-md-12" );
+        });
+    }
     /**
      * Initialize function of File Uploader
      * @param _fileData
@@ -151,6 +162,9 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
                 // is available to use, we can now import it for use.
                 /*self.dataWrangler = require('dataWrangler');
                 self.*/dataWrangler.reload(data, file, self);
+
+                //this will initialize the ui
+                self.initUI();
             }
         };
 
