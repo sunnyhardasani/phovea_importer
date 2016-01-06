@@ -107,7 +107,6 @@ define(["jquery","d3","topTableData"],
         self.loadTopTable();
 
         var allOpr = topTableData.getAllOperations();
-        console.log(allOpr);
         for(key in allOpr){
             if(allOpr[key].type === "ID"){//todo define id in local settings
                 self.addIDOperation(key,                    //row

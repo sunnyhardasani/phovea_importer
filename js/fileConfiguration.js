@@ -61,7 +61,11 @@ define(["jquery", "d3","dataWrangler"],
         FileConfiguration.prototype.addNewFile = function () {
 
             var self = this;
+
             var settings = require("utility/localSettings");
+            var TABLE_HOMOGENEOUS = settings.localSettings().TABLE_HOMOGENEOUS;
+            var TABLE_HETEROGENEOUS = settings.localSettings().TABLE_HETEROGENEOUS;
+
             var allColData = self.dataWranglerIns.getColumnData();
             var file = require("fileUploader").files[0];
 
@@ -103,20 +107,149 @@ define(["jquery", "d3","dataWrangler"],
                 }
             }
 
+            var colData;
+            var type = self.findType(colIds,rowTypeIds,rowsToIgnore);
+            if(type === TABLE_HOMOGENEOUS){
+                var homogeneousKey =  self.homogeneousKey;
+                colData = {homogeneousKey : allColData[homogeneousKey]};
+            }
+            else{
+                colData = allColData;
+            }
+
             //prepare the file data
             self.outFileData = {
                 "name": file.name.substr(0, file.name.lastIndexOf('.')),
                 "path": file.name,
                 "size": {
-                    "col_count":columnCount,
-                    "row_count":rowCount
+                    "col_count": columnCount,
+                    "row_count": rowCount
                 },
-                "type":"table",
-                "rowtype":rowTypeIds,
-                "coltype":colIds,
+                "type": type,
+                "rowtype": rowTypeIds,
+                "coltype": colIds,
                 "ignorerows": rowsToIgnore,
-                "columns": self.loadData(self.dataWranglerIns.getColumnData())
+                "columns": self.loadData(colData)
             };
+        }
+
+        /**
+         * this function is responsible for finding out
+         * type of the table Homogeneous or Heterogeneous
+         * @param _colIds
+         * @param _rowTypeIds
+         * @param _rowsToIgnore
+         * @returns {string}
+         */
+        FileConfiguration.prototype.findType = function (_colIds,_rowTypeIds,_rowsToIgnore) {
+            var self = this;
+
+            var settings = require("utility/localSettings");
+
+            var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
+            var DATATYPE_NOMINAL = settings.localSettings().DATATYPE_NOMINAL;
+            var DATATYPE_NUMERICAL = settings.localSettings().DATATYPE_NUMERICAL;
+            var DATATYPE_ORDINAL = settings.localSettings().DATATYPE_ORDINAL;
+            var DATATYPE_ERROR = settings.localSettings().DATATYPE_ERROR;
+
+            var TABLE_HOMOGENEOUS = settings.localSettings().TABLE_HOMOGENEOUS;
+            var TABLE_HETEROGENEOUS = settings.localSettings().TABLE_HETEROGENEOUS;
+
+            var allColData = self.dataWranglerIns.getColumnData();
+            var lastCol = null;
+            var tableType = TABLE_HOMOGENEOUS;
+
+            for (key in allColData) {
+                var col = allColData[key];
+
+                //this if will take care for all
+                //the ID columns to ignore while
+                //finding out the type
+                if (_colIds.indexOf(col.id-1) < 0) {
+
+                    if (lastCol != null) {
+
+                        //1. check all the type
+                        //2. if numerical
+                        //      a. check min
+                        //      b. check max
+                        //      c. check center
+                        //3. if nominal
+                        //      a. compare all the keys should be same
+                        //4. todo ask if string
+
+                        console.log(col, lastCol);
+
+                        if (lastCol["dataTypeObj"].type !== col["dataTypeObj"].type) {
+                            tableType = TABLE_HETEROGENEOUS;
+                            break;
+                        }
+                        if (lastCol["dataTypeObj"].type === DATATYPE_NUMERICAL) {
+                            if (lastCol["dataTypeObj"].min != col["dataTypeObj"].min) {
+                                tableType = TABLE_HETEROGENEOUS;
+                                break;
+                            }
+                            else if (lastCol["dataTypeObj"].max !== col["dataTypeObj"].max) {
+                                tableType = TABLE_HETEROGENEOUS;
+                                break;
+                            }
+                            else if (lastCol["dataTypeObj"].center !== col["dataTypeObj"].center) {
+                                tableType = TABLE_HETEROGENEOUS;
+                                break;
+                            }
+                        }
+                        else if (lastCol["dataTypeObj"].type !== DATATYPE_NOMINAL) {
+                            for (key1 in lastCol["dataTypeObj"].keyCountMap) {
+                                if (!(key1 in col["dataTypeObj"].keyCountMap)) {
+                                    tableType = TABLE_HETEROGENEOUS;
+                                    break;
+                                }
+                            }
+                        }
+
+                        console.log(col);
+                    }
+                    else {
+                        lastCol = col;
+                        self.homogeneousKey = key;
+                    }
+                }
+            }
+
+            return tableType;
+        }
+
+        /**
+         * This function will save the json file on the
+         * local machine, it will get invoked when
+         * save configuration is clicked
+         * @param textToWrite
+         * @param fileNameToSaveAs
+         */
+        FileConfiguration.prototype.saveFile = function(textToWrite,fileNameToSaveAs)
+        {
+            var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+
+            var downloadLink = document.createElement("a");
+            downloadLink.download = fileNameToSaveAs;
+            downloadLink.innerHTML = "Download File";
+            if (window.webkitURL != null)
+            {
+                // Chrome allows the link to be clicked
+                // without actually adding it to the DOM.
+                downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+            }
+            else
+            {
+                // Firefox requires the link to be added to the DOM
+                // before it can be clicked.
+                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+                downloadLink.onclick = destroyClickedElement;
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+            }
+
+            downloadLink.click();
         }
 
         /**
@@ -192,9 +325,12 @@ define(["jquery", "d3","dataWrangler"],
             var blob = new Blob([json], {type: "application/json"});
             var url  = URL.createObjectURL(blob);
 
+            self.saveFile(json,"file.json");
+
             var url = 'data:text/json;charset=utf8,' + encodeURIComponent(json);
             window.open(url, '_blank');
             window.focus();
+
 
             var self = this;
         }
@@ -267,11 +403,14 @@ define(["jquery", "d3","dataWrangler"],
         FileConfiguration.prototype.loadData = function (curTableData) {
             var self = this;
 
+            console.log(curTableData);
+
             var outColumnArray = [];
             for (col in curTableData) {
 
                 //fetching the required type and converting it to new structure
                 var col = curTableData[col];
+
                 var dataTypeObj = col["dataTypeObj"];
                 var data = col["data"];
 

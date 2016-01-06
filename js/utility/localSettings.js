@@ -20,7 +20,10 @@ define(function(){
         DATATYPE_ORDINAL : "ordinal",
         DATATYPE_ERROR : "error",
 
-        NUMERICAL_BIN_COUNT: 10
+        NUMERICAL_BIN_COUNT: 10,
+
+        TABLE_HOMOGENEOUS: "HOMOGENEOUS",
+        TABLE_HETEROGENEOUS: "HETEROGENEOUS"
     };
 
     return {
