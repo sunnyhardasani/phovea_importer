@@ -12,27 +12,66 @@
     <!--template containing the table -->
     <template id="importertemplate">
         <div class="container-fluid">
+            <div id="file-config" class="row">
+                <div id="ribbon">
+                    <div id="fileHandler" style="float: left;width:10%; height:50px">
+                        <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000"/>
+                            <!--todo copy this icon to local folder-->
+                            <label for="fileselect">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </label>
+                            <input type="file" id="fileselect"/>
+                        </form>
+                    </div>
+                    <div style="float: right;width:90%;">
+                        <div id="filedrag">
+                            or drop file here
+                        </div>
+                        <div id="submitbutton">
+                            <button type="submit">Upload File</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="main" class="row">
-                <div id="tool-required" class="col-md-12">
-                    <button id="tool-id-button" type="button" class="btn btn-default btn-sm">
+                <div id="tool-required" class="col-md-12" >
+                    <button id="tool-id-button" type="button" class="btn btn-default btn-sm" style="float:left" title="Change table settings">
                         <span class="glyphicon glyphicon-cog"></span>
                     </button>
-                </div>
-                <div id="table-group" class="col-md-12">
-                    <div id="topLeftOperations" class="col-md-2">
-                        <button id="add-col-id-button" type="button" class="btn btn-default btn-sm">
+                    <div style="float:left;"><span class="selftab"></span></div>
+                    <div id="oprButtons" style="float:left;">
+                        <button id="add-col-id-button" type="button" class="btn btn-default btn-sm" title="Add Column Identifier">
                             <span class="glyphicon glyphicon-option-vertical"></span>
                         </button>
-                        <button id="copy-id-button" type="button" class="btn btn-default btn-sm">
+                        <button id="copy-id-button" type="button" class="btn btn-default btn-sm" title="Copy Column Settings">
                             <span class="glyphicon glyphicon-copy"></span>
                         </button>
-                        <button id="add-row-id-button" type="button" class="btn btn-default btn-sm">
+                        <button id="add-row-id-button" type="button" class="btn btn-default btn-sm" title="Add Row Identifier">
                             <span class="glyphicon glyphicon-option-horizontal"></span>
                         </button>
-                        <button id="remove-row-button" type="button" class="btn btn-default btn-sm">
+                        <button id="remove-row-button" type="button" class="btn btn-default btn-sm" title="Ignore Rows">
                             <span class="glyphicon glyphicon-compressed"></span>
                         </button>
                     </div>
+                    <div id="separatorOpr" style="float:right">
+                        <strong> Select separators : </strong>
+                        <input id="comma" type="radio" name="sep" value="comma">&nbsp; comma
+                        <input id="space" type="radio" name="sep" value="space">&nbsp; space
+                        <input id="tab" type="radio" name="sep" value="tab">&nbsp; tab
+                        <input id="semicolon" type="radio" name="sep" value="semicolon">&nbsp; semicolon
+                        &nbsp; or &nbsp; others
+                        <input id="any" type="text" name="sep">
+                    </div>
+                    <div style="float:right;"><span class="selftab"></span></div>
+                    <div id="stringMarker" style="float:right">
+                        <strong> String marker </strong>
+                        <input id="quote" type="text">
+                    </div>
+
+                </div>
+                <div id="table-group" class="col-md-12">
+                    <div id="topLeftOperations" class="col-md-2"></div>
                     <div id="topOperations" class="col-md-10">&nbsp;</div>
                     <div id="leftOperations" class="col-md-2" align="right">&nbsp;</div>
                     <div id="importedTable" class="col-md-10">&nbsp;</div>
@@ -90,75 +129,12 @@
 </head>
 <body>
 
-    <div id="file-config" class="box">
-        <div class="box-inner">
-            <div></div>
-            <div>
-                <div id="ribbon">
-                    <div id="fileHandler">
-                        <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
-                            <!--todo copy this icon to local folder-->
-                            <label for="fileselect">
-                                <span class="glyphicon glyphicon-folder-open"></span>
-                            </label>
-                            <input type="file" id="fileselect"/>
-                        </form>
-                    </div>
-                    <div>
-                        <div id="filedrag">
-                            or drop file here
-                        </div>
-                        <div id="submitbutton">
-                            <button type="submit">Upload File</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="other">
-                    <div id="separatorOpr">
-                        <strong> Select separators : </strong>
-                        <input id="comma" type="radio" name="sep" value="comma">comma
-                        <input id="space" type="radio" name="sep" value="space">space
-                        <input id="tab" type="radio" name="sep" value="tab">tab
-                        <input id="semicolon" type="radio" name="sep" value="semicolon">semicolon
-                        &nbsp; or &nbsp; others
-                        <input id="any" type="text" name="sep">
-                    </div>
-                    <div id="stringMarker">
-                        <strong> String marker </strong>
-                        <input id="quote" type="text">
-                    </div>
-                </div>
-            </div>
-            <div id = "save-current-conf">
-                <button id="save-conf-button"> Save Current Configuration</button>
-            </div>
-            <div>
-                <h5>Most Recent Files</h5>
-                <div id = "recentFiles">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="menu">
-        <div id="open-configuration-window">
-            &nbsp;&nbsp;&nbsp;
-            <img src="http://caleydo.github.io/assets/images/logos/caleydo_c.svg" width="50" height="50">
-            <span id="head-label"><strong>Caleydo Importer</strong></span>
-        </div>
-    </div>
 
     <div id="colorbox-pop-up">
         <!--<p>
             This div only appears when the trigger link is hovered over.
             Otherwise it is hidden from view.
         </p>-->
-    </div>
-    <div id="datatype-pop-up">
-        <input type="radio" name="datatype" value="string"> String <br>
-        <input type="radio" name="datatype" value="nominal"> Nominal <br>
-        <input type="radio" name="datatype" value="ordinal"> Ordinal <br>
-        <input type="radio" name="datatype" value="numerical"> Numerical <br>
     </div>
 </body>
 </html>

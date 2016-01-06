@@ -51,11 +51,16 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
 
         $("#tool-id-button").bind("click",function(){
             //alert("ui called");
+            $( "#oprButtons" ).toggleClass( "hide" );
             $( "#topLeftOperations" ).toggleClass( "hide" );
             $( "#leftOperations" ).toggleClass( "hide" );
             $( "#topOperations" ).toggleClass( "hide" );
             $( "#importedTable" ).toggleClass( "col-md-10", "col-md-12" );
         });
+
+        $("#tool-id-button").trigger("click");
+
+        $('[data-toggle="tooltip"]').tooltip();
     }
     /**
      * Initialize function of File Uploader
@@ -156,7 +161,7 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
 
                 // this function will call the file configuration
                 // switch window to switch the window
-                fileConfiguration.switchWindow();
+                //fileConfiguration.switchWindow();
 
                 // requireJS will ensure that the DataWrangler definition
                 // is available to use, we can now import it for use.

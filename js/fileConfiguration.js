@@ -261,11 +261,11 @@ define(["jquery", "d3","dataWrangler"],
             var self = this;
 
             //file configuration ui functionality
-            $("#main").hide();
+            /*$("#main").hide();
             $("#open-configuration-window").click(function () {
                 $("#main").toggle();
                 $(".box").toggle();
-            });
+            });*/
             $("#save-conf-button").click(function () {
                 self.saveConfiguration();
             });
@@ -276,12 +276,12 @@ define(["jquery", "d3","dataWrangler"],
          * windows between the file configuration ui
          * and main ui
          */
-        FileConfiguration.prototype.switchWindow = function(){
+        /*FileConfiguration.prototype.switchWindow = function(){
             var self = this;
             $("#main").show();
             $(".box").hide();
         }
-
+        */
         /**
          * This function will get called when save configuration
          * button is clicked on the File Configuration UI,
