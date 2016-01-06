@@ -235,6 +235,23 @@ define(["jquery", "d3", "d3-tip",
             self.updateTable();
             self.updatePagination();
 
+
+
+            //this will update the requried highlight on the table
+            self.setDefaultTableColor();
+            self.highlightRowType();
+            self.highlightColType();
+            self.highlightIgnoreRows();
+        }
+
+        /**
+         * this function will set the default color
+         * of the table i.e. white, after that
+         * ID row and ID col with get highlighted
+         */
+        Table.prototype.setDefaultTableColor = function(){
+            var self = this;
+
             //changing the default color of the table
             for(key in self.data){
                 var col = self.data[key];
@@ -248,11 +265,6 @@ define(["jquery", "d3", "d3-tip",
                     rows[i].style.backgroundColor = "white";
                 }
             }
-
-            //this will update the requried highlight on the table
-            self.highlightRowType();
-            self.highlightColType();
-            self.highlightIgnoreRows();
         }
 
         /**
@@ -284,6 +296,8 @@ define(["jquery", "d3", "d3-tip",
         }
 
         /**
+         * todo temporary code similar to copy settings functionality
+         *
          * this fucntion will create the color box
          * which appear on click of the bar graph
          * @param selectedScale
@@ -294,6 +308,9 @@ define(["jquery", "d3", "d3-tip",
             //check which scale is selected and
             //create the color box accordingly
             if(selectedScale == "ordinalScale"){
+                $('#colorbox-pop-up').css('height', '80');
+            }
+            else if(selectedScale == "polyLinearScale"){
                 $('#colorbox-pop-up').css('height', '80');
             }
             else if(selectedScale == "linearScale") {
@@ -722,7 +739,16 @@ define(["jquery", "d3", "d3-tip",
             var dataType = dataTypeObj.type;
             var min = dataTypeObj.min;
             var max = dataTypeObj.max;
+            var isDataCenter = dataTypeObj.isDataCenter;
             var binCount = settings.localSettings().NUMERICAL_BIN_COUNT;
+
+            var setColorScale;
+            if(isDataCenter){
+                setColorScale = "polyLinearScale";
+            }
+            else{
+                setColorScale = "linearScale"
+            }
 
             //this will create the margin for numerical svg
             var margin = {top: 5, right: 5, bottom: 0, left: 5},
@@ -765,14 +791,33 @@ define(["jquery", "d3", "d3-tip",
                 })])
                 .range([0, height]);
 
+            var linearColorScale;
 
-            var linearColorScale = d3.scale.linear()
-                .domain([d3.min(histogram, function (d) {
-                    return x(d.x);
-                }), d3.max(histogram, function (d) {
-                    return x(d.x);
-                })])
-                .range([selColor[0],selColor[selColor.length-1]]);
+            if(isDataCenter) {
+
+                // setting min, max and center value for polylinear scale
+                linearColorScale = d3.scale.linear()
+                    .domain([d3.min(histogram, function (d) {
+                        return d.x;
+                    }),
+                        0
+                        , d3.max(histogram, function (d) {
+                        return d.x;
+                    })])
+                    .range([selColor[0],"white",selColor[selColor.length - 1]]);
+            }
+            else{
+
+                // setting min, max and center value for linear scale
+                linearColorScale = d3.scale.linear()
+                    .domain([d3.min(histogram, function (d) {
+                        return d.x;
+                    }), d3.max(histogram, function (d) {
+                        return d.x;
+                    })])
+                    .range([selColor[0],selColor[selColor.length-1]]);
+            }
+
 
             //D3 Tip defined
             var tip = d3tip()
@@ -809,7 +854,8 @@ define(["jquery", "d3", "d3-tip",
                     return y(d.y);
                 })
                 .style("fill", function (d) {
-                    return linearColorScale(x(d.x));
+                    console.log(d.x);
+                    return linearColorScale(d.x);
                 })
                 .style("stroke-width","0.5")
                 .style("stroke","black")
@@ -825,17 +871,18 @@ define(["jquery", "d3", "d3-tip",
 
                     //call the function to create the
                     //color box of the linear scales
-                    self.createColorBox("linearScale");
+                    // polylinear scale for negative values
+                    self.createColorBox(setColorScale);
 
                     //this function will be called when color box
                     //will be clicked
                     self.colorBox.on("click", function (d) {
 
                         //figure out the last key
-                        var keys = Object.keys(colorbrewer["linearScale"][d.key]);
+                        var keys = Object.keys(colorbrewer[setColorScale][d.key]);
                         var lastKey = keys[keys.length - 1];
 
-                        self.parentInstance.changeColColor(colId, colorbrewer["linearScale"][d.key][lastKey]);
+                        self.parentInstance.changeColColor(colId, colorbrewer[setColorScale][d.key][lastKey]);
 
                         //finally hide the color box
                         $('#colorbox-pop-up').hide();
