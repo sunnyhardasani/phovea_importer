@@ -1,12 +1,17 @@
-define(["jquery",
-    "d3",
-    "d3-tip",
-    "colorbrewer",
-    "dataWrangler",
-    "table",
-    "jquery-resizable-columns"],function () {
+/**
+ * This class is responsible for file uploading
+ * to the application either through drag and
+ * drop or through select file.
+ */
 
+define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
+    function ($,dataWrangler,settings,fileConfiguration) {
     "use strict";
+
+        console.log(dataWrangler);
+
+    var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
+    var INITIAL_END_BYTE = settings.localSettings().INITIAL_END_BYTE;
 
     //singleton instance of the class
     var instance = null;
@@ -22,6 +27,12 @@ define(["jquery",
         }
     }
 
+    // getElementById - helper function
+    function $id(id) {
+        return document.getElementById(id);
+    }
+
+
     /**
      * This function returns instance of the class
      * @returns {*}
@@ -35,6 +46,22 @@ define(["jquery",
         return instance;
     };
 
+    FileUploader.prototype.initUI = function() {
+        var self = this;
+
+        $("#tool-id-button").bind("click",function(){
+            //alert("ui called");
+            $( "#oprButtons" ).toggleClass( "hide" );
+            $( "#topLeftOperations" ).toggleClass( "hide" );
+            $( "#leftOperations" ).toggleClass( "hide" );
+            $( "#topOperations" ).toggleClass( "hide" );
+            $( "#importedTable" ).toggleClass( "col-md-10", "col-md-12" );
+        });
+
+        $("#tool-id-button").trigger("click");
+
+        //$('[data-toggle="tooltip"]').tooltip();
+    }
     /**
      * Initialize function of File Uploader
      * @param _fileData
@@ -55,7 +82,7 @@ define(["jquery",
         // file select
         fileselect.addEventListener("change", self.fileSelectHandler.bind(self), false);
 
-        // is XHR2 available?
+        // is XHR2 available
         var xhr = new XMLHttpRequest();
         if (xhr.upload) {
 
@@ -94,7 +121,8 @@ define(["jquery",
     };
 
     /**
-     *
+     *  this function will read the next frame when the
+     *  pagination reaches one of the last pages
      */
     FileUploader.prototype.streamNextFrame = function(){
         var self = this;
@@ -124,21 +152,23 @@ define(["jquery",
                 var data;
                 self.file_data =  evt.target.result;
 
-                //read data line by line
+                // read data line by line
                 if(self.file_data.lastIndexOf("\n")>0) {
                     data = self.file_data.substring(0, self.file_data.lastIndexOf("\n"));
                 } else {
                     data = self.file_data;
                 }
 
-                //todo move this call to much better place
-                $("#main").toggle();
-                $(".box").toggle();
+                // this function will call the file configuration
+                // switch window to switch the window
+                //fileConfiguration.switchWindow();
 
                 // requireJS will ensure that the DataWrangler definition
                 // is available to use, we can now import it for use.
-                self.dataWrangler = require('dataWrangler');
-                self.dataWrangler.reload(data, file, self);
+                dataWrangler.reload(data, file, self);
+
+                //this will initialize the ui
+                self.initUI();
             }
         };
 

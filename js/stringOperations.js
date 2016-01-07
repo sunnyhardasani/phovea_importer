@@ -1,13 +1,8 @@
 /**
- * Created by Sunny on 11/8/2015.
+ * Created by Sunny Hardasani on 11/8/2015.
  */
-define(["jquery",
-    "d3",
-    "d3-tip",
-    "colorbrewer",
-    "dataWrangler",
-    "table",
-    "jquery-resizable-columns"],function () {
+define(["jquery","d3", "colorbrewer"],
+        function ($, d3, colorbrewer) {
 
     //instance of the class
     var instance = null;
@@ -286,7 +281,12 @@ define(["jquery",
         barGroups.exit().remove();
     }
 
-
+    /**
+     *
+     * @param element
+     * @param check
+     * @param displayText
+     */
     StringOperations.prototype.onElementSelection = function (element, check, displayText) {
         var self = this;
 
