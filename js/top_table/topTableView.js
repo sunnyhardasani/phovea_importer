@@ -177,7 +177,7 @@ define(["jquery","d3","topTableData"],
             .style("border", "7px white solid")
             //.attr("border","1")
             .attr("bgcolor","#D1D0CE")
-            .attr("onMouseover","this.bgColor='#FFE5B4'")
+            .attr("onMouseover","this.bgColor='#87B6DE'")
             .attr("onMouseout","this.bgColor='#D1D0CE'")
             .append("svg")
             .attr("width", width)
@@ -275,7 +275,7 @@ define(["jquery","d3","topTableData"],
             .style("border", "7px white solid")
             .style("height", columnWidth/8)
             .attr("bgcolor","#D1D0CE")                          //these are the styling
-            .attr("onMouseover","this.bgColor='#FFE5B4'")
+            .attr("onMouseover","this.bgColor='#87B6DE'")
             .attr("onMouseout","this.bgColor='#D1D0CE'")
             .append("svg")
             .attr("width", width)

@@ -26,7 +26,7 @@
                     </div>
                     <div style="float: right;width:90%;">
                         <div id="filedrag">
-                            or drop file here
+                            <small>or drop file here</small>
                         </div>
                         <div id="submitbutton">
                             <button type="submit">Upload File</button>
@@ -36,7 +36,7 @@
             </div>
             <div id="main" class="row">
                 <div id="tool-required" class="col-md-12" >
-                    <button id="tool-id-button" type="button" class="btn btn-default btn-sm" style="float:left" title="Change table settings">
+                    <button id="tool-id-button" type="button" class="btn btn-primary btn-sm" style="float:left" title="Change table settings">
                         <span class="glyphicon glyphicon-cog"></span>
                     </button>
                     <div style="float:left;"><span class="selftab"></span></div>
@@ -56,21 +56,21 @@
                     </div>
 
                     <div id = "save-current-conf" style="float:right">
-                        <button id="save-conf-button"> Save Current Configuration</button>
+                        <button id="save-conf-button"  class="btn btn-primary btn-sm"> Save Current Configuration</button>
                     </div>
                     <div style="float:right;"><span class="selftab"></span></div>
                     <div id="stringMarker" style="float:right">
-                        <strong> String marker </strong>
+                        <small> String marker </small>
                         <input id="quote" type="text">
                     </div>
                     <div style="float:right;"><span class="selftab"></span></div>
                     <div id="separatorOpr" style="float:right">
-                        <strong> Select separators : </strong>
-                        <input id="comma" type="radio" name="sep" value="comma">&nbsp; comma
-                        <input id="space" type="radio" name="sep" value="space">&nbsp; space
-                        <input id="tab" type="radio" name="sep" value="tab">&nbsp; tab
-                        <input id="semicolon" type="radio" name="sep" value="semicolon">&nbsp; semicolon
-                        &nbsp; or &nbsp; others
+                        <strong> <small> Select separators :</small> </strong>
+                        <input id="comma" type="radio" name="sep" value="comma">&nbsp; <small> comma</small>
+                        <input id="space" type="radio" name="sep" value="space">&nbsp;<small>  space</small>
+                        <input id="tab" type="radio" name="sep" value="tab">&nbsp;  <small>  tab </small>
+                        <input id="semicolon" type="radio" name="sep" value="semicolon">&nbsp;  <small> semicolon</small>
+                        &nbsp; or &nbsp; <small>others</small>
                         <input id="any" type="text" name="sep">
                     </div>
 
@@ -82,7 +82,9 @@
                     <div id="importedTable" class="col-md-10">&nbsp;</div>
 
                     <div id="paginate" class="col-md-12 text-center">
-                        <ul class="pagination"></ul>
+                        <small>
+                            <ul class="pagination"></ul>
+                        </small>
                     </div>
                 </div>
                 <div id="operations" class="col-md-2 hidden">

@@ -143,7 +143,7 @@ define(["jquery","d3","leftTableData"],
                     .attr("height", rowHeight * self.rowCount)
                     .style("border", "7px white solid")
                     .attr("bgcolor","#D1D0CE")                          //these are the styling
-                    .attr("onMouseover","this.bgColor='#FFE5B4'")
+                    .attr("onMouseover","this.bgColor='#87B6DE'")
                     .attr("onMouseout","this.bgColor='#D1D0CE'")
                     .append("svg")
                     .style("width", columnWidth/4)
