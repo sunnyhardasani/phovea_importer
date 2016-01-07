@@ -1,0 +1,28 @@
+{
+  "name": "caleydo_importer",
+  "homepage": "https://github.com/Caleydo/caleydo_importer",
+  "description": "Flexiable Smart and Visual Data Importer for Web Based Visualization",
+  "version": "0.0.1",
+  "license" : "SEE LICENSE IN LICENSE",
+  "repository": "Caleydo/caleydo_links",
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "caleydo_core": "*",
+    "caleydo_wrapper_bootstrap_fontawesome": "*"
+  },
+  "caleydo": {
+    "dependencies": {
+      "web": {
+        "colorbrewer": "~1.0.0",
+        "d3-tip": "~0.6.7",
+        "jquery-resizable-columns": "~0.2.3",
+        "store": "~2.3.2",
+        "d3": "~3.5.5"
+      }
+    }
+  },
+  "publishConfig": {
+    "registry": "http://registry.caleydo.org/"
+  }
+}
