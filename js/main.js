@@ -18,7 +18,6 @@ requirejs.config({
         "localSettings":"utility/localSettings"
     }
 });
-
 define(["require",
         "fileUploader",
         "fileConfiguration",

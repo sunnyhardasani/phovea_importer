@@ -20,7 +20,6 @@ define(["jquery", "d3", "d3-tip",
 
         //instance of the class
         var instance = null;
-        var tip = null;
 
         /**
          * if class is reinitilized then throws an eror
@@ -982,15 +981,14 @@ define(["jquery", "d3", "d3-tip",
 
 
                 //todo - fix the d3 tip bower error
-                tip = d3tip()
+                var tip = d3tip()
                     .attr('class', 'd3-tip')
                     .offset([-10, 0])
                     .html(function (d, i) {
 
                         if (i == (histogram.length)) {
                             return "<strong>Invalid &nbsp; values &nbsp; frequency &nbsp; : " +
-                                "</strong>" + d.y +
-                                "<strong></strong>";
+                                "</strong>" + d.y;
                         }
                         else {
                             return "" + d3.min(d) + " - " + d3.max(d);
@@ -1071,7 +1069,7 @@ define(["jquery", "d3", "d3-tip",
                     .range([0, height]);
 
                 //initialize the tip of the bar
-                tip = d3tip()
+                var tip = d3tip()
                     .attr('class', 'd3-tip')
                     .offset([-10, 0])
                     .html(function (d, i) {

@@ -60,7 +60,7 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
 
         $("#tool-id-button").trigger("click");
 
-        $('[data-toggle="tooltip"]').tooltip();
+        //$('[data-toggle="tooltip"]').tooltip();
     }
     /**
      * Initialize function of File Uploader
