@@ -2,7 +2,7 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(["jquery","d3","leftTableData"],
+define(["jquery","d3","./leftTableData"],
         function($,d3,leftTableData){
 
     //instance of the class

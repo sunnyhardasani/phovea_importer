@@ -1,13 +1,11 @@
-<!--template containing the table -->
-<template id="importertemplate">
-    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="bower_components/jquery-resizable-columns/dist/jquery.resizableColumns.css">
-    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+<!doctype html>
+<html>
+<head>
 
-    <script data-main="js/main" src="bower_components/requirejs/require.js"></script>
-
-    <div class="container-fluid">
+</head>
+<body>
+<div>
+  <div class="container-fluid">
         <div id="file-config" class="row">
             <div id="ribbon">
                 <div id="fileHandler" style="float: left;width:10%; height:50px">
@@ -121,34 +119,5 @@
             get replaced by copy settings option
         </p>-->
     </div>
-
-</template>
-
-<!--this script will registers the x-importer-template
- element and whenever the tag is used it create the
- table at that tag-->
-<script>
-    (function() {
-        function supportsCustomElements() {
-            return 'registerElement' in document;
-        }
-        if (supportsCustomElements()) {
-            var importDoc = document.currentScript.ownerDocument; // importee
-
-            var proto = Object.create(HTMLElement.prototype, {
-                createdCallback: {
-                    value: function() {
-                        var t = importDoc.querySelector('#importertemplate');
-                        var clone = document.importNode(t.content, true);
-                        this.appendChild(clone);
-                    }
-                }
-            });
-            document.registerElement('x-importer-template', {prototype: proto});
-        }
-        else{
-            alert("WHOAA!!! I think register element is \ " +
-                    "not supported in you browser...");
-        }
-    })();
-</script>
+</div>
+</body>
