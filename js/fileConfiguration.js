@@ -2,7 +2,7 @@
 // JSON Output File to handle output from the class //
 //////////////////////////////////////////////////////
 
-define(["jquery", "d3","dataWrangler"],
+define(["jquery", "d3","./dataWrangler"],
 
     function ($, d3, dataWrangler) {
 
@@ -62,12 +62,12 @@ define(["jquery", "d3","dataWrangler"],
 
             var self = this;
 
-            var settings = require("utility/localSettings");
+            var settings = require("./utility/localSettings");
             var TABLE_HOMOGENEOUS = settings.localSettings().TABLE_HOMOGENEOUS;
             var TABLE_HETEROGENEOUS = settings.localSettings().TABLE_HETEROGENEOUS;
 
             var allColData = self.dataWranglerIns.getColumnData();
-            var file = require("fileUploader").files[0];
+            var file = require("./fileUploader").files[0];
 
 
             //fetch the column count
@@ -144,7 +144,7 @@ define(["jquery", "d3","dataWrangler"],
         FileConfiguration.prototype.findType = function (_colIds,_rowTypeIds,_rowsToIgnore) {
             var self = this;
 
-            var settings = require("utility/localSettings");
+            var settings = require("./utility/localSettings");
 
             var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
             var DATATYPE_NOMINAL = settings.localSettings().DATATYPE_NOMINAL;
@@ -296,7 +296,7 @@ define(["jquery", "d3","dataWrangler"],
         FileConfiguration.prototype.saveConfiguration = function () {
             var self = this;
 
-            self.dataWranglerIns =  require("dataWrangler");
+            self.dataWranglerIns =  require("./dataWrangler");
 
             self.addNewFile();
 

@@ -46,7 +46,7 @@ define(["require","jquery"],function(require){
      */
     LeftTableData.prototype.reload = function () {
         var self = this;
-        self.dataWranglerIns = require("dataWrangler");
+        self.dataWranglerIns = require("../dataWrangler");
         self.init();
     }
 

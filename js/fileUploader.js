@@ -4,7 +4,7 @@
  * drop or through select file.
  */
 
-define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
+define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguration"],
     function ($,dataWrangler,settings,fileConfiguration) {
     "use strict";
 

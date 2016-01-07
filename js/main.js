@@ -7,15 +7,6 @@ requirejs.config({
         "d3-tip": "../bower_components/d3-tip/index",
         "jquery-resizable-columns": "../bower_components/jquery-resizable-columns/dist/jquery.resizableColumns.min",
         "store": "../bower_components/store/store.min",
-        "load-component":"utility/loadComponent",
-        "dataWrangler":"dataWrangler",
-        "table":"table",
-        "nominalGraphEffects":"effects/graphs/nominalGraphEffects",
-        "topTableData":"top_table/topTableData",
-        "topTableView":"top_table/topTableView",
-        "leftTableData":"left_table/leftTableData",
-        "leftTableView":"left_table/leftTableView",
-        "localSettings":"utility/localSettings"
     }
 });
 define(["require",

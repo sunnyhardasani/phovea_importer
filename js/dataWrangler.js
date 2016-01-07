@@ -1,12 +1,12 @@
-define(["require","jquery", "table", "d3",
-        "utility/localSettings", "utility/modColorBrewer"],
+define(["require","jquery", "./table", "d3",
+        "./utility/localSettings", "./utility/modColorBrewer"],
     function (require) {
 
         var $ = require("jquery");
         var d3 = require("d3");
-        var table =  require("table");
-        var settings =  require("utility/localSettings");
-        var colorbrewer =  require("utility/modColorBrewer");
+        var table =  require("./table");
+        var settings =  require("./utility/localSettings");
+        var colorbrewer =  require("./utility/modColorBrewer");
 
         // default values
         var MIN_VALUE = settings.localSettings().MIN_VALUE;

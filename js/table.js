@@ -3,9 +3,9 @@
  */
 
 define(["jquery", "d3", "d3-tip",
-        "jquery-resizable-columns", "fileConfiguration",
-        "stringOperations", "utility/localSettings", "utility/modColorBrewer",
-        "topTableView","leftTableView"],
+        "jquery-resizable-columns", "./fileConfiguration",
+        "./stringOperations", "./utility/localSettings", "./utility/modColorBrewer",
+        "./top_table/topTableView","./left_table/leftTableView"],
     function ($,d3, d3tip, jqueryResizableColumns, fileConfiguration,
               stringOperations, settings, colorbrewer,topTableView,leftTableView) {
 

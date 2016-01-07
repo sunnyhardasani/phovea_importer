@@ -2,7 +2,7 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(["jquery","d3","topTableData"],
+define(["jquery","d3","./topTableData"],
         function($,d3,topTableData){
 
     //instance of the class
