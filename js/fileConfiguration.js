@@ -5,22 +5,14 @@
 define(["jquery", "d3","./dataWrangler"],
 
     function ($, d3, dataWrangler) {
-
-        // class instance initialized to null
-        var instance = null;
-
         /**
          * 1. Check if instance is null then throw error
          * 2. Calls the load ui related to this class
          * @constructor
          */
-        function FileConfiguration() {
+        function FileConfiguration(root) {
             var self = this;
-
-            //if instance is not null then throw an error
-            if (instance !== null) {
-                throw new Error("Cannot instantiate more than one FileConfiguration, use FileConfiguration.getInstance()");
-            }
+            self.root = root;
 
             //load the ui
             self.loadUI();
@@ -28,20 +20,6 @@ define(["jquery", "d3","./dataWrangler"],
             //read the data from the stored json file
             self.localJSONData = [];
         }
-
-        /**
-         * this function returns the instance of this
-         * class if not created
-         * @returns {*}
-         */
-        FileConfiguration.getInstance = function () {
-            // gets an instance of the singleton. It is better to use
-            if (instance === null) {
-                instance = new FileConfiguration();
-            }
-            return instance;
-        };
-
 
         /**
          * This function will get initialized when this class
@@ -493,5 +471,9 @@ define(["jquery", "d3","./dataWrangler"],
             self.tempData = data;
         }
 
-        return FileConfiguration.getInstance();
+        return {
+          create: function(parent) {
+            return new FileConfiguration(parent);
+          }
+        };
     });

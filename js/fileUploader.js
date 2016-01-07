@@ -13,52 +13,32 @@ define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguratio
     var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
     var INITIAL_END_BYTE = settings.localSettings().INITIAL_END_BYTE;
 
-    //singleton instance of the class
-    var instance = null;
-
     /**
      * Constructor whether instance is null or
      * not, if null then throw error
      * @constructor
      */
-    function FileUploader(){
-        if(instance !== null){
-            throw new Error("Cannot instantiate more than one FileUploader, use FileUploader.getInstance()");
-        }
+    function FileUploader(root){
+      this.root = root;
+      this.$root = $(root);
     }
 
-    // getElementById - helper function
-    function $id(id) {
-        return document.getElementById(id);
-    }
-
-
-    /**
-     * This function returns instance of the class
-     * @returns {*}
-     */
-    FileUploader.getInstance = function(){
-
-        // gets an instance of the singleton
-        if(instance === null){
-            instance = new FileUploader();
-        }
-        return instance;
+    FileUploader.prototype.$id = function(id) {
+      return this.root.querySelector('#' + id);
     };
-
     FileUploader.prototype.initUI = function() {
         var self = this;
 
-        $("#tool-id-button").bind("click",function(){
+        this.$root.find("#tool-id-button").bind("click",function(){
             //alert("ui called");
-            $( "#oprButtons" ).toggleClass( "hide" );
-            $( "#topLeftOperations" ).toggleClass( "hide" );
-            $( "#leftOperations" ).toggleClass( "hide" );
-            $( "#topOperations" ).toggleClass( "hide" );
-            $( "#importedTable" ).toggleClass( "col-md-10", "col-md-12" );
+            self.$root.find( "#oprButtons" ).toggleClass( "hide" );
+            self.$root.find( "#topLeftOperations" ).toggleClass( "hide" );
+            self.$root.find( "#leftOperations" ).toggleClass( "hide" );
+            self.$root.find( "#topOperations" ).toggleClass( "hide" );
+            self.$root.find( "#importedTable" ).toggleClass( "col-md-10", "col-md-12" );
         });
 
-        $("#tool-id-button").trigger("click");
+        this.$root.find("#tool-id-button").trigger("click");
 
         //$('[data-toggle="tooltip"]').tooltip();
     }
@@ -75,9 +55,9 @@ define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguratio
         self.table = _table;
 
         //taking required html element
-        var fileselect = $id("fileselect");
-        var filedrag = $id("filedrag");
-        var submitbutton = $id("submitbutton");
+        var fileselect = this.$id("fileselect");
+        var filedrag = this.$id("filedrag");
+        var submitbutton = this.$id("submitbutton");
 
         // file select
         fileselect.addEventListener("change", self.fileSelectHandler.bind(self), false);
@@ -165,7 +145,7 @@ define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguratio
 
                 // requireJS will ensure that the DataWrangler definition
                 // is available to use, we can now import it for use.
-                dataWrangler.reload(data, file, self);
+                dataWrangler.reload(self.root, data, file, self);
 
                 //this will initialize the ui
                 self.initUI();
@@ -189,5 +169,9 @@ define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguratio
         e.target.className = (e.type == "dragover" ? "hover" : "");
     };
 
-    return FileUploader.getInstance();
+    return {
+      create: function(parent) {
+        return new FileUploader(parent);
+      }
+    };
 });

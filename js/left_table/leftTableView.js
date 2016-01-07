@@ -28,28 +28,29 @@ define(["jquery","d3","./leftTableData"],
      * will be called once on the initialiaztion
      * of the application
      */
-    LeftTableView.prototype.initUI = function () {
+    LeftTableView.prototype.initUI = function (root) {
         var self = this;
+        self.$root = $(root);
 
-        $(self.parentElementName + " " +'#importedTable').on('scroll', function (event) {
-            $(self.parentElementName + " " +'#leftOperations').scrollLeft($(this).scrollLeft());
+        self.$root.find('#importedTable').on('scroll', function (event) {
+            self.$root.find('#leftOperations').scrollLeft($(this).scrollLeft());
             $( this ).off( event );
         });
 
 
         //first unbind the previous initialized events and then reinitialize it again
-        $(self.parentElementName + " " +'#add-row-id-button').unbind("click");
-        $(self.parentElementName + " " +'#remove-row-button').unbind("click");
+        self.$root.find('#add-row-id-button').unbind("click");
+        self.$root.find('#remove-row-button').unbind("click");
 
         //temporary button to keep the rows
-        $(self.parentElementName + " " +'#add-row-id-button').bind("click",function(event){
+        self.$root.find('#add-row-id-button').bind("click",function(event){
             self.oprCount++;
 
             leftTableData.insertNewOpr(self.oprCount,"ID",{topIndex:0,bottomIndex:1});
             $( this ).off( event );
         });
 
-        $(self.parentElementName + " " +'#remove-row-button').bind("click",function(event){
+        self.$root.find('#remove-row-button').bind("click",function(event){
             self.oprCount++;
             leftTableData.insertNewOpr(self.oprCount,"REMOVE",Array.apply(null, new Array(self.rowCount)).map(Number.prototype.valueOf,0));
             $( this ).off( event );
@@ -75,7 +76,7 @@ define(["jquery","d3","./leftTableData"],
      * is loaded on the same session
      * @param _data
      */
-    LeftTableView.prototype.reload = function (_columns,_rowCount) {
+    LeftTableView.prototype.reload = function (root, _columns,_rowCount) {
         var self = this;
 
         self.dataWranglerIns = require("dataWrangler");
@@ -85,7 +86,7 @@ define(["jquery","d3","./leftTableData"],
         self.rowCount = _rowCount;
 
 
-        self.initUI();
+        self.initUI(root);
         self.init();
 
     }
@@ -113,7 +114,7 @@ define(["jquery","d3","./leftTableData"],
         var columnWidth = 150;
         var colCount = 1;
 
-        self.leftTable = d3.select(self.parentElementName + " " + "#leftOperations")
+        self.leftTable = d3.select(self.$root[0]).select("#leftOperations")
             .append("table")
             .attr("class","leftTable")
             .attr("id", "left-table")

@@ -4,10 +4,10 @@
 
 define(["jquery", "d3", "d3-tip",
         "jquery-resizable-columns", "./fileConfiguration",
-        "./stringOperations", "./utility/localSettings", "./utility/modColorBrewer",
+        "./utility/localSettings", "./utility/modColorBrewer",
         "./top_table/topTableView","./left_table/leftTableView"],
     function ($,d3, d3tip, jqueryResizableColumns, fileConfiguration,
-              stringOperations, settings, colorbrewer,topTableView,leftTableView) {
+               settings, colorbrewer,topTableView,leftTableView) {
 
 
         //defination of the variables
@@ -54,8 +54,9 @@ define(["jquery", "d3", "d3-tip",
          * is loaded on the same session
          * @param _data
          */
-        Table.prototype.reload = function (_data, _parentInstance) {
+        Table.prototype.reload = function (root, _data, _parentInstance) {
             var self = this;
+            self.root = root;
 
             self.data = _data;
             self.displayRowCount = DISPLAY_ROW_COUNT;
@@ -71,8 +72,8 @@ define(["jquery", "d3", "d3-tip",
 
 
             //this will remove all the tips
-            $(".d3-tip").remove();
-            $(".n").remove();
+            $(self.root).find(".d3-tip").remove();
+            $(self.root).find(".n").remove();
 
             //load file data and call initialize
             self.init();
@@ -102,9 +103,9 @@ define(["jquery", "d3", "d3-tip",
 
             //this will set on resizable columns
             //  $(self.parentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
-            $(self.parentElementName + " " + "#string-opr-menu > span").click(function () {
-                $(self.parentElementName + " " + '#table-group').attr("class", "col-md-12");
-                $(self.parentElementName + " " + '#operations').attr("class", "col-md-0 hidden");
+            $(self.root).find("#string-opr-menu > span").click(function () {
+                $(self.root).find('#table-group').attr("class", "col-md-12");
+                $(self.root).find('#operations').attr("class", "col-md-0 hidden");
             });
         }
 
@@ -164,7 +165,7 @@ define(["jquery", "d3", "d3-tip",
 
             }
 
-            var pagination = d3.select(self.parentElementName + " " + "#paginate").selectAll(".pagination");
+            var pagination = d3.select(self.root).select("#paginate").selectAll(".pagination");
             var page = pagination.selectAll("li").data(pageData);
 
             page.enter()
@@ -1264,10 +1265,10 @@ define(["jquery", "d3", "d3-tip",
             var tableWidth = ind * 150;
 
             //var topTableView = require("topTableView");
-            topTableView.reload(columns);
+            topTableView.reload(self.root, columns);
 
             //todo following top left goes into the separate function
-            self.topLeftTable = d3.select(self.parentElementName + " " + "#topLeftOperations").append("table")
+            self.topLeftTable = d3.select(self.root).select("#topLeftOperations").append("table")
                 .attr("id", "top-left-table")
                 .style("border-collapse", "collapse")
                 .style("border", "0px black solid")
@@ -1276,9 +1277,9 @@ define(["jquery", "d3", "d3-tip",
 
             //todo following left table goes into separate function
             var rowsToCreateLeftView = (self.rowCount / DISPLAY_ROW_COUNT >= 1) ? DISPLAY_ROW_COUNT : self.rowCount;
-           leftTableView.reload(columns,rowsToCreateLeftView);
+           leftTableView.reload(self.root, columns,rowsToCreateLeftView);
 
-            self.table = d3.select(self.parentElementName + " " + "#importedTable").append("table")
+            self.table = d3.select(self.root).select("#importedTable").append("table")
                 .attr("id", "data-table")
                 .style("border-collapse", "collapse")
                 //.style("border", "1px black solid")
@@ -1335,7 +1336,7 @@ define(["jquery", "d3", "d3-tip",
                             })
                             .on("change",function(d){
                                 var strId = "#drop-down-" + (d.id-1);
-                                var datatype = $(strId).val();
+                                var datatype = $(self.root).find(strId).val();
                                 self.parentInstance.changeDataType((d.id-1), datatype);
                             });
             var opt = select.selectAll("option")

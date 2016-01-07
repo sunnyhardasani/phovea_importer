@@ -28,33 +28,34 @@ define(["jquery","d3","./topTableData"],
      * will be called once on the initialiaztion
      * of the application
      */
-    TopTableView.prototype.initUI = function () {
+    TopTableView.prototype.initUI = function (root) {
         var self = this;
+      self.$root = $(root);
 
-        $(self.parentElementName + " " +'#importedTable').on('scroll', function () {
+        self.$root.find('#importedTable').on('scroll', function () {
             $('#topOperations').scrollLeft($(this).scrollLeft());
         });
 
-        $(self.parentElementName + " " +'#topOperations').on('scroll', function () {
+        self.$root.find('#topOperations').on('scroll', function () {
             $('#importedTable').scrollLeft($(this).scrollLeft());
         });
 
-        $(self.parentElementName + " " +'#topOperations').on('scroll', function () {
+        self.$root.find('#topOperations').on('scroll', function () {
             $('#topLeftOperations').scrollTop($(this).scrollTop());
         });
 
         //this will unbind the event for reinitialization
-        $(self.parentElementName + " " +'#add-col-id-button').unbind("click");
-        $(self.parentElementName + " " +'#copy-id-button').unbind("click")
+        self.$root.find('#add-col-id-button').unbind("click");
+        self.$root.find('#copy-id-button').unbind("click")
 
         //temoparary button to keep the rows
-        $(self.parentElementName + " " +'#add-col-id-button').bind("click",function(event){
+        self.$root.find('#add-col-id-button').bind("click",function(event){
             self.oprCount++;
             topTableData.insertNewOpr(self.oprCount,"ID",{"left":0,"right":1});
             $( this ).off( event );
         });
 
-        $(self.parentElementName + " " +'#copy-id-button').bind("click",function(event){
+        self.$root.find('#copy-id-button').bind("click",function(event){
             self.oprCount++;
 
             self.selectedCol = [];
@@ -85,13 +86,13 @@ define(["jquery","d3","./topTableData"],
      * is loaded on the same session
      * @param _data
      */
-    TopTableView.prototype.reload = function (_columns) {
+    TopTableView.prototype.reload = function (root, _columns) {
         var self = this;
 
         self.dataWranglerIns = require("dataWrangler");
         topTableData.reload();
         self.columns = _columns;
-        self.initUI();
+        self.initUI(root);
         self.init();
     }
 
@@ -131,7 +132,7 @@ define(["jquery","d3","./topTableData"],
         var tableWidth = self.columns.length * 150;
 
         //this function will initialize the table
-        self.toptable = d3.select(self.parentElementName + " " + "#topOperations")
+        self.toptable = d3.select(self.$root[0]).select("#topOperations")
             .append("table")
             .attr("id", "top-table")
             //.style("border-collapse", "collapse")

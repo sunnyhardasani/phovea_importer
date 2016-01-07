@@ -53,9 +53,8 @@ define(["require","jquery", "./table", "d3",
             return instance;
         };
 
-        // getElementById - helper function
-        function $id(id) {
-            return document.getElementById(id);
+        DataWrangler.prototype.$id = function(id) {
+            return this.root.querySelector('#'+id);
         }
 
         /**
@@ -64,9 +63,10 @@ define(["require","jquery", "./table", "d3",
          * @param file
          * @param _mainInstance
          */
-        DataWrangler.prototype.reload = function (data, file, _mainInstance) {
+        DataWrangler.prototype.reload = function (root, data, file, _mainInstance) {
 
             var self = this;
+            self.root = root;
             self.data = data;
             self.file = file;
             self.mainInstance = _mainInstance;
@@ -117,10 +117,10 @@ define(["require","jquery", "./table", "d3",
 
             //todo make the solution for this one urgently !!!
 
-            d3.select("#colorbox-pop-up").selectAll("*").remove();
-            d3.select("#leftOperations").selectAll("*").remove();
-            d3.select("#topOperations").selectAll("*").remove();
-            d3.select("#importedTable").selectAll("*").remove();
+            d3.select(this.root).select("#colorbox-pop-up").selectAll("*").remove();
+            d3.select(this.root).select("#leftOperations").selectAll("*").remove();
+            d3.select(this.root).select("#topOperations").selectAll("*").remove();
+            d3.select(this.root).select("#importedTable").selectAll("*").remove();
         }
 
         /**
@@ -133,28 +133,28 @@ define(["require","jquery", "./table", "d3",
             // registering all the events of the
             // check box and input box on the separator
             // modal
-            $("#comma").click(function () {
+            $(this.root).find("#comma").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
                 else {
                 }
             });
-            $("#space").click(function () {
+            $(this.root).find("#space").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
                 else {
                 }
             });
-            $("#tab").click(function () {
+            $(this.root).find("#tab").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
                 else {
                 }
             });
-            $("#semicolon").click(function () {
+            $(this.root).find("#semicolon").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
@@ -163,19 +163,19 @@ define(["require","jquery", "./table", "d3",
             });
 
             // this will read the event on the
-            $('#any').bind('input', function () {
+            $(this.root).find('#any').bind('input', function () {
                 // get the current value of the input field.
                 var val = $(this).val();
                 self.saveClicked();
             });
 
             // this will read the event on the
-            $('#quote').bind('input', function () {
+            $(this.root).find('#quote').bind('input', function () {
                 self.saveClicked();
             });
 
             // this will read the event on the
-            $('#save').click(function () {
+            $(this.root).find('#save').click(function () {
                 // get the current value of the input field.
                 self.saveClicked();
             });
@@ -261,7 +261,7 @@ define(["require","jquery", "./table", "d3",
             }
 
             //set the highest count radio button to true
-            $id(strDelimiter).checked = true;
+            this.$id(strDelimiter).checked = true;
 
         }
 
@@ -274,24 +274,24 @@ define(["require","jquery", "./table", "d3",
             var self = this;
 
             //following will insert the quote
-            if ($id('quote').value != "") {
-                self.quote = "\\" + $id('quote').value.charAt(0);
+            if (this.$id('quote').value != "") {
+                self.quote = "\\" + this.$id('quote').value.charAt(0);
             }
 
             //this will handle the delimiter
-            if ($id('any').value != "") {
-                self.delimiter = $id('any').value.charAt(0);
+            if (this.$id('any').value != "") {
+                self.delimiter = this.$id('any').value.charAt(0);
             }
-            else if ($id('comma').checked) {
+            else if (this.$id('comma').checked) {
                 self.delimiter = ",";
             }
-            else if ($id('space').checked) {
+            else if (this.$id('space').checked) {
                 self.delimiter = "\s";
             }
-            else if ($id("tab").checked) {
+            else if (this.$id("tab").checked) {
                 self.delimiter = "\t";
             }
-            else if ($id('semicolon').checked) {
+            else if (this.$id('semicolon').checked) {
                 self.delimiter = ";";
             }
         }
@@ -348,7 +348,7 @@ define(["require","jquery", "./table", "d3",
 
             // requireJS will ensure that the Table definition is available
             // to use, we can now import it for use.
-            table.reload(self.allColumnsDataArray, self);
+            table.reload(self.root, self.allColumnsDataArray, self);
         }
 
         /**
@@ -615,7 +615,7 @@ define(["require","jquery", "./table", "d3",
             self.clean();
 
             //this will keep only one instance of the table class
-            table.reload(self.allColumnsDataArray, self);
+            table.reload(self.root, self.allColumnsDataArray, self);
         }
 
         /**
@@ -639,7 +639,7 @@ define(["require","jquery", "./table", "d3",
                 self.clean();
 
                 //this will keep only one instance of the table class
-                table.reload(self.allColumnsDataArray, self);
+                table.reload(self.root, self.allColumnsDataArray, self);
             }
         }
 
@@ -681,7 +681,7 @@ define(["require","jquery", "./table", "d3",
 
             //this will keep only one instance of the table class
             self.table = require('table');
-            self.table.reload(self.allColumnsDataArray, self);
+            self.table.reload(self.root, self.allColumnsDataArray, self);
         }
 
         /**
@@ -703,7 +703,7 @@ define(["require","jquery", "./table", "d3",
 
             //this will keep only one instance of the table class
             self.table = require('table');
-            self.table.reload(self.allColumnsDataArray, self);
+            self.table.reload(self.root, self.allColumnsDataArray, self);
         }
 
         /**
@@ -744,7 +744,7 @@ define(["require","jquery", "./table", "d3",
             self.clean();
 
             //this will keep only one instance of the table class
-            table.reload(self.allColumnsDataArray, self);
+            table.reload(self.root, self.allColumnsDataArray, self);
 
         }
 
@@ -772,7 +772,7 @@ define(["require","jquery", "./table", "d3",
             self.clean();
 
             //this will keep only one instance of the table class
-            table.reload(self.allColumnsDataArray, self);
+            table.reload(self.root, self.allColumnsDataArray, self);
 
         }
 
@@ -871,7 +871,7 @@ define(["require","jquery", "./table", "d3",
             self.clean();
 
             //this will keep only one instance of the table class
-            table.reload(self.allColumnsDataArray, self);
+            table.reload(self.root, self.allColumnsDataArray, self);
         }
 
         /**
@@ -892,7 +892,7 @@ define(["require","jquery", "./table", "d3",
             self.clean();
 
             //this will keep only one instance of the table class
-            table.reload(self.allColumnsDataArray, self);
+            table.reload(self.root, self.allColumnsDataArray, self);
 
         }
 
