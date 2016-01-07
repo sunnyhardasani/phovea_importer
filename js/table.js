@@ -854,7 +854,7 @@ define(["jquery", "d3", "d3-tip",
                     return y(d.y);
                 })
                 .style("fill", function (d) {
-                    return linearColorScale(d.x);
+                return linearColorScale(d.x);
                 })
                 .style("stroke-width","0.5")
                 .style("stroke","black")
