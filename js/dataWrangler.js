@@ -864,6 +864,10 @@ define(["require", "jquery", "table", "d3",
                     self.allColumnsDataArray[key]["dataTypeObj"].min = copyColData["dataTypeObj"].min;
                     self.allColumnsDataArray[key]["dataTypeObj"].max = copyColData["dataTypeObj"].max;
                     self.allColumnsDataArray[key]["dataTypeObj"].type = copyColData["dataTypeObj"].type;
+
+                    for(mapKey in self.allColumnsDataArray[key]["dataTypeObj"].keyCountMap){
+                        self.allColumnsDataArray[key]["dataTypeObj"].keyCountMap[mapKey].color = "";
+                    }
                 }
             }
 

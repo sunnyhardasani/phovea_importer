@@ -265,6 +265,7 @@ define(["jquery","d3","topTableData"],
             .origin(function (d) {
                 return d;
             })
+            .on("dragstart",dragbegin)
             .on("drag", dragmove)
             .on("dragend", dragstop);
 
@@ -337,7 +338,9 @@ define(["jquery","d3","topTableData"],
             .attr("y", height / 2 - radius)
             .attr("height", radius * 2).call(drag);
 
+        console.log("circle");
         function dragmove(d) {
+            console.log(d);
             var selRecLen = 0;
             d3.select(this)
                 .attr("cx", selRecLen = Math.max(d.x, Math.min(width - radius, d3.event.x)));
@@ -346,21 +349,42 @@ define(["jquery","d3","topTableData"],
             checkRightRadios(d.x, selRecLen);
         }
 
+        function dragbegin(d){
+            for (var i = 0; i < c[0].length; i++) {
+                var selectedCircle = d3.select(c[0][i]);
+                selectedCircle.attr("visibility", "hidden");
+            }
+            self.selectedCol = [];
+            self.fromLoc = d.id - 1;
+        }
+
         function dragstop(d) {
             d3.select(r[0][d.id - 1]).attr("width", 0);
             d3.select(this).attr("cx", d.x)
 
-            var selectedCol = [];
-            topTableData.insertNewOpr(opr,"COPY_SETTINGS",{"fromCol":fromCol,"arr":self.selectedCol});
+            //this will check all the circle having
+            //visible state and prepare required
+            //array to send to toptabledata
+            for (var i = 0; i < c[0].length; i++) {
+                var selectedCircle = d3.select(c[0][i]);
+                if (selectedCircle.attr("visibility") === "visible") {
+                    self.selectedCol[parseInt(selectedCircle.attr("id"))] = true;
+                }
+            }
+
+            //set new operation to the toptabledata operation
+            topTableData.insertNewOpr(opr,"COPY_SETTINGS",{"fromCol":self.fromLoc,"arr":self.selectedCol});
         }
 
+        //this function check whether the rectangle is
+        //passing through the circle and turns the
+        //visibility on
         function checkRightRadios(fromLoc, currentLoc) {
             for (var i = 0; i < c[0].length; i++) {
                 var selectedCircle = d3.select(c[0][i]);
-                if (currentLoc > selectedCircle.attr("cx")
+                if (currentLoc >= selectedCircle.attr("cx")
                     && selectedCircle.attr("cx") >= fromLoc) {
                     selectedCircle.attr("visibility", "visible");
-                    self.selectedCol[parseInt(selectedCircle.attr("id"))] = true;
                 }
             }
         }

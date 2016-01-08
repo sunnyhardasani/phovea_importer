@@ -1210,7 +1210,7 @@ define(["jquery", "d3", "d3-tip",
 
         /**
          * this function will highlight row identification type
-         * on every initilization
+         * on every initialization
          */
         Table.prototype.highlightRowType = function(){
             var self = this;
@@ -1228,6 +1228,10 @@ define(["jquery", "d3", "d3-tip",
             }
         }
 
+        /**
+         * this function will highlight all the rows
+         * which are give by the user to ignore
+         */
         Table.prototype.highlightIgnoreRows = function(){
             var self = this;
 
@@ -1246,8 +1250,10 @@ define(["jquery", "d3", "d3-tip",
                 }
             }
         }
+
         /**
-         * update columns
+         * this function will print the table headers and
+         * also initialize printing of the chart
          */
         Table.prototype.printTableHeaders = function () {
             var self = this;
