@@ -24,7 +24,7 @@ define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguratio
     }
 
     FileUploader.prototype.$id = function(id) {
-      return this.root.querySelector('#' + id);
+      return this.root.getElementById(id);
     };
     FileUploader.prototype.initUI = function() {
         var self = this;

@@ -54,7 +54,7 @@ define(["require","jquery", "./table", "d3",
         };
 
         DataWrangler.prototype.$id = function(id) {
-            return this.root.querySelector('#'+id);
+            return this.root.getElementById(id);
         }
 
         /**
