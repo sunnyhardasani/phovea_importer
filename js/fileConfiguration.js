@@ -178,8 +178,6 @@ define(["jquery", "d3","dataWrangler"],
                         //      a. compare all the keys should be same
                         //4. todo ask if string
 
-                        console.log(col, lastCol);
-
                         if (lastCol["dataTypeObj"].type !== col["dataTypeObj"].type) {
                             tableType = TABLE_HETEROGENEOUS;
                             break;
@@ -206,8 +204,6 @@ define(["jquery", "d3","dataWrangler"],
                                 }
                             }
                         }
-
-                        console.log(col);
                     }
                     else {
                         lastCol = col;
@@ -402,8 +398,6 @@ define(["jquery", "d3","dataWrangler"],
          */
         FileConfiguration.prototype.loadData = function (curTableData) {
             var self = this;
-
-            console.log(curTableData);
 
             var outColumnArray = [];
             for (col in curTableData) {

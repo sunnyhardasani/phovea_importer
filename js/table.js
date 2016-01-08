@@ -1198,7 +1198,6 @@ define(["jquery", "d3", "d3-tip",
                     var id = col.id-1;
                     var colId = "col-"+id;
 
-                    console.log("coltype called");
                     //this function will highlight all the column
                     //whose row identifier is true
                     var rows = document.getElementsByClassName(colId);
@@ -1209,6 +1208,10 @@ define(["jquery", "d3", "d3-tip",
             }
         }
 
+        /**
+         * this function will highlight row identification type
+         * on every initilization
+         */
         Table.prototype.highlightRowType = function(){
             var self = this;
 
@@ -1233,7 +1236,7 @@ define(["jquery", "d3", "d3-tip",
                 if (arr[key] == 1) {
                     var id = key;
                     var rowId = "row-" + id;
-                    console.log("ignore rows called");
+
                     //this function will highlight all the row ids
                     var rows = document.getElementsByClassName(rowId);
 
