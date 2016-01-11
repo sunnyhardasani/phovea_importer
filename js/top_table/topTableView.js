@@ -2,8 +2,8 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(["jquery","d3","./topTableData"],
-        function($,d3,topTableData){
+define(["jquery","d3","./topTableData","../dataWrangler"],
+        function($,d3,topTableData, dataWrangler){
 
     //instance of the class
     var instance = null;
@@ -89,7 +89,7 @@ define(["jquery","d3","./topTableData"],
     TopTableView.prototype.reload = function (root, _columns) {
         var self = this;
 
-        self.dataWranglerIns = require("dataWrangler");
+        self.dataWranglerIns = dataWrangler;
         topTableData.reload();
         self.columns = _columns;
         self.initUI(root);

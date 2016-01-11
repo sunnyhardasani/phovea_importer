@@ -4,15 +4,26 @@
 
 define(['require', 'exports', 'text!./xImporterTemplate.html', 'text!./style.css', 'bootstrap', './js/fileUploader', './js/fileConfiguration'],
   function (require, exports, template, style) {
-    template = template.replace('STYLE_HACK',style);
-
     function ImporterWizard(parent) {
       this.root = document.createElement('div');
       this.root.classList.add('importer');
       parent.appendChild(this.root);
       this.root = this.root.createShadowRoot();
-      this.root.applyAuthorStyles = true;
+      //deprecated this.root.applyAuthorStyles = true;
       this.root.innerHTML = template;
+
+      var sstyle = document.createElement('style');
+      var fullstyle = style;
+
+      //import the styles that need to mapped also in the shadow dom as @imports
+      var styles = [].slice.call(document.querySelectorAll('link[href$="/jquery-resizable-columns/dist/jquery.resizableColumns.css"], link[href$="bootstrap/dist/css/bootstrap.css"]'));
+      styles.forEach(function(s) {
+        fullstyle = '@import url("'+ s.href+'");\n' + fullstyle;
+      });
+
+      sstyle.innerText = fullstyle;
+      this.root.insertBefore(sstyle, this.root.firstChild);
+
       // requireJS will ensure that the FileUploader,
       // FileConfiguration definition is available
       // to use, we can now import it for use.

@@ -2,8 +2,8 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(["jquery","d3","./leftTableData"],
-        function($,d3,leftTableData){
+define(["jquery","d3","./leftTableData", "../dataWrangler"],
+        function($,d3,leftTableData, dataWrangler){
 
     //instance of the class
     var instance = null;
@@ -79,7 +79,7 @@ define(["jquery","d3","./leftTableData"],
     LeftTableView.prototype.reload = function (root, _columns,_rowCount) {
         var self = this;
 
-        self.dataWranglerIns = require("dataWrangler");
+        self.dataWranglerIns = dataWrangler;
         //self.topTableData =  require("topTableData");
         leftTableData.reload();
         self.columns = _columns;
