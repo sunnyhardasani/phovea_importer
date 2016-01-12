@@ -410,6 +410,7 @@ define(["require", "jquery", "table", "d3",
                             //"colId": self.colId[colKey],          //head will guess in separate function
                             "dataTypeObj": new Object(),         //data type will be guessed in separate function
                             "isColType": false,
+                            "isRemoved":false,
                             "data": []
                         };
                     }
@@ -868,6 +869,27 @@ define(["require", "jquery", "table", "d3",
                     for(mapKey in self.allColumnsDataArray[key]["dataTypeObj"].keyCountMap){
                         self.allColumnsDataArray[key]["dataTypeObj"].keyCountMap[mapKey].color = "";
                     }
+                }
+            }
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            table.reload(self.allColumnsDataArray, self);
+        }
+
+        /**
+         * remove columns
+         */
+        DataWrangler.prototype.removeColumn = function (arrSelectedCol) {
+            var self = this;
+
+            //this will all
+            for (var key in self.allColumnsDataArray) {
+                if (arrSelectedCol[key]) {
+                    self.allColumnsDataArray[key].isRemoved = true;
                 }
             }
 

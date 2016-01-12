@@ -99,6 +99,7 @@ define(["jquery", "d3", "d3-tip",
             self.highlightRowType();
             self.highlightColType();
             self.highlightIgnoreRows();
+            self.highlightIgnoreColumn();
 
             //this will set on resizable columns
             //  $(self.parentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
@@ -241,6 +242,7 @@ define(["jquery", "d3", "d3-tip",
             self.highlightRowType();
             self.highlightColType();
             self.highlightIgnoreRows();
+            self.highlightIgnoreColumn();
         }
 
         /**
@@ -1203,6 +1205,30 @@ define(["jquery", "d3", "d3-tip",
                     var rows = document.getElementsByClassName(colId);
                     for (var i = 0; i < rows.length ; i++) {
                         rows[i].style.backgroundColor = "#D3D3D3";
+                    }
+                }
+            }
+        }
+
+        /**
+         * This function is reposible for the higlighting
+         * of the selected row identifier, this function
+         * works independently with no extra inputs
+         */
+        Table.prototype.highlightIgnoreColumn = function(){
+            var self = this;
+
+            for (key in self.data) {
+                var col = self.data[key];
+                if(col.isRemoved){
+                    var id = col.id-1;
+                    var colId = "col-"+id;
+
+                    //this function will highlight all the column
+                    //whose row identifier is true
+                    var rows = document.getElementsByClassName(colId);
+                    for (var i = 0; i < rows.length ; i++) {
+                        rows[i].style.backgroundColor = "#F9966B";
                     }
                 }
             }

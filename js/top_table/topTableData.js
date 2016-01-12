@@ -77,8 +77,12 @@ define(["require","jquery"],function(require){
         else if(_type === "COPY_SETTINGS"){
             //now take the column selected array
             //and perform the copy settings opertaions
-            console.log(_obj.fromCol,_obj.arr);
             self.dataWranglerIns.copySettings(_obj.fromCol,_obj.arr);
+        }
+        else if(_type === "REMOVE_COLUMN"){
+            //now take the column selected array
+            //and perform the copy settings opertaions
+            self.dataWranglerIns.removeColumn(_obj.arr);
         }
     }
 
