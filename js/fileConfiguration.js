@@ -156,8 +156,6 @@ define(["jquery", "d3","./dataWrangler"],
                         //      a. compare all the keys should be same
                         //4. todo ask if string
 
-                        console.log(col, lastCol);
-
                         if (lastCol["dataTypeObj"].type !== col["dataTypeObj"].type) {
                             tableType = TABLE_HETEROGENEOUS;
                             break;
@@ -184,8 +182,6 @@ define(["jquery", "d3","./dataWrangler"],
                                 }
                             }
                         }
-
-                        console.log(col);
                     }
                     else {
                         lastCol = col;
@@ -381,86 +377,87 @@ define(["jquery", "d3","./dataWrangler"],
         FileConfiguration.prototype.loadData = function (curTableData) {
             var self = this;
 
-            console.log(curTableData);
-
             var outColumnArray = [];
-            for (col in curTableData) {
+            for (colIndex in curTableData) {
 
                 //fetching the required type and converting it to new structure
-                var col = curTableData[col];
+                var col = curTableData[colIndex];
 
-                var dataTypeObj = col["dataTypeObj"];
-                var data = col["data"];
+                if(!col.isRemoved) {
+                    var dataTypeObj = col["dataTypeObj"];
+                    var data = col["data"];
 
-                //taking the json output information
-                var outId = col["id"];
-                var outHeader = col["colId"];
-                var outColor = col["colorScheme"];
+                    //taking the json output information
+                    var outId = col["id"];
+                    var outHeader = col["colId"];
+                    var outColor = col["colorScheme"];
 
-                //for numerical data type
-                if (dataTypeObj.type === "numerical") {
-                    var outNumericalDTType = {
-                        "type": dataTypeObj.type,
-                        "min": dataTypeObj.min,
-                        "max": dataTypeObj.max
-                    };
+                    //for numerical data type
+                    if (dataTypeObj.type === "numerical") {
+                        var outNumericalDTType = {
+                            "type": dataTypeObj.type,
+                            "min": dataTypeObj.min,
+                            "max": dataTypeObj.max
+                        };
 
-                    if(dataTypeObj.isDataCenter){
-                        outNumericalDTType["center"] = dataTypeObj.center;
-                    }
+                        if (dataTypeObj.isDataCenter) {
+                            outNumericalDTType["center"] = dataTypeObj.center;
+                        }
 
-                    outColumnArray.push({
-                        "id": outId,
-                        "header": outHeader,
-                        "datatype": outNumericalDTType,
-                        "colorSchemeSelected": outColor
-                    });
-                }
-                //for nominal data type
-                else if (dataTypeObj.type === "nominal") {
-                    var outCategories = [];
-                    for (cat in dataTypeObj.keyCountMap) {
-                        outCategories.push({
-                            "name": cat,
-                            "freq": dataTypeObj.keyCountMap[cat]
+                        outColumnArray.push({
+                            "id": outId,
+                            "header": outHeader,
+                            "datatype": outNumericalDTType,
+                            "colorSchemeSelected": outColor
                         });
                     }
-                    var outNominalDTType = {
-                        type: dataTypeObj.type,
-                        categories: outCategories
-                    };
-                    outColumnArray.push({
-                        "id": outId,
-                        "header": outHeader,
-                        "datatype": outNominalDTType,
-                        "colorSchemeSelected": outColor
-                    });
-                }
-                //for string data type
-                else if (dataTypeObj.type === "string") {
-                    var outStringDTType = {
-                        type: dataTypeObj.type
-                    };
-                    outColumnArray.push({
-                        "id": outId,
-                        "header": outHeader,
-                        "datatype": outStringDTType,
-                        "colorSchemeSelected": outColor
-                    });
-                }
-                //for error data type
-                else if (dataTypeObj.type === "error") {
-                    var outErrorDTType = {
-                        type: dataTypeObj.type,
-                        expected_type: dataTypeObj.baseType
-                    };
-                    outColumnArray.push({
-                        "id": outId,
-                        "header": outHeader,
-                        "datatype": outErrorDTType
-                    });
+                    //for nominal data type
+                    else if (dataTypeObj.type === "nominal") {
+                        var outCategories = [];
+                        for (cat in dataTypeObj.keyCountMap) {
+                            outCategories.push({
+                                "name": cat,
+                                "freq": dataTypeObj.keyCountMap[cat]
+                            });
+                        }
+                        var outNominalDTType = {
+                            type: dataTypeObj.type,
+                            categories: outCategories
+                        };
+                        outColumnArray.push({
+                            "id": outId,
+                            "header": outHeader,
+                            "datatype": outNominalDTType,
+                            "colorSchemeSelected": outColor
+                        });
+                    }
+                    //for string data type
+                    else if (dataTypeObj.type === "string") {
+                        var outStringDTType = {
+                            type: dataTypeObj.type
+                        };
+                        outColumnArray.push({
+                            "id": outId,
+                            "header": outHeader,
+                            "datatype": outStringDTType,
+                            "colorSchemeSelected": outColor
+                        });
+                    }
+                    //for error data type
+                    else if (dataTypeObj.type === "error") {
+                        var outErrorDTType = {
+                            type: dataTypeObj.type,
+                            expected_type: dataTypeObj.baseType
+                        };
+                        outColumnArray.push({
+                            "id": outId,
+                            "header": outHeader,
+                            "datatype": outErrorDTType
+                        });
+                    }
                 }
             }
+
 
             return outColumnArray;
         }

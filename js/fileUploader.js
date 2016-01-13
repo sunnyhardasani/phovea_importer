@@ -8,8 +8,6 @@ define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguratio
     function ($,dataWrangler,settings,fileConfiguration) {
     "use strict";
 
-        console.log(dataWrangler);
-
     var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
     var INITIAL_END_BYTE = settings.localSettings().INITIAL_END_BYTE;
 

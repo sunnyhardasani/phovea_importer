@@ -79,6 +79,11 @@ define(["require","jquery"],function(require){
             //and perform the copy settings opertaions
             self.dataWranglerIns.copySettings(_obj.fromCol,_obj.arr);
         }
+        else if(_type === "REMOVE_COLUMN"){
+            //now take the column selected array
+            //and perform the copy settings opertaions
+            self.dataWranglerIns.removeColumn(_obj.arr);
+        }
     }
 
     TopTableData.prototype.getAllOperations = function () {
