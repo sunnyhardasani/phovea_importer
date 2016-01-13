@@ -127,7 +127,7 @@ define(["jquery", "d3", "d3-tip",
             //total pages in the pagination;
             var pageData = [];
 
-            //this will create the page
+            //thifprints will create the page
             //todo clean the following code to handle pagination logic
             //todo pagination display on page not working properly when pages reache to end
 
@@ -1125,20 +1125,179 @@ define(["jquery", "d3", "d3-tip",
          * @param _col
          * @param _svgArea
          */
-        Table.prototype.printStringGraph = function(_col,_svgArea){
+        Table.prototype.printStringGraph  = function(_col, _svgArea){
             var self = this;
 
-            //intialize the local variable
+            //set up the margins of the svg
+            var margin = {top: 5, right: 5, bottom: 5, left: 5},
+                width = 150 - margin.left - margin.right,
+                height = 100 - margin.top - margin.bottom;
+
+            //take the col
             var col = _col;
             var svgArea = _svgArea;
+
+            //fetch required data
             var selColor = col.colorScheme;
             var dataTypeObj = col.dataTypeObj;
             var dataType = dataTypeObj.type;
+            var freqMap = dataTypeObj.keyCountMap;
+            var keys = Object.keys(freqMap);
+            var d3FreMap = d3.entries(freqMap);
+            var index = 0;
 
-            //set up the margins for the svg area
-            var margin = {top: 5, right: 5, bottom: 0, left: 5},
-                width = 150 - margin.left - margin.right,
-                height = 100 - margin.top - margin.bottom;
+
+
+
+
+            //Initialize the d3 tip for displaying
+            //value for each bar on mouse hover
+            var tip = d3tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function (d) {
+                    return d.key + " : " + d.value.value;
+                });
+
+            //Form new svg and attach d3 tip
+            var svg = d3.select(svgArea)
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            svg.call(tip);
+
+            //this will take the take got from the
+            //data wrnagler and sort the data accordingly
+            //to plot on the graph
+            d3FreMap.sort(function (a, b) {
+                if (a.value.value > b.value.value) {
+                    return -1;
+                }
+                else if (a.value.value < b.value.value) {
+                    return 1;
+                }
+                return 0;
+            })
+
+            //declare constant for this value
+            var lengthExceddingWidth = 0;
+            var newMap = [];
+            for(var id = 0; id < 9 && id < d3FreMap.length ; id++) {
+                newMap.push(d3FreMap[id]);
+            }
+            if(newMap.length == 9){
+                lengthExceddingWidth = 15;
+                svg.append("text").attr("x",width-lengthExceddingWidth).attr("y",height).attr("font-size",20).text("...");
+            }
+
+            //Set up the required x, y and
+            //color scales
+            //Reference : http://jsfiddle.net/59vLw/
+
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width - lengthExceddingWidth], .1);
+            var y = d3.scale.linear()
+                .range([height, 0]);
+            var o = d3.scale.ordinal()
+                .domain(d3FreMap.map(function (d) {
+                    return d.key;
+                }))
+                .range(selColor);
+
+            // The following code was contained in the callback function.
+            x.domain(newMap.map(function (d) {
+                return d.key;
+            }));
+            y.domain([0, d3.max(newMap, function (d) {
+                return d.value.value;
+            })]);
+
+            // Attach all the data required by the D3
+            newMap.map(function (d) {
+
+                d.x = x(d.key);
+                d.y = y(d.value.value);
+
+                //add the real freq object to further sort and take the data
+                d.freObjKey = d.key;
+                d.freObjValue = d.value;
+
+                // appending the svg area on the bar graph to fetch information for mouse event
+                d.index = index++;
+                d.svg = svgArea;
+                d.colId = col.id - 1;
+
+            });
+
+            self.d3FreMapArr[col.id - 1] = d3FreMap;
+
+            var bars = svg.selectAll(".bar")
+                .data(newMap)
+                .enter().append("rect")
+                .attr("svg-info", function (d) {
+                    return d.svg;
+                }) // appending the svg area on the bar graph to fetch information for mouse event
+                .attr("class", "bar")
+                .attr("x", function (d) {
+                    return d.x;
+                })
+                .attr("width", x.rangeBand())
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("height", function (d) {
+                    return (height - y(d.value.value)) < 10 ? 10 : 10 + (height - y(d.value.value));
+                })
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide)
+                .style("fill", function (d) {
+
+                    //if color is null then set the
+                    //color and send otherwise send
+                    //the attached color
+                    if (d.freObjValue.color === "") {
+                        d.freObjValue.color = o(d.key);
+                    }
+
+                    return d.freObjValue.color;
+                })
+                .style("stroke-width","0.5")
+                .style("stroke","rgb(0,0,0)")
+                .on("contextmenu", function (d) {
+
+                    var selectedSVG = d.svg;
+                    var colId = d.colId;
+
+                    self.createColorBox("ordinalScale");
+
+                    self.colorBox.on("click", function (d) {
+
+                        var keys = Object.keys(colorbrewer["ordinalScale"][d.key]);
+                        var lastKey = keys[keys.length - 1];
+
+
+                        self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
+
+                        $('#colorbox-pop-up').hide();
+                    })
+
+                        //todo need to check the below code whether its required or not
+                        .selectAll(".swatch")
+                        .data(function (d) {
+                            return d.value[d3.keys(d.value).map(Number).sort(d3.descending)[0]];
+                        })
+                        .enter().append("div")
+                        .attr("class", "swatch")
+                        .style("background-color", function (d) {
+                            return d;
+                        });
+
+                    $('#colorbox-pop-up')
+                        .show()
+                        .css('top', d3.event.pageY)
+                        .css('left', d3.event.pageX)
+                        .appendTo('body');
+
+                    d3.event.preventDefault();
+                });
         }
 
         /**
@@ -1178,7 +1337,7 @@ define(["jquery", "d3", "d3-tip",
                     self.printNumericalGraph(col,svgArea);
                 }
                 else if (dataType == DATATYPE_STRING) {
-
+                    self.printStringGraph(col,svgArea);
                 }
                 else if (dataType == DATATYPE_ERROR) {
                     self.printErrorGraph(col,svgArea);
