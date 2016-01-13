@@ -2,7 +2,7 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(["require","jquery"],function(require){
+define(["require","jquery", "../dataWrangler"],function(require){
 
     var $ = require("jquery");
     //var dataWrangler = require("dataWrangler");

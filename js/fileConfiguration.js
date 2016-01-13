@@ -2,9 +2,9 @@
 // JSON Output File to handle output from the class //
 //////////////////////////////////////////////////////
 
-define(["jquery", "d3","./dataWrangler"],
+define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings", "./fileUploader"],
 
-    function ($, d3, dataWrangler) {
+    function (require, $, d3, dataWrangler) {
         /**
          * 1. Check if instance is null then throw error
          * 2. Calls the load ui related to this class
@@ -286,6 +286,13 @@ define(["jquery", "d3","./dataWrangler"],
             //reload the fresh data
             //self.readLocalData();
         }
+
+      FileConfiguration.prototype.save = function() {
+        this.dataWranglerIns =  require("./dataWrangler");
+
+        this.addNewFile();
+        return this.outFileData;
+      };
 
         /**
          * This function will write current json data to the file

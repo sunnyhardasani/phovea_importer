@@ -46,6 +46,10 @@ define(['exports', 'text!./xImporterTemplate.html', 'text!./style.css', '../wrap
       this.fileConfigurationIns.init();
     }
 
+    ImporterWizard.prototype.save = function() {
+      return this.fileConfigurationIns.save();
+    };
+
     exports.create = function (parent, callback, options) {
       return new ImporterWizard(parent, callback, options);
     };
@@ -60,7 +64,7 @@ define(['exports', 'text!./xImporterTemplate.html', 'text!./style.css', '../wrap
         var importer = exports.create(dialog.body, done, options);
 
         dialog.onHide(function() {
-          resolve(null); //just via save configuration
+          resolve(importer.save());
           dialog.destroy();
         });
         dialog.show();
