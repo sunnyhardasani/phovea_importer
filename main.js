@@ -2,9 +2,14 @@
  * Created by Samuel Gratzl on 07.01.2016.
  */
 
-define(['require', 'exports', 'text!./xImporterTemplate.html', 'text!./style.css', 'bootstrap', './js/fileUploader', './js/fileConfiguration'],
-  function (require, exports, template, style) {
-    function ImporterWizard(parent) {
+define(['exports', 'text!./xImporterTemplate.html', 'text!./style.css', '../wrapper_bootstrap_fontawesome/dialogs', '../caleydo_core/main', './js/fileUploader', './js/fileConfiguration', 'bootstrap'],
+  function (exports, template, style, dialogs, C, fileUploader, fileConfiguration) {
+    function ImporterWizard(parent, callback, options) {
+      this.options = C.mixin({
+
+      }, options);
+      callback = callback || C.noop;
+
       this.root = document.createElement('div');
       this.root.classList.add('importer');
       parent.appendChild(this.root);
@@ -27,8 +32,8 @@ define(['require', 'exports', 'text!./xImporterTemplate.html', 'text!./style.css
       // requireJS will ensure that the FileUploader,
       // FileConfiguration definition is available
       // to use, we can now import it for use.
-      this.fileUploaderIns = require('./js/fileUploader').create(this.root);
-      this.fileConfigurationIns = require('./js/fileConfiguration').create(this.root);
+      this.fileUploaderIns = fileUploader.create(this.root);
+      this.fileConfigurationIns = fileConfiguration.create(this.root);
 
       // this will initialize the file uploader
       var fileData = {};
@@ -41,7 +46,24 @@ define(['require', 'exports', 'text!./xImporterTemplate.html', 'text!./style.css
       this.fileConfigurationIns.init();
     }
 
-    exports.create = function (parent) {
-      return new ImporterWizard(parent);
+    exports.create = function (parent, callback, options) {
+      return new ImporterWizard(parent, callback, options);
+    };
+    exports.openDialog = function (options) {
+      return new Promise(function(resolve) {
+        var dialog = dialogs.generateDialog('Import Data', 'Import');
+        function done(result) {
+          dialog.destroy();
+          resolve(result);
+        }
+        dialog.body.parentElement.parentElement.style.width = '60%';
+        var importer = exports.create(dialog.body, done, options);
+
+        dialog.onHide(function() {
+          resolve(null); //just via save configuration
+          dialog.destroy();
+        });
+        dialog.show();
+      })
     }
 });

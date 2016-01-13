@@ -6,6 +6,7 @@
 define(['./main'], function (importer) {
   'use strict';
 
-  var importer = importer.create(document.body);
-  //TODO listen to event when done
+  importer.openDialog().then(function(json) {
+    console.log(json);
+  });
 });
