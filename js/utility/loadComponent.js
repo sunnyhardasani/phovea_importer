@@ -4,11 +4,10 @@
  * with name x-importer-template.
  * on calling the create element new component
  * will get create on the ui
- * todo need to the
  */
 
 define(function(){
-    function supportsCustomElements() {
+    /*function supportsCustomElements() {
         return 'registerElement' in document;
     }
     if (supportsCustomElements()) {
@@ -24,7 +23,7 @@ define(function(){
         document.registerElement('x-importer-template', {prototype: proto});
     }
     else{
-        alert("WHOAA!!! I think register element is not\ " +
-            "supported in you browser...");
-    }
+        alert("WHOAA!!! I think register element is \ " +
+             "not supported in you browser...");
+    }*/
 });

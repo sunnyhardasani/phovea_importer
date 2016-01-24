@@ -61,6 +61,13 @@ define(["require","jquery"],function(require){
 
     }
 
+    /**
+     * This fucntion handles all the new operation
+     * added on the left operation table
+     * @param row
+     * @param _type
+     * @param _obj
+     */
     LeftTableData.prototype.insertNewOpr = function (row,_type,_obj) {
         var self = this;
 

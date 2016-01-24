@@ -8,8 +8,6 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
     function ($,dataWrangler,settings,fileConfiguration) {
     "use strict";
 
-        console.log(dataWrangler);
-
     var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
     var INITIAL_END_BYTE = settings.localSettings().INITIAL_END_BYTE;
 
@@ -60,7 +58,7 @@ define(["jquery", "dataWrangler","utility/localSettings","fileConfiguration"],
 
         $("#tool-id-button").trigger("click");
 
-        $('[data-toggle="tooltip"]').tooltip();
+        //$('[data-toggle="tooltip"]').tooltip();
     }
     /**
      * Initialize function of File Uploader

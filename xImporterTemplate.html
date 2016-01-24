@@ -1,0 +1,158 @@
+<!--template containing the table -->
+<template id="importertemplate">
+    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/jquery-resizable-columns/dist/jquery.resizableColumns.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <script data-main="js/main" src="bower_components/requirejs/require.js"></script>
+
+    <div class="container-fluid">
+        <div id="file-config" class="row">
+            <div id="ribbon">
+                <div id="fileHandler" style="float: left;width:10%; height:50px">
+                    <form id="upload" action="index.html" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000"/>
+                        <!--todo copy this icon to local folder-->
+                        <label for="fileselect">
+                            <span class="glyphicon glyphicon-folder-open"></span>
+                        </label>
+                        <input type="file" id="fileselect"/>
+                    </form>
+                </div>
+                <div style="float: right;width:90%;">
+                    <div id="filedrag">
+                        <small>or drop file here</small>
+                    </div>
+                    <div id="submitbutton">
+                        <button type="submit">Upload File</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="main" class="row">
+            <div id="tool-required" class="col-md-12" >
+                <button id="tool-id-button" type="button" class="btn btn-primary btn-sm" style="float:left" title="Change table settings">
+                    <span class="glyphicon glyphicon-cog"></span>
+                </button>
+                <div style="float:left;"><span class="selftab"></span></div>
+                <div id="oprButtons" style="float:left;">
+                    <button id="add-col-id-button" type="button" class="btn btn-default btn-sm" title="Add Column Identifier">
+                        <span class="glyphicon glyphicon-option-vertical"></span>
+                    </button>
+                    <button id="remove-col-button" type="button" class="btn btn-default btn-sm" title="Remove Column">
+                        <span class="glyphicon glyphicon-remove-sign"></span>
+                    </button>
+                    <button id="copy-id-button" type="button" class="btn btn-default btn-sm" title="Copy Column Settings">
+                        <span class="glyphicon glyphicon-copy"></span>
+                    </button>
+                    <span class="selftab"></span>
+                    <button id="add-row-id-button" type="button" class="btn btn-default btn-sm" title="Add Row Identifier">
+                        <span class="glyphicon glyphicon-option-horizontal"></span>
+                    </button>
+                    <button id="remove-row-button" type="button" class="btn btn-default btn-sm" title="Ignore Rows">
+                        <span class="glyphicon glyphicon-compressed"></span>
+                    </button>
+                </div>
+
+                <div id = "save-current-conf" style="float:right">
+                    <button id="save-conf-button"  class="btn btn-primary btn-sm"> Save Current Configuration</button>
+                </div>
+                <div style="float:right;"><span class="selftab"></span></div>
+                <div id="stringMarker" style="float:right">
+                    <small> String marker </small>
+                    <input id="quote" type="text">
+                </div>
+                <div style="float:right;"><span class="selftab"></span></div>
+                <div id="separatorOpr" style="float:right">
+                    <strong> <small> Select separators :</small> </strong>
+                    <input id="comma" type="radio" name="sep" value="comma">&nbsp; <small> comma</small>
+                    <input id="space" type="radio" name="sep" value="space">&nbsp;<small>  space</small>
+                    <input id="tab" type="radio" name="sep" value="tab">&nbsp;  <small>  tab </small>
+                    <input id="semicolon" type="radio" name="sep" value="semicolon">&nbsp;  <small> semicolon</small>
+                    &nbsp; or &nbsp; <small>others</small>
+                    <input id="any" type="text" name="sep">
+                </div>
+
+            </div>
+            <div id="table-group" class="col-md-12">
+                <div id="topLeftOperations" class="col-md-2"></div>
+                <div id="topOperations" class="col-md-10">&nbsp;</div>
+                <div id="leftOperations" class="col-md-2" align="right">&nbsp;</div>
+                <div id="importedTable" class="col-md-10">&nbsp;</div>
+
+                <div id="paginate" class="col-md-12 text-center">
+                    <small>
+                        <ul class="pagination"></ul>
+                    </small>
+                </div>
+            </div>
+            <div id="operations" class="col-md-2 hidden">
+                <!--todo copy this gif to local folder-->
+                <div id="string-opr-menu">
+                    <span class="glyphicon glyphicon-remove-sign"></span>
+                </div>
+                <div id="data-operations">
+                    <h5><strong>Data Operations</strong></h5>
+                </div>
+                <div id="semis-wrapper">
+                    <svg id = "semis">
+
+                    </svg>
+                </div>
+                <div id = "parent-operator">
+                    <br>
+                    <!--reference: https://css-tricks.com/snippets/javascript/clear-field-on-focus/-->
+                    <input id="new-col-name" type="text" onfocus="if(this.value == 'Column-1') { this.value = ''; }" value="Column-1" />
+                    <br>
+                    <strong>Select elements to form new category:</strong>
+                    <div id="elements-selected">
+
+                    </div>
+                    <div id="operator">
+                        <input type="checkbox" name="selected-category" checked>Mark remaining as others<br>
+                        <button id="button-new-category" type="button">Create new category</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="colorbox-pop-up">
+        <!--<p>
+            This div only appears when the trigger link is hovered over.
+            Otherwise it is hidden from view.
+            todo this is temporary solution later this solution will
+            get replaced by copy settings option
+        </p>-->
+    </div>
+
+</template>
+
+<!--this script will registers the x-importer-template
+ element and whenever the tag is used it create the
+ table at that tag-->
+<script>
+    (function() {
+        function supportsCustomElements() {
+            return 'registerElement' in document;
+        }
+        if (supportsCustomElements()) {
+            var importDoc = document.currentScript.ownerDocument; // importee
+
+            var proto = Object.create(HTMLElement.prototype, {
+                createdCallback: {
+                    value: function() {
+                        var t = importDoc.querySelector('#importertemplate');
+                        var clone = document.importNode(t.content, true);
+                        this.appendChild(clone);
+                    }
+                }
+            });
+            document.registerElement('x-importer-template', {prototype: proto});
+        }
+        else{
+            alert("WHOAA!!! I think register element is \ " +
+                    "not supported in you browser...");
+        }
+    })();
+</script>

@@ -45,7 +45,8 @@ define(["jquery","d3","topTableData"],
 
         //this will unbind the event for reinitialization
         $(self.parentElementName + " " +'#add-col-id-button').unbind("click");
-        $(self.parentElementName + " " +'#copy-id-button').unbind("click")
+        $(self.parentElementName + " " +'#copy-id-button').unbind("click");
+        $(self.parentElementName + " " +'#remove-col-button').unbind("click");
 
         //temoparary button to keep the rows
         $(self.parentElementName + " " +'#add-col-id-button').bind("click",function(event){
@@ -64,6 +65,19 @@ define(["jquery","d3","topTableData"],
                 self.selectedCol.push(false);
             }
             topTableData.insertNewOpr(self.oprCount,"COPY_SETTINGS",{"fromCol":0 ,"arr":self.selectedCol});
+            $( this ).off( event );
+        });
+
+        $(self.parentElementName + " " +'#remove-col-button').bind("click",function(event){
+            self.oprCount++;
+
+            self.selectedCol = [];
+            //check for all the button whose radio buttons are marked
+            //and take action against it
+            for (var i = 0; i < self.columns.length; i++) {
+                self.selectedCol.push(false);
+            }
+            topTableData.insertNewOpr(self.oprCount,"REMOVE_COLUMN",{"fromCol":0 ,"arr":self.selectedCol});
             $( this ).off( event );
         });
     }
@@ -114,7 +128,10 @@ define(["jquery","d3","topTableData"],
                                     allOpr[key].obj.right); //right index
             }
             else if(allOpr[key].type === "COPY_SETTINGS"){
-                self.addDragNDropOperation(key,allOpr[key].obj.arr);
+                self.addDragNDropOperation(key,allOpr[key].obj.arr,"COPY_SETTINGS");
+            }
+            else if(allOpr[key].type === "REMOVE_COLUMN"){
+                self.addDragNDropOperation(key,allOpr[key].obj.arr,"REMOVE_COLUMN");
             }
         }
     }
@@ -249,7 +266,7 @@ define(["jquery","d3","topTableData"],
      * This function will handle all the drag
      * and drop related operations of the table
      */
-    TopTableView.prototype.addDragNDropOperation = function (opr,arrColVisibleStatus) {
+    TopTableView.prototype.addDragNDropOperation = function (opr,arrColVisibleStatus,oprType) {
         var self = this;
 
         var columns = self.columns;
@@ -265,6 +282,7 @@ define(["jquery","d3","topTableData"],
             .origin(function (d) {
                 return d;
             })
+            .on("dragstart",dragbegin)
             .on("drag", dragmove)
             .on("dragend", dragstop);
 
@@ -338,6 +356,7 @@ define(["jquery","d3","topTableData"],
             .attr("height", radius * 2).call(drag);
 
         function dragmove(d) {
+            console.log(d);
             var selRecLen = 0;
             d3.select(this)
                 .attr("cx", selRecLen = Math.max(d.x, Math.min(width - radius, d3.event.x)));
@@ -346,21 +365,42 @@ define(["jquery","d3","topTableData"],
             checkRightRadios(d.x, selRecLen);
         }
 
+        function dragbegin(d){
+            for (var i = 0; i < c[0].length; i++) {
+                var selectedCircle = d3.select(c[0][i]);
+                selectedCircle.attr("visibility", "hidden");
+            }
+            self.selectedCol = [];
+            self.fromLoc = d.id - 1;
+        }
+
         function dragstop(d) {
             d3.select(r[0][d.id - 1]).attr("width", 0);
             d3.select(this).attr("cx", d.x)
 
-            var selectedCol = [];
-            topTableData.insertNewOpr(opr,"COPY_SETTINGS",{"fromCol":fromCol,"arr":self.selectedCol});
+            //this will check all the circle having
+            //visible state and prepare required
+            //array to send to toptabledata
+            for (var i = 0; i < c[0].length; i++) {
+                var selectedCircle = d3.select(c[0][i]);
+                if (selectedCircle.attr("visibility") === "visible") {
+                    self.selectedCol[parseInt(selectedCircle.attr("id"))] = true;
+                }
+            }
+
+            //set new operation to the toptabledata operation
+            topTableData.insertNewOpr(opr,oprType,{"fromCol":self.fromLoc,"arr":self.selectedCol});
         }
 
+        //this function check whether the rectangle is
+        //passing through the circle and turns the
+        //visibility on
         function checkRightRadios(fromLoc, currentLoc) {
             for (var i = 0; i < c[0].length; i++) {
                 var selectedCircle = d3.select(c[0][i]);
-                if (currentLoc > selectedCircle.attr("cx")
+                if (currentLoc >= selectedCircle.attr("cx")
                     && selectedCircle.attr("cx") >= fromLoc) {
                     selectedCircle.attr("visibility", "visible");
-                    self.selectedCol[parseInt(selectedCircle.attr("id"))] = true;
                 }
             }
         }

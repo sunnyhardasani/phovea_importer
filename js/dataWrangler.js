@@ -1,12 +1,12 @@
-define(["require","jquery", "table", "d3",
+define(["require", "jquery", "table", "d3",
         "utility/localSettings", "utility/modColorBrewer"],
     function (require) {
 
         var $ = require("jquery");
         var d3 = require("d3");
-        var table =  require("table");
-        var settings =  require("utility/localSettings");
-        var colorbrewer =  require("utility/modColorBrewer");
+        var table = require("table");
+        var settings = require("utility/localSettings");
+        var colorbrewer = require("utility/modColorBrewer");
 
         // default values
         var MIN_VALUE = settings.localSettings().MIN_VALUE;
@@ -341,7 +341,7 @@ define(["require","jquery", "table", "d3",
              *  5. Finally send the data to the table creation
              */
 
-            //self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
+                //self.sliceColId();      //todo - auto guess - currently guessing that the first col is row id
             self.formColumn();      //working
             self.guessDataType();   //working
             self.sliceRowId();    //todo - auto guess - currently guessing that the first row is column id
@@ -397,7 +397,6 @@ define(["require","jquery", "table", "d3",
             var self = this;
 
             self.allColumnsDataArray = {};
-            var rowCount = 0;
             self.importedData.forEach(function (row) {
                 var colKey = 0;
                 row.forEach(function (cell) {
@@ -411,6 +410,7 @@ define(["require","jquery", "table", "d3",
                             //"colId": self.colId[colKey],          //head will guess in separate function
                             "dataTypeObj": new Object(),         //data type will be guessed in separate function
                             "isColType": false,
+                            "isRemoved":false,
                             "data": []
                         };
                     }
@@ -419,19 +419,13 @@ define(["require","jquery", "table", "d3",
                     self.allColumnsDataArray[colKey].id = colKey + 1;
 
 
-                    // push the cell content into repective array
+                    // push the cell content into respective array
                     // this data is use for printing
-                    //if(self.arrIgnoreRows[rowCount] !== undefined ) {
-                        if(self.arrIgnoreRows[rowCount] !== 1) {
-                            self.allColumnsDataArray[colKey].data.push(cell);
-                        }
-                    //}
+                    self.allColumnsDataArray[colKey].data.push(cell);
 
                     //increase the key
                     colKey++;
                 });
-
-                rowCount++;
             });
         }
 
@@ -453,7 +447,7 @@ define(["require","jquery", "table", "d3",
 
                 //following data will get refresh with each iteration
                 var nNumericCount = 0;
-                var nTotalCount = dataCount;
+                var nTotalCount = 0;
                 var min = MIN_VALUE; //
                 var max = MAX_VALUE;
                 var freqMap = {};
@@ -464,66 +458,74 @@ define(["require","jquery", "table", "d3",
                 //first check all the data is numerical
                 for (var index = 0; index < dataCount; index++) {
 
-                    //following handles the numerical items
-                    if (!isNaN(colData[index])) {
+                    //this will check whether the particular
+                    //index is not in the ignore to row list
+                    if (self.arrIgnoreRows[index] !== 1) {
 
-                        //increase the numerical element count
-                        nNumericCount++;
+                        //total considered row count
+                        nTotalCount++;
 
-                        //converting string to number
-                        var nData = Number(colData[index]);
+                        //following handles the numerical items
+                        if (!isNaN(colData[index])) {
 
-                        //note: first checking for min and max value data might of the real and range type
-                        //finding the maximum value and the min value might be required for the range
-                        if (max < nData) {
-                            max = nData;
-                        }
-                        if (min > nData) {
-                            min = nData;
-                        }
+                            //increase the numerical element count
+                            nNumericCount++;
 
-                        //calculate the frequency of each element
-                        //todo freqmap data strcuture will require few changes
-                        if (!freqMap.hasOwnProperty(nData)) {
-                            freqMap[nData] = {
-                                value: 1,
-                                sortIndex: index,
-                                type: "numerical",
-                                color: ""
-                            };
-                        }
-                        else {
-                            freqMap[nData].value++;
-                        }
+                            //converting string to number
+                            var nData = Number(colData[index]);
 
-                        //add the number data in the array
-                        numberMap[index] = colData[index];
-                    }
-                    else {
+                            //note: first checking for min and max value data might of the real and range type
+                            //finding the maximum value and the min value might be required for the range
+                            if (max < nData) {
+                                max = nData;
+                            }
+                            if (min > nData) {
+                                min = nData;
+                            }
 
-                        // this will load the data in the frequency map as
-                        // string and each element frequency is calculated
-                        // now string data can be of different types as all
-                        // the element or all the element can have different
-                        // elements calculate the frequency of each element
+                            //calculate the frequency of each element
+                            //todo freqmap data strcuture will require few changes
+                            if (!freqMap.hasOwnProperty(nData)) {
+                                freqMap[nData] = {
+                                    value: 1,
+                                    sortIndex: index,
+                                    type: "numerical",
+                                    color: ""
+                                };
+                            }
+                            else {
+                                freqMap[nData].value++;
+                            }
 
-                        var strData = colData[index];
-
-                        if (!freqMap.hasOwnProperty(strData)) {
-                            freqMap[strData] = {
-                                value: 1,
-                                sortIndex: index,
-                                type: "string",
-                                color: ""
-                            };
+                            //add the number data in the array
+                            numberMap[index] = colData[index];
                         }
                         else {
-                            freqMap[strData].value++;
-                        }
 
-                        //add the number data in the array
-                        //this data is required by the error field
-                        stringMap[index] = colData[index];
+                            // this will load the data in the frequency map as
+                            // string and each element frequency is calculated
+                            // now string data can be of different types as all
+                            // the element or all the element can have different
+                            // elements calculate the frequency of each element
+
+                            var strData = colData[index];
+
+                            if (!freqMap.hasOwnProperty(strData)) {
+                                freqMap[strData] = {
+                                    value: 1,
+                                    sortIndex: index,
+                                    type: "string",
+                                    color: ""
+                                };
+                            }
+                            else {
+                                freqMap[strData].value++;
+                            }
+
+                            //add the number data in the array
+                            //this data is required by the error field
+                            stringMap[index] = colData[index];
+                        }
                     }
                 }
 
@@ -537,7 +539,7 @@ define(["require","jquery", "table", "d3",
                 col["dataTypeObj"].isDataCenter = false;
                 col["dataTypeObj"].center = 0; //set center to zero
 
-                if(max > 0 && min < 0){
+                if (max > 0 && min < 0) {
                     col["dataTypeObj"].isDataCenter = true;
                     col["dataTypeObj"].center = 0; //set center to zero
                 }
@@ -722,9 +724,9 @@ define(["require","jquery", "table", "d3",
 
             for (var key in self.allColumnsDataArray) {
 
-                for(opr in oprIdArr) {
+                for (opr in oprIdArr) {
 
-                    if(oprIdArr[opr].type === "ID") {
+                    if (oprIdArr[opr].type === "ID") {
 
                         //this will select the start index and
                         //end index of the application
@@ -858,11 +860,36 @@ define(["require","jquery", "table", "d3",
 
             var copyColData = self.allColumnsDataArray[fromCol];
             for (var key in self.allColumnsDataArray) {
-                if(arrSelectedCol[key]){
+                if (arrSelectedCol[key]) {
                     self.allColumnsDataArray[key].colorScheme = copyColData.colorScheme;
                     self.allColumnsDataArray[key]["dataTypeObj"].min = copyColData["dataTypeObj"].min;
-                    self.allColumnsDataArray[key]["dataTypeObj"].max  = copyColData["dataTypeObj"].max;
+                    self.allColumnsDataArray[key]["dataTypeObj"].max = copyColData["dataTypeObj"].max;
                     self.allColumnsDataArray[key]["dataTypeObj"].type = copyColData["dataTypeObj"].type;
+
+                    for(mapKey in self.allColumnsDataArray[key]["dataTypeObj"].keyCountMap){
+                        self.allColumnsDataArray[key]["dataTypeObj"].keyCountMap[mapKey].color = "";
+                    }
+                }
+            }
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            table.reload(self.allColumnsDataArray, self);
+        }
+
+        /**
+         * remove columns
+         */
+        DataWrangler.prototype.removeColumn = function (arrSelectedCol) {
+            var self = this;
+
+            //this will all
+            for (var key in self.allColumnsDataArray) {
+                if (arrSelectedCol[key]) {
+                    self.allColumnsDataArray[key].isRemoved = true;
                 }
             }
 
@@ -880,7 +907,7 @@ define(["require","jquery", "table", "d3",
          * this data will get returned by the
          * table request to highlight the rows
          */
-        DataWrangler.prototype.setRowTypeID= function(arr){
+        DataWrangler.prototype.setRowTypeID = function (arr) {
             var self = this;
 
             //before setting new this will clear
@@ -897,7 +924,7 @@ define(["require","jquery", "table", "d3",
         }
 
         //this will return the row type identification array
-        DataWrangler.prototype.getRowTypeID= function(arr){
+        DataWrangler.prototype.getRowTypeID = function (arr) {
             var self = this;
 
             //before setting new this will clear
@@ -905,16 +932,27 @@ define(["require","jquery", "table", "d3",
             return self.arrRowTypes;
         }
 
-        DataWrangler.prototype.setRowsToIgnore = function(arrIgnoreRows){
+        DataWrangler.prototype.setRowsToIgnore = function (arrIgnoreRows) {
             var self = this;
 
             self.arrIgnoreRows = arrIgnoreRows;
 
-            self.saveClicked(null);
+            //after setting new rows to ignore
+            //guess the datatype again with the
+            //remaining data and reinitialize the
+            //table
+            self.guessDataType();
+
+            //todo the following line of code in the
+            //separate function of table reinitialize
+            self.clean();
+
+            //this will keep only one instance of the table class
+            table.reload(self.allColumnsDataArray, self);
 
         }
 
-        DataWrangler.prototype.getRowsToIgnore = function(){
+        DataWrangler.prototype.getRowsToIgnore = function () {
             var self = this;
 
             return self.arrIgnoreRows;
