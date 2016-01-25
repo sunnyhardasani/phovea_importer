@@ -1364,7 +1364,7 @@ define(["jquery", "d3", "d3-tip",
                     //whose row identifier is true
                     var rows = document.getElementsByClassName(colId);
                     for (var i = 0; i < rows.length ; i++) {
-                        rows[i].style.backgroundColor = "#D3D3D3";
+                        rows[i].style.backgroundColor = "rgba(0, 0, 0, 0.1)";
                     }
                 }
             }
@@ -1388,7 +1388,7 @@ define(["jquery", "d3", "d3-tip",
                     //whose row identifier is true
                     var rows = document.getElementsByClassName(colId);
                     for (var i = 0; i < rows.length ; i++) {
-                        rows[i].style.backgroundColor = "#F9966B";
+                        rows[i].style.backgroundColor = "rgba(255, 0, 0, 0.15)";
                     }
                 }
             }
@@ -1409,7 +1409,7 @@ define(["jquery", "d3", "d3-tip",
                 //this function will highlight all the row ids
                 var rows = document.getElementsByClassName(rowId);
                 for (var i = 0; i < rows.length ; i++) {
-                    rows[i].style.backgroundColor = "#D3D3D3";
+                    rows[i].style.backgroundColor = "rgba(0, 0, 0, 0.1)";
                 }
             }
         }
@@ -1431,7 +1431,7 @@ define(["jquery", "d3", "d3-tip",
                     var rows = document.getElementsByClassName(rowId);
 
                     for (var i = 0; i < rows.length; i++) {
-                        rows[i].style.backgroundColor = "#F9966B";
+                        rows[i].style.backgroundColor = "rgba(255, 0, 0, 0.15)";
                     }
                 }
             }
