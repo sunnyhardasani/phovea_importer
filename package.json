@@ -9,7 +9,7 @@
   },
   "peerDependencies": {
     "caleydo_core": "*",
-    "wrapper_bootstrap_fontawesome": "*"
+    "caleydo_bootstrap_fontawesome": "*"
   },
   "caleydo": {
     "dependencies": {

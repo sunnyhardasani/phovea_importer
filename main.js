@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 07.01.2016.
  */
 
-define(['exports', 'text!./xImporterTemplate.html', 'text!./style.css', '../wrapper_bootstrap_fontawesome/dialogs', '../caleydo_core/main', './js/fileUploader', './js/fileConfiguration', 'bootstrap'],
+define(['exports', 'text!./xImporterTemplate.html', 'text!./style.css', '../caleydo_bootstrap_fontawesome/dialogs', '../caleydo_core/main', './js/fileUploader', './js/fileConfiguration', 'bootstrap'],
   function (exports, template, style, dialogs, C, fileUploader, fileConfiguration) {
     function ImporterWizard(parent, callback, options) {
       this.options = C.mixin({
