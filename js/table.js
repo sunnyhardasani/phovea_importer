@@ -31,9 +31,6 @@ define(["jquery", "d3", "d3-tip",
             if (instance !== null) {
                 throw new Error("Cannot instantiate more than one Table, use Table.getInstance()");
             }
-
-            //todo this will be updated by taking the constructor parameter
-            self.parentElementName = "x-importer-template";
             self.originalDataFlag = true;
         }
 
@@ -385,7 +382,7 @@ define(["jquery", "d3", "d3-tip",
                 });
 
             //Form new svg and attach d3 tip
-            var svg = d3.select(svgArea)
+            var svg = d3.select(self.root).select(svgArea)
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             svg.call(tip);
 
@@ -567,7 +564,7 @@ define(["jquery", "d3", "d3-tip",
                 });
 
             //Form new svg and attach d3 tip
-            var svg = d3.select(svgArea)
+            var svg = d3.select(self.root).select(svgArea)
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             svg.call(tip);
 
@@ -830,7 +827,7 @@ define(["jquery", "d3", "d3-tip",
                 });
 
             //this will select the svg area to print the chart
-            var vis = d3.select(svgArea)
+            var vis = d3.select(self.root).select(svgArea)
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                 .attr("width", width)
                 .attr("height", height);
@@ -998,7 +995,7 @@ define(["jquery", "d3", "d3-tip",
                         }
                     });
 
-                var vis = d3.select(svgArea)
+                var vis = d3.select(self.root).select(svgArea)
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                     .attr("width", width)
                     .attr("height", height);
@@ -1084,7 +1081,7 @@ define(["jquery", "d3", "d3-tip",
                         }
                     });
 
-                var vis = d3.select(svgArea)
+                var vis = d3.select(self.root).select(svgArea)
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                     .attr("width", width)
                     .attr("height", height);
@@ -1161,7 +1158,7 @@ define(["jquery", "d3", "d3-tip",
                 });
 
             //Form new svg and attach d3 tip
-            var svg = d3.select(svgArea)
+            var svg = d3.select(self.root).select(svgArea)
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             svg.call(tip);
 
@@ -1325,8 +1322,7 @@ define(["jquery", "d3", "d3-tip",
                 var dataType = dataTypeObj.type;
 
                 //add the printing logic per column
-                var svgArea = self.parentElementName + " " +
-                    "#svg-col-" + (col.id - 1);
+                var svgArea = "#svg-col-" + (col.id - 1);
 
                 if (dataType == DATATYPE_NOMINAL) {
                     self.printNominalGraph(col,svgArea);

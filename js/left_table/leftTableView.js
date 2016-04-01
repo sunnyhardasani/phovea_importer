@@ -28,7 +28,7 @@ define(["jquery","d3","./leftTableData", "../dataWrangler"],
          * will be called once on the initialiaztion
          * of the application
          */
-        LeftTableView.prototype.initUI = function () {
+        LeftTableView.prototype.initUI = function (root) {
             var self = this;
 
 
