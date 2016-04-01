@@ -34,10 +34,6 @@ define(["require","jquery", "./table", "d3",
             if (instance !== null) {
                 throw new Error("Cannot instantiate more than one DataWrangler, use DataWrangler.getInstance()");
             }
-
-            // registering all the events of the check box
-            // and input box on the separator modal
-            this.registerSepEvents();
         }
 
         /**
@@ -67,6 +63,10 @@ define(["require","jquery", "./table", "d3",
 
             var self = this;
             self.root = root;
+
+            // registering all the events of the check box
+            // and input box on the separator modal
+            this.registerSepEvents();
             self.data = data;
             self.file = file;
             self.mainInstance = _mainInstance;

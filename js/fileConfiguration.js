@@ -2,7 +2,7 @@
 // JSON Output File to handle output from the class //
 //////////////////////////////////////////////////////
 
-define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings", "./fileUploader"],
+define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
     function (require, $, d3, dataWrangler) {
         /**
@@ -25,8 +25,9 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings", "
          * This function will get initialized when this class
          * start from the constructor
          */
-        FileConfiguration.prototype.init = function () {
+        FileConfiguration.prototype.init = function (fileUploader) {
             var self = this;
+            self.fileUploader = fileUploader;
 
             //todo : this function will read the server
             self.readLocalData();
@@ -45,7 +46,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings", "
             var TABLE_HETEROGENEOUS = settings.localSettings().TABLE_HETEROGENEOUS;
 
             var allColData = self.dataWranglerIns.getColumnData();
-            var file = require("./fileUploader").files[0];
+            var file = self.fileUploader.files[0];
 
 
             //fetch the column count

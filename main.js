@@ -43,7 +43,7 @@ define(['exports', 'text!./xImporterTemplate.html', 'text!./style.css', '../cale
       // this will initialize the file configuration data, attach all the UI
       // relation operations and load the already read files from the local
       // machines
-      this.fileConfigurationIns.init();
+      this.fileConfigurationIns.init(this.fileUploaderIns);
     }
 
     ImporterWizard.prototype.save = function() {

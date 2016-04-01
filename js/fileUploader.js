@@ -4,8 +4,8 @@
  * drop or through select file.
  */
 
-define(["jquery", "./dataWrangler","./utility/localSettings","./fileConfiguration"],
-    function ($,dataWrangler,settings,fileConfiguration) {
+define(["jquery", "./dataWrangler","./utility/localSettings"],
+    function ($,dataWrangler,settings) {
     "use strict";
 
     var INITIAL_START_BYTE = settings.localSettings().INITIAL_START_BYTE;
