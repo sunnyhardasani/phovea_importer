@@ -1983,8 +1983,6 @@ define(["jquery", "d3", "d3-tip",
 
                 // requireJS will ensure that the StringOperations definition is available
                 // to use, we can now import it for use.
-                //self.stringOperations = require('stringOperations');
-                //self.stringOperations.reload(self.data, col, self.regex, self);
 
             }
         }

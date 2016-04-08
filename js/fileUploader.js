@@ -4,12 +4,9 @@
  * drop or through select file.
  */
 
-define(['jquery', './dataWrangler', './utility/localSettings'],
-  function ($, dataWrangler, settings) {
-    "use strict";
+define(['jquery', './dataWrangler', './utility/localSettings'], function ($, dataWrangler, settings) {
+    'use strict';
 
-    var INITIAL_START_BYTE = settings.INITIAL_START_BYTE;
-    var INITIAL_END_BYTE = settings.INITIAL_END_BYTE;
 
     /**
      * Constructor whether instance is null or
@@ -27,19 +24,16 @@ define(['jquery', './dataWrangler', './utility/localSettings'],
     FileUploader.prototype.initUI = function () {
       var self = this;
 
-      this.$root.find("#tool-id-button").bind("click", function () {
-        //alert("ui called");
-        self.$root.find("#oprButtons").toggleClass("hide");
-        self.$root.find("#topLeftOperations").toggleClass("hide");
-        self.$root.find("#leftOperations").toggleClass("hide");
-        self.$root.find("#topOperations").toggleClass("hide");
-        self.$root.find("#importedTable").toggleClass("col-md-10", "col-md-12");
+      this.$root.find('#tool-id-button').bind('click', function () {
+        //alert('ui called');
+        self.$root.find('#oprButtons, #topLeftOperations, #leftOperations, #topOperations').toggleClass('hide');
+        self.$root.find('#importedTable').toggleClass('col-md-10', 'col-md-12');
       });
 
-      this.$root.find("#tool-id-button").trigger("click");
+      this.$root.find('#tool-id-button').trigger('click');
 
-      //$('[data-toggle="tooltip"]').tooltip();
-    }
+      //$('[data-toggle='tooltip']').tooltip();
+    };
     /**
      * Initialize function of File Uploader
      * @param _fileData
@@ -53,25 +47,25 @@ define(['jquery', './dataWrangler', './utility/localSettings'],
       self.table = _table;
 
       //taking required html element
-      var fileselect = this.$id("fileselect");
-      var filedrag = this.$id("filedrag");
-      var submitbutton = this.$id("submitbutton");
+      var fileselect = this.$id('fileselect');
+      var filedrag = this.$id('filedrag');
+      var submitbutton = this.$id('submitbutton');
 
       // file select
-      fileselect.addEventListener("change", self.fileSelectHandler.bind(self), false);
+      fileselect.addEventListener('change', self.fileSelectHandler.bind(self), false);
 
       // is XHR2 available
       var xhr = new XMLHttpRequest();
       if (xhr.upload) {
 
         // file drop
-        filedrag.addEventListener("dragover", self.fileDragHover.bind(self), false);
-        filedrag.addEventListener("dragleave", self.fileDragHover.bind(self), false);
-        filedrag.addEventListener("drop", self.fileSelectHandler.bind(self), false);
-        filedrag.style.display = "block";
+        filedrag.addEventListener('dragover', self.fileDragHover.bind(self), false);
+        filedrag.addEventListener('dragleave', self.fileDragHover.bind(self), false);
+        filedrag.addEventListener('drop', self.fileSelectHandler.bind(self), false);
+        filedrag.style.display = 'block';
 
         // remove submit button
-        submitbutton.style.display = "none";
+        submitbutton.style.display = 'none';
       }
     };
 
@@ -95,7 +89,7 @@ define(['jquery', './dataWrangler', './utility/localSettings'],
       //fileConfigInst.addNewFile(self.files[0]);
 
       // process all File objects
-      self.streamFile(self.files[0], INITIAL_START_BYTE, INITIAL_END_BYTE);
+      self.streamFile(self.files[0], settings.INITIAL_START_BYTE, settings.INITIAL_END_BYTE);
     };
 
     /**
@@ -104,7 +98,7 @@ define(['jquery', './dataWrangler', './utility/localSettings'],
      */
     FileUploader.prototype.streamNextFrame = function () {
       var self = this;
-    }
+    };
 
     /**
      * Stream file will read the file from start byte to end byte
@@ -131,8 +125,8 @@ define(['jquery', './dataWrangler', './utility/localSettings'],
           self.file_data = evt.target.result;
 
           // read data line by line
-          if (self.file_data.lastIndexOf("\n") > 0) {
-            data = self.file_data.substring(0, self.file_data.lastIndexOf("\n"));
+          if (self.file_data.lastIndexOf('\n') > 0) {
+            data = self.file_data.substring(0, self.file_data.lastIndexOf('\n'));
           } else {
             data = self.file_data;
           }
@@ -159,12 +153,9 @@ define(['jquery', './dataWrangler', './utility/localSettings'],
      * @param e
      */
     FileUploader.prototype.fileDragHover = function (e) {
-
-      var self = this;
-
       e.stopPropagation();
       e.preventDefault();
-      e.target.className = (e.type == "dragover" ? "hover" : "");
+      e.target.className = (e.type == 'dragover' ? 'hover' : '');
     };
 
     return {
