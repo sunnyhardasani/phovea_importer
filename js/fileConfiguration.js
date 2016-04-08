@@ -2,9 +2,9 @@
 // JSON Output File to handle output from the class //
 //////////////////////////////////////////////////////
 
-define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
+define(["jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
-    function (require, $, d3, dataWrangler) {
+    function ($, d3, dataWrangler, settings) {
         /**
          * 1. Check if instance is null then throw error
          * 2. Calls the load ui related to this class
@@ -25,13 +25,14 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
          * This function will get initialized when this class
          * start from the constructor
          */
-        FileConfiguration.prototype.init = function (fileUploader) {
+        FileConfiguration.prototype.init = function (fileUploader, root) {
             var self = this;
+            self.root = root;
             self.fileUploader = fileUploader;
 
             //todo : this function will read the server
             self.readLocalData();
-        }
+        };
 
         /**
          * This function will get initialized when this class
@@ -41,26 +42,22 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
             var self = this;
 
-            var settings = require("./utility/localSettings");
-            var TABLE_HOMOGENEOUS = settings.TABLE_HOMOGENEOUS;
-            var TABLE_HETEROGENEOUS = settings.TABLE_HETEROGENEOUS;
-
-            var allColData = self.dataWranglerIns.getColumnData();
+            var allColData = dataWrangler.getColumnData();
             var file = self.fileUploader.files[0];
 
 
             //fetch the column count
-            var columnCount = Object.keys(self.dataWranglerIns.getColumnData()).length;
+            var columnCount = Object.keys(dataWrangler.getColumnData()).length;
 
             //fetch the row count of the object
-            var rowCount = self.dataWranglerIns.getColumnData()[0].data.length;
+            var rowCount = dataWrangler.getColumnData()[0].data.length;
             if(file.size > settings.INITIAL_END_BYTE){
                 rowCount = "NA";
             }
 
             //iterate all the columns and check the
             var colIds = [];
-            for(key in allColData){
+            for(var key in allColData){
                 var col = allColData[key];
                 if(col.isColType){
                     colIds.push(parseInt(col.id-1));
@@ -69,7 +66,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
             //take the left operations and select the
             var rowTypeIds = [];
-            var rowTypeDataArr = self.dataWranglerIns.getRowTypeID();
+            var rowTypeDataArr = dataWrangler.getRowTypeID();
             for(key in rowTypeDataArr){
                 if(rowTypeDataArr[key]){
                     rowTypeIds.push(parseInt(key));
@@ -79,7 +76,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
             //take the rows to ignore operation from
             //rows to ignore
             var rowsToIgnore = [];
-            var rowToIgnoreArr = self.dataWranglerIns.getRowsToIgnore();
+            var rowToIgnoreArr = dataWrangler.getRowsToIgnore();
             for(key in rowToIgnoreArr){
                 if(rowToIgnoreArr[key] == 1){
                     rowsToIgnore.push(parseInt(key));
@@ -88,7 +85,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
             var colData;
             var type = self.findType(colIds,rowTypeIds,rowsToIgnore);
-            if(type === TABLE_HOMOGENEOUS){
+            if(type === settings.TABLE_HOMOGENEOUS){
                 var homogeneousKey =  self.homogeneousKey;
                 colData = {homogeneousKey : allColData[homogeneousKey]};
             }
@@ -110,7 +107,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
                 "ignorerows": rowsToIgnore,
                 "columns": self.loadData(colData)
             };
-        }
+        };
 
         /**
          * this function is responsible for finding out
@@ -123,22 +120,11 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
         FileConfiguration.prototype.findType = function (_colIds,_rowTypeIds,_rowsToIgnore) {
             var self = this;
 
-            var settings = require("./utility/localSettings");
-
-            var DATATYPE_STRING = settings.DATATYPE_STRING;
-            var DATATYPE_NOMINAL = settings.DATATYPE_NOMINAL;
-            var DATATYPE_NUMERICAL = settings.DATATYPE_NUMERICAL;
-            var DATATYPE_ORDINAL = settings.DATATYPE_ORDINAL;
-            var DATATYPE_ERROR = settings.DATATYPE_ERROR;
-
-            var TABLE_HOMOGENEOUS = settings.TABLE_HOMOGENEOUS;
-            var TABLE_HETEROGENEOUS = settings.TABLE_HETEROGENEOUS;
-
-            var allColData = self.dataWranglerIns.getColumnData();
+            var allColData = dataWrangler.getColumnData();
             var lastCol = null;
-            var tableType = TABLE_HOMOGENEOUS;
+            var tableType = settings.TABLE_HOMOGENEOUS;
 
-            for (key in allColData) {
+            for (var key in allColData) {
                 var col = allColData[key];
 
                 //this if will take care for all
@@ -158,27 +144,27 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
                         //4. todo ask if string
 
                         if (lastCol["dataTypeObj"].type !== col["dataTypeObj"].type) {
-                            tableType = TABLE_HETEROGENEOUS;
+                            tableType = settings.TABLE_HETEROGENEOUS;
                             break;
                         }
-                        if (lastCol["dataTypeObj"].type === DATATYPE_NUMERICAL) {
+                        if (lastCol["dataTypeObj"].type === settings.DATATYPE_NUMERICAL) {
                             if (lastCol["dataTypeObj"].min != col["dataTypeObj"].min) {
-                                tableType = TABLE_HETEROGENEOUS;
+                                tableType = settings.TABLE_HETEROGENEOUS;
                                 break;
                             }
                             else if (lastCol["dataTypeObj"].max !== col["dataTypeObj"].max) {
-                                tableType = TABLE_HETEROGENEOUS;
+                                tableType = settings.TABLE_HETEROGENEOUS;
                                 break;
                             }
                             else if (lastCol["dataTypeObj"].center !== col["dataTypeObj"].center) {
-                                tableType = TABLE_HETEROGENEOUS;
+                                tableType = settings.TABLE_HETEROGENEOUS;
                                 break;
                             }
                         }
-                        else if (lastCol["dataTypeObj"].type !== DATATYPE_NOMINAL) {
-                            for (key1 in lastCol["dataTypeObj"].keyCountMap) {
+                        else if (lastCol["dataTypeObj"].type !== settings.DATATYPE_NOMINAL) {
+                            for (var key1 in lastCol["dataTypeObj"].keyCountMap) {
                                 if (!(key1 in col["dataTypeObj"].keyCountMap)) {
-                                    tableType = TABLE_HETEROGENEOUS;
+                                    tableType = settings.TABLE_HETEROGENEOUS;
                                     break;
                                 }
                             }
@@ -192,7 +178,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
             }
 
             return tableType;
-        }
+        };
 
         /**
          * This function will save the json file on the
@@ -221,11 +207,11 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
                 downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
                 downloadLink.onclick = destroyClickedElement;
                 downloadLink.style.display = "none";
-                document.body.appendChild(downloadLink);
+                this.root.appendChild(downloadLink);
             }
 
             downloadLink.click();
-        }
+        };
 
         /**
          * This function will get loaded only once
@@ -241,10 +227,10 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
                 $("#main").toggle();
                 $(".box").toggle();
             });*/
-            $("#save-conf-button").click(function () {
+            $(self.root).find("#save-conf-button").click(function () {
                 self.saveConfiguration();
             });
-        }
+        };
 
         /**
          * This function is responsible for switching
@@ -271,12 +257,10 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
         FileConfiguration.prototype.saveConfiguration = function () {
             var self = this;
 
-            self.dataWranglerIns =  require("./dataWrangler");
-
             self.addNewFile();
 
             //convert the table data to the json output format
-            //self.outFileData.columns = self.loadData(self.dataWranglerIns.getColumnData());
+            //self.outFileData.columns = self.loadData(dataWrangler.getColumnData());
 
             //push the new file data to the local json dat  a
             //self.localJSONData.push(self.outFileData);
@@ -289,8 +273,6 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
         }
 
       FileConfiguration.prototype.save = function() {
-        this.dataWranglerIns =  require("./dataWrangler");
-
         this.addNewFile();
         return this.outFileData;
       };
@@ -309,7 +291,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
             self.saveFile(json,"file.json");
 
-            var url = 'data:text/json;charset=utf8,' + encodeURIComponent(json);
+            url = 'data:text/json;charset=utf8,' + encodeURIComponent(json);
             window.open(url, '_blank');
             window.focus();
 
@@ -331,9 +313,9 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
             //file confguration GUI
 
             //todo make it using exit and remove
-            d3.select("#recentFiles").selectAll("*").remove();
+            d3.select(this.root).select("#recentFiles").selectAll("*").remove();
 
-            var recentFiles = d3.select("#recentFiles")
+            var recentFiles = d3.select(this.root).select("#recentFiles")
                 .style("width", "400px")
                 .style("overflow", "auto")
                 .selectAll("#file");
@@ -386,7 +368,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
             var self = this;
 
             var outColumnArray = [];
-            for (colIndex in curTableData) {
+            for (var colIndex in curTableData) {
 
                 //fetching the required type and converting it to new structure
                 var col = curTableData[colIndex];
@@ -468,13 +450,13 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
 
             return outColumnArray;
-        }
+        };
 
         //todo remove this function this will bring the temporary file upload
         FileConfiguration.prototype.tempDataLoad = function (data) {
             var self = this;
             self.tempData = data;
-        }
+        };
 
         return {
           create: function(parent) {

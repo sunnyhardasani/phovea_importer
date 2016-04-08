@@ -1,25 +1,6 @@
 define(["require","jquery", "./table", "d3",
         "./utility/localSettings", "./utility/modColorBrewer"],
-    function (require) {
-
-        var $ = require("jquery");
-        var d3 = require("d3");
-        var table =  require("./table");
-        var settings =  require("./utility/localSettings");
-        var colorbrewer =  require("./utility/modColorBrewer");
-
-        // default values
-        var MIN_VALUE = settings.MIN_VALUE;
-        var MAX_VALUE = settings.MAX_VALUE;
-        var RATIO = settings.RATIO;
-        var TOTAL_STRAT_COUNT = settings.TOTAL_STRAT_COUNT;
-
-        // defination of the variables
-        var DATATYPE_STRING = settings.DATATYPE_STRING;
-        var DATATYPE_NOMINAL = settings.DATATYPE_NOMINAL;
-        var DATATYPE_NUMERICAL = settings.DATATYPE_NUMERICAL;
-        var DATATYPE_ORDINAL = settings.DATATYPE_ORDINAL;
-        var DATATYPE_ERROR = settings.DATATYPE_ERROR;
+    function (require, $, table, d3, settings, colorbrewer) {
 
         //initialize the instance with the null
         var instance = null;
@@ -51,7 +32,7 @@ define(["require","jquery", "./table", "d3",
 
         DataWrangler.prototype.$id = function(id) {
             return this.root.getElementById(id);
-        }
+        };
 
         /**
          * Initialize the instance with the new data
@@ -82,7 +63,7 @@ define(["require","jquery", "./table", "d3",
 
             //call the initialize function
             self.init();
-        }
+        };
 
         /**
          * this function will initialize the separator modal
@@ -106,22 +87,18 @@ define(["require","jquery", "./table", "d3",
         DataWrangler.prototype.output = function (msg) {
             /*   var m = $id("fileDetails");
              m.innerHTML = msg + m.innerHTML;*/
-        }
+        };
 
         /**
          * this function will clean  all the msg on the separator modal
-         * @param msg
          */
         DataWrangler.prototype.clean = function () {
             var self = this;
 
             //todo make the solution for this one urgently !!!
 
-            d3.select(this.root).select("#colorbox-pop-up").selectAll("*").remove();
-            d3.select(this.root).select("#leftOperations").selectAll("*").remove();
-            d3.select(this.root).select("#topOperations").selectAll("*").remove();
-            d3.select(this.root).select("#importedTable").selectAll("*").remove();
-        }
+            d3.select(this.root).selectAll("#colorbox-pop-up, #leftOperations, #topOperations, #importedTable").selectAll("*").remove();
+        };
 
         /**
          * todo: make another box to show how the demo view how the table will look like
@@ -133,28 +110,29 @@ define(["require","jquery", "./table", "d3",
             // registering all the events of the
             // check box and input box on the separator
             // modal
-            $(this.root).find("#comma").click(function () {
+            var $root = $(this.root);
+            $root.find("#comma").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
                 else {
                 }
             });
-            $(this.root).find("#space").click(function () {
+            $root.find("#space").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
                 else {
                 }
             });
-            $(this.root).find("#tab").click(function () {
+            $root.find("#tab").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
                 else {
                 }
             });
-            $(this.root).find("#semicolon").click(function () {
+            $root.find("#semicolon").click(function () {
                 if ($(this).is(':checked')) {
                     self.saveClicked();
                 }
@@ -163,24 +141,24 @@ define(["require","jquery", "./table", "d3",
             });
 
             // this will read the event on the
-            $(this.root).find('#any').bind('input', function () {
+            $root.find('#any').bind('input', function () {
                 // get the current value of the input field.
                 var val = $(this).val();
                 self.saveClicked();
             });
 
             // this will read the event on the
-            $(this.root).find('#quote').bind('input', function () {
+            $root.find('#quote').bind('input', function () {
                 self.saveClicked();
             });
 
             // this will read the event on the
-            $(this.root).find('#save').click(function () {
+            $root.find('#save').click(function () {
                 // get the current value of the input field.
                 self.saveClicked();
             });
 
-        }
+        };
 
         /**
          * this function will guess the separator from the input data
@@ -263,7 +241,7 @@ define(["require","jquery", "./table", "d3",
             //set the highest count radio button to true
             this.$id(strDelimiter).checked = true;
 
-        }
+        };
 
         /**
          * this function will change the global delimiter
@@ -294,7 +272,7 @@ define(["require","jquery", "./table", "d3",
             else if (this.$id('semicolon').checked) {
                 self.delimiter = ";";
             }
-        }
+        };
 
         /**
          * This function will convert dsv to json converter
@@ -349,7 +327,7 @@ define(["require","jquery", "./table", "d3",
             // requireJS will ensure that the Table definition is available
             // to use, we can now import it for use.
             table.reload(self.root, self.allColumnsDataArray, self);
-        }
+        };
 
         /**
          * This function will slice the row id
@@ -373,7 +351,7 @@ define(["require","jquery", "./table", "d3",
 
             //default selection
             self.allColumnsDataArray[0].isColType = true;
-        }
+        };
 
         //todo
         DataWrangler.prototype.sliceColId = function () {
@@ -388,7 +366,7 @@ define(["require","jquery", "./table", "d3",
 
             self.colId = self.importedData.shift();
 
-        }
+        };
 
 
         //this will form each column data
@@ -408,7 +386,7 @@ define(["require","jquery", "./table", "d3",
                             "id": colKey,
                             "colorScheme": colorbrewer["defaultScale"]["default"][12], // todo add this 12 into settings
                             //"colId": self.colId[colKey],          //head will guess in separate function
-                            "dataTypeObj": new Object(),         //data type will be guessed in separate function
+                            "dataTypeObj": {},         //data type will be guessed in separate function
                             "isColType": false,
                             "isRemoved":false,
                             "data": []
@@ -427,7 +405,7 @@ define(["require","jquery", "./table", "d3",
                     colKey++;
                 });
             });
-        }
+        };
 
         /**
          * Guess Data Type function: this function will take the column array and
@@ -439,7 +417,7 @@ define(["require","jquery", "./table", "d3",
 
             var self = this;
 
-            for (key in self.allColumnsDataArray) {
+            for (var key in self.allColumnsDataArray) {
 
                 var col = self.allColumnsDataArray[key];
                 var colData = col["data"];
@@ -448,8 +426,8 @@ define(["require","jquery", "./table", "d3",
                 //following data will get refresh with each iteration
                 var nNumericCount = 0;
                 var nTotalCount = 0;
-                var min = MIN_VALUE; //
-                var max = MAX_VALUE;
+                var min = settings.MIN_VALUE; //
+                var max = settings.MAX_VALUE;
                 var freqMap = {};
                 var numberMap = {};
                 var stringMap = {};
@@ -560,13 +538,13 @@ define(["require","jquery", "./table", "d3",
                     // todo: Ratio logic calculation needs to be discussed and may require change
 
                     //checking for stratified data
-                    if (nKeyCount / nNumericCount < RATIO && nKeyCount < TOTAL_STRAT_COUNT) {
-                        col["dataTypeObj"].type = DATATYPE_NOMINAL;
+                    if (nKeyCount / nNumericCount < settings.RATIO && nKeyCount < settings.TOTAL_STRAT_COUNT) {
+                        col["dataTypeObj"].type = settings.DATATYPE_NOMINAL;
                     }
                     else {
                         //todo: set the output parameter in this area
                         //Print the data is real and the range of the data
-                        col["dataTypeObj"].type = DATATYPE_NUMERICAL;
+                        col["dataTypeObj"].type = settings.DATATYPE_NUMERICAL;
                     }
                 }
                 else if (nNumericCount == 0) { // only string data
@@ -574,13 +552,13 @@ define(["require","jquery", "./table", "d3",
                     // If non numeric element found
                     // Todo: following logic require change after discussion
                     //String can be stratified
-                    if ((nKeyCount / nTotalCount) < RATIO) { // Todo: logic change is required in this line
-                        col["dataTypeObj"].type = DATATYPE_NOMINAL;
+                    if ((nKeyCount / nTotalCount) < settings.RATIO) { // Todo: logic change is required in this line
+                        col["dataTypeObj"].type = settings.DATATYPE_NOMINAL;
                     }
                     else {
                         //String can be names of the person so chances are
                         //Print the data is real and the range of the data
-                        col["dataTypeObj"].type = DATATYPE_STRING;
+                        col["dataTypeObj"].type = settings.DATATYPE_STRING;
                     }
 
                 }
@@ -589,7 +567,7 @@ define(["require","jquery", "./table", "d3",
                     // keep the type as error i.e. not able to judge and sent
                     // define error structure and send the doubtful error
                     // location to the server
-                    col["dataTypeObj"].type = DATATYPE_ERROR;
+                    col["dataTypeObj"].type = settings.DATATYPE_ERROR;
 
                     // guessing the base data type of the column if base type
                     // is numerical than highlight the strings with red color
@@ -597,10 +575,10 @@ define(["require","jquery", "./table", "d3",
                     // 10 numbers and then for base type to be numerical there
                     // must be 6,7,8,9 or 10 numbers else its base type change
                     // to string
-                    col["dataTypeObj"].baseType = (nNumericCount / nTotalCount) >= 0.5 ? DATATYPE_NUMERICAL : DATATYPE_STRING;
+                    col["dataTypeObj"].baseType = (nNumericCount / nTotalCount) >= 0.5 ? settings.DATATYPE_NUMERICAL : settings.DATATYPE_STRING;
                 }
             }
-        }
+        };
 
         /**
          * This function is responsible for changing the data type
@@ -618,7 +596,7 @@ define(["require","jquery", "./table", "d3",
 
             //this will keep only one instance of the table class
             table.reload(self.root, self.allColumnsDataArray, self);
-        }
+        };
 
         /**
          * this function will change the color of the column of
@@ -643,7 +621,7 @@ define(["require","jquery", "./table", "d3",
                 //this will keep only one instance of the table class
                 table.reload(self.root, self.allColumnsDataArray, self);
             }
-        }
+        };
 
         /**
          * This function will return the current data
@@ -654,7 +632,7 @@ define(["require","jquery", "./table", "d3",
 
             //this will return the current column data
             return self.allColumnsDataArray;
-        }
+        };
 
         /**
          * This function is responsible adding the new category
@@ -663,7 +641,7 @@ define(["require","jquery", "./table", "d3",
         DataWrangler.prototype.addNewCategoryInNominal = function () {
             var self = this;
 
-        }
+        };
 
         /**
          * This new frequency map comes from the
@@ -682,9 +660,9 @@ define(["require","jquery", "./table", "d3",
             self.clean();
 
             //this will keep only one instance of the table class
-            self.table = require('table');
+            self.table = table;
             self.table.reload(self.root, self.allColumnsDataArray, self);
-        }
+        };
 
         /**
          * This will update numerical minimum and maximum
@@ -704,7 +682,7 @@ define(["require","jquery", "./table", "d3",
             self.clean();
 
             //this will keep only one instance of the table class
-            self.table = require('table');
+            self.table = table;
             self.table.reload(self.root, self.allColumnsDataArray, self);
         }
 
@@ -724,7 +702,7 @@ define(["require","jquery", "./table", "d3",
 
             for (var key in self.allColumnsDataArray) {
 
-                for (opr in oprIdArr) {
+                for (var opr in oprIdArr) {
 
                     if (oprIdArr[opr].type === "ID") {
 
@@ -748,7 +726,7 @@ define(["require","jquery", "./table", "d3",
             //this will keep only one instance of the table class
             table.reload(self.root, self.allColumnsDataArray, self);
 
-        }
+        };
 
         DataWrangler.prototype.addNewCategory = function (_colId, newCategoryElement) {
             var self = this;
@@ -776,7 +754,7 @@ define(["require","jquery", "./table", "d3",
             //this will keep only one instance of the table class
             table.reload(self.root, self.allColumnsDataArray, self);
 
-        }
+        };
 
         /**
          * todo move this function to the utility class
@@ -850,7 +828,7 @@ define(["require","jquery", "./table", "d3",
             }
             // Return the parsed data.
             return ( arrData );
-        }
+        };
 
         /**
          * copy settings
@@ -878,7 +856,7 @@ define(["require","jquery", "./table", "d3",
 
             //this will keep only one instance of the table class
             table.reload(self.root, self.allColumnsDataArray, self);
-        }
+        };
 
         /**
          * remove columns
@@ -899,7 +877,7 @@ define(["require","jquery", "./table", "d3",
 
             //this will keep only one instance of the table class
             table.reload(self.allColumnsDataArray, self);
-        }
+        };
 
         /**
          * this function will take the row ids
@@ -921,7 +899,7 @@ define(["require","jquery", "./table", "d3",
             //this will keep only one instance of the table class
             table.reload(self.root, self.allColumnsDataArray, self);
 
-        }
+        };
 
         //this will return the row type identification array
         DataWrangler.prototype.getRowTypeID = function (arr) {
@@ -930,7 +908,7 @@ define(["require","jquery", "./table", "d3",
             //before setting new this will clear
             //all the previous set values
             return self.arrRowTypes;
-        }
+        };
 
         DataWrangler.prototype.setRowsToIgnore = function (arrIgnoreRows) {
             var self = this;
@@ -950,13 +928,13 @@ define(["require","jquery", "./table", "d3",
             //this will keep only one instance of the table class
             table.reload(self.allColumnsDataArray, self);
 
-        }
+        };
 
         DataWrangler.prototype.getRowsToIgnore = function () {
             var self = this;
 
             return self.arrIgnoreRows;
-        }
+        };
 
         return DataWrangler.getInstance();
     });

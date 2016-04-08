@@ -46,7 +46,7 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
         $(this).off(event);
       });
 
-      $(self.parentElementName + " " + '#remove-row-button').bind("click", function (event) {
+      self.$root.find('#remove-row-button').bind("click", function (event) {
         self.oprCount++;
         leftTableData.insertNewOpr(self.oprCount, "REMOVE", Array.apply(null, new Array(self.rowCount)).map(Number.prototype.valueOf, 0));
         $(this).off(event);
@@ -82,8 +82,6 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
      */
     LeftTableView.prototype.reload = function (root, _columns, _rowCount) {
       var self = this;
-
-      self.dataWranglerIns = dataWrangler;
       //self.topTableData =  require("topTableData");
       leftTableData.reload();
       self.columns = _columns;
@@ -143,7 +141,7 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
       var row = self.leftTableHead.append("tr").attr("width", columnWidth / 4);
 
       self.cells = [];
-      for (key in allOpr) {
+      Object.keys(allOpr).forEach(function(key) {
         var svgCol = row.append("td")
           .attr("height", rowHeight * self.rowCount)
           .style("border", "7px white solid")
@@ -161,8 +159,8 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
         else if (allOpr[key].type === "REMOVE") {//todo define id in local settings
           self.addDragNDropOperation(key, svgCol, allOpr[key].obj);
         }
-      }
-    }
+      });
+    };
 
     /**
      * this function is responsible to initialize
@@ -256,7 +254,7 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
 
         leftTableData.insertNewOpr(opr, "ID", {topIndex: topId, bottomIndex: bottomId});
       }
-    }
+    };
 
     /**
      * This function will handle all the drag
@@ -334,13 +332,13 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
 
           var arrVisibilityStatus = [];
           var allDotData = allDot.data();
-          for (key in allDotData) {
+          Object.keys(allDotData).forEach(function(key) {
             arrVisibilityStatus[/*parseInt(baseRowIndex) + */parseInt(key)] = allDotData[key].visible;
-          }
+          });
           leftTableData.insertNewOpr(opr, "REMOVE", arrVisibilityStatus);
         })
 
-    }
+    };
 
 
     //this will return the single instance

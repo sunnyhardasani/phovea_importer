@@ -9,15 +9,6 @@ define(["jquery", "d3", "d3-tip",
     function ($,d3, d3tip, jqueryResizableColumns, fileConfiguration,
                settings, colorbrewer,topTableView,leftTableView) {
 
-
-        //defination of the variables
-        var DATATYPE_STRING = settings.DATATYPE_STRING;
-        var DATATYPE_NOMINAL = settings.DATATYPE_NOMINAL;
-        var DATATYPE_NUMERICAL = settings.DATATYPE_NUMERICAL;
-        var DATATYPE_ORDINAL = settings.DATATYPE_ORDINAL;
-        var DATATYPE_ERROR = settings.DATATYPE_ERROR;
-        var DISPLAY_ROW_COUNT = settings.DISPLAY_ROW_COUNT;
-
         //instance of the class
         var instance = null;
 
@@ -54,9 +45,10 @@ define(["jquery", "d3", "d3-tip",
         Table.prototype.reload = function (root, _data, _parentInstance) {
             var self = this;
             self.root = root;
+            self.$root = $(root);
 
             self.data = _data;
-            self.displayRowCount = DISPLAY_ROW_COUNT;
+            self.displayRowCount = settings.DISPLAY_ROW_COUNT;
             self.currPage = 1;
             self.dataToDisplay = [];
             self.parentInstance = _parentInstance;
@@ -69,8 +61,8 @@ define(["jquery", "d3", "d3-tip",
 
 
             //this will remove all the tips
-            $(self.root).find(".d3-tip").remove();
-            $(self.root).find(".n").remove();
+            self.$root.find(".d3-tip").remove();
+            self.$root.find(".n").remove();
 
             //load file data and call initialize
             self.init();
@@ -87,7 +79,7 @@ define(["jquery", "d3", "d3-tip",
 
             //take the row count and col count
             self.colCount = Object.keys(self.data).length;
-            self.totalPages = Math.ceil(self.rowCount / DISPLAY_ROW_COUNT);
+            self.totalPages = Math.ceil(self.rowCount / settings.DISPLAY_ROW_COUNT);
 
             self.createDataTypeBox();
             self.updatePagination();
@@ -101,9 +93,9 @@ define(["jquery", "d3", "d3-tip",
 
             //this will set on resizable columns
             //  $(self.parentElementName + " " + "table").resizableColumns(); //todo to start resizable columns
-            $(self.root).find("#string-opr-menu > span").click(function () {
-                $(self.root).find('#table-group').attr("class", "col-md-12");
-                $(self.root).find('#operations').attr("class", "col-md-0 hidden");
+            self.$root.find("#string-opr-menu > span").click(function () {
+                self.$root.find('#table-group').attr("class", "col-md-12");
+                self.$root.find('#operations').attr("class", "col-md-0 hidden");
             });
         }
 
@@ -252,14 +244,14 @@ define(["jquery", "d3", "d3-tip",
             var self = this;
 
             //changing the default color of the table
-            for(key in self.data){
+            for(var key in self.data){
                 var col = self.data[key];
                 var id = col.id-1;
                 var colId = "col-"+id;
 
                 //this function will highlight all the column
                 //whose row identifier is true
-                var rows = document.getElementsByClassName(colId);
+                var rows = self.$root.find('.'+colId);
                 for (var i = 0; i < rows.length ; i++) {
                     rows[i].style.backgroundColor = "white";
                 }
@@ -273,23 +265,23 @@ define(["jquery", "d3", "d3-tip",
         Table.prototype.createDataTypeBox = function (colId) {
             var self = this;
 
-            $('#datatype-pop-up input:radio').prop('checked', false);
-            $('#datatype-pop-up input:radio').off('click');
-            $('#datatype-pop-up input:radio').click(function () {
-                if ($(this).val() === DATATYPE_STRING) {
-                    self.parentInstance.changeDataType(colId, DATATYPE_STRING);
+            self.$root.find('#datatype-pop-up input:radio').prop('checked', false);
+            self.$root.find('#datatype-pop-up input:radio').off('click');
+            self.$root.find('#datatype-pop-up input:radio').click(function () {
+                if ($(this).val() === settings.DATATYPE_STRING) {
+                    self.parentInstance.changeDataType(colId, settings.DATATYPE_STRING);
                 }
-                else if ($(this).val() === DATATYPE_NOMINAL) {
-                    self.parentInstance.changeDataType(colId, DATATYPE_NOMINAL);
-                    self.parentInstance.changeDataType(colId, DATATYPE_NOMINAL);
+                else if ($(this).val() === settings.DATATYPE_NOMINAL) {
+                    self.parentInstance.changeDataType(colId, settings.DATATYPE_NOMINAL);
+                    self.parentInstance.changeDataType(colId, settings.DATATYPE_NOMINAL);
                 }
-                else if ($(this).val() === DATATYPE_NUMERICAL) {
-                    self.parentInstance.changeDataType(colId, DATATYPE_NUMERICAL);
+                else if ($(this).val() === settings.DATATYPE_NUMERICAL) {
+                    self.parentInstance.changeDataType(colId, settings.DATATYPE_NUMERICAL);
                 }
-                else if ($(this).val() === DATATYPE_ORDINAL) {
-                    self.parentInstance.changeDataType(colId,DATATYPE_ORDINAL);
+                else if ($(this).val() === settings.DATATYPE_ORDINAL) {
+                    self.parentInstance.changeDataType(colId,settings.DATATYPE_ORDINAL);
                 }
-                $('#datatype-pop-up').hide();
+                self.$root.find('#datatype-pop-up').hide();
             });
 
         }
@@ -307,20 +299,20 @@ define(["jquery", "d3", "d3-tip",
             //check which scale is selected and
             //create the color box accordingly
             if(selectedScale == "ordinalScale"){
-                $('#colorbox-pop-up').css('height', '80');
+                self.$root.find('#colorbox-pop-up').css('height', '80');
             }
             else if(selectedScale == "polyLinearScale"){
-                $('#colorbox-pop-up').css('height', '80');
+                self.$root.find('#colorbox-pop-up').css('height', '80');
             }
             else if(selectedScale == "linearScale") {
-                $('#colorbox-pop-up').css('height', '130');
+                self.$root.find('#colorbox-pop-up').css('height', '130');
             }
 
             //remove previously selected child div element
-            d3.select("#colorbox-pop-up").select("div").remove();
+            d3.select(this.root).select("#colorbox-pop-up").select("div").remove();
 
             //this will add the new div
-            self.colorBox = d3.select("#colorbox-pop-up")
+            self.colorBox = d3.select(this.root).select("#colorbox-pop-up")
                 .append("div")
                 .attr("class", "allcolor")
                 .selectAll(".palette")
@@ -473,7 +465,7 @@ define(["jquery", "d3", "d3-tip",
 
                         self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
 
-                        $('#colorbox-pop-up').hide();
+                        self.$root.find('#colorbox-pop-up').hide();
                     })
 
                         //todo need to check the below code whether its required or not
@@ -487,7 +479,7 @@ define(["jquery", "d3", "d3-tip",
                             return d;
                         });
 
-                    $('#colorbox-pop-up')
+                    self.$root.find('#colorbox-pop-up')
                         .show()
                         .css('top', d3.event.pageY)
                         .css('left', d3.event.pageX)
@@ -656,7 +648,7 @@ define(["jquery", "d3", "d3-tip",
 
                         self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
 
-                        $('#colorbox-pop-up').hide();
+                        self.$root.find('#colorbox-pop-up').hide();
                     })
 
                         //todo need to check the below code whether its required or not
@@ -670,7 +662,7 @@ define(["jquery", "d3", "d3-tip",
                             return d;
                         });
 
-                    $('#colorbox-pop-up')
+                    self.$root.find('#colorbox-pop-up')
                         .show()
                         .css('top', d3.event.pageY)
                         .css('left', d3.event.pageX)
@@ -883,7 +875,7 @@ define(["jquery", "d3", "d3-tip",
                         self.parentInstance.changeColColor(colId, colorbrewer[setColorScale][d.key][lastKey]);
 
                         //finally hide the color box
-                        $('#colorbox-pop-up').hide();
+                        self.$root.find('#colorbox-pop-up').hide();
                     })
 
                         //todo need to check the below code whether its required or not
@@ -898,7 +890,7 @@ define(["jquery", "d3", "d3-tip",
                         });
 
                     //open the colorbox div
-                    $('#colorbox-pop-up')
+                    self.$root.find('#colorbox-pop-up')
                         .show()
                         .css('top', d3.event.pageY)
                         .css('left', d3.event.pageX)
@@ -948,7 +940,7 @@ define(["jquery", "d3", "d3-tip",
                 width = 150 - margin.left - margin.right,
                 height = 100 - margin.top - margin.bottom;
 
-            if (dataTypeObj.baseType == DATATYPE_NUMERICAL) {
+            if (dataTypeObj.baseType == settings.DATATYPE_NUMERICAL) {
 
                 var histogram = d3.layout.histogram().bins(10) //todo set the bin count in the setting folder
                 (d3.values(dataTypeObj.numberMap));
@@ -1274,7 +1266,7 @@ define(["jquery", "d3", "d3-tip",
 
                         self.parentInstance.changeColColor(colId, colorbrewer["ordinalScale"][d.key][lastKey]);
 
-                        $('#colorbox-pop-up').hide();
+                        self.$root.find('#colorbox-pop-up').hide();
                     })
 
                         //todo need to check the below code whether its required or not
@@ -1288,7 +1280,7 @@ define(["jquery", "d3", "d3-tip",
                             return d;
                         });
 
-                    $('#colorbox-pop-up')
+                    self.$root.find('#colorbox-pop-up')
                         .show()
                         .css('top', d3.event.pageY)
                         .css('left', d3.event.pageX)
@@ -1314,7 +1306,7 @@ define(["jquery", "d3", "d3-tip",
                 height = 100 - margin.top - margin.bottom;
 
 
-            for (key in self.data) {
+            for (var key in self.data) {
 
                 var col = self.data[key];
                 var selColor = col.colorScheme;
@@ -1324,19 +1316,19 @@ define(["jquery", "d3", "d3-tip",
                 //add the printing logic per column
                 var svgArea = "#svg-col-" + (col.id - 1);
 
-                if (dataType == DATATYPE_NOMINAL) {
+                if (dataType == settings.DATATYPE_NOMINAL) {
                     self.printNominalGraph(col,svgArea);
                 }
-                else if (dataType == DATATYPE_ORDINAL) {
+                else if (dataType == settings.DATATYPE_ORDINAL) {
                     self.printOrdinalGraph(col,svgArea);
                 }
-                else if (dataType == DATATYPE_NUMERICAL) {
+                else if (dataType == settings.DATATYPE_NUMERICAL) {
                     self.printNumericalGraph(col,svgArea);
                 }
-                else if (dataType == DATATYPE_STRING) {
+                else if (dataType == settings.DATATYPE_STRING) {
                     self.printStringGraph(col,svgArea);
                 }
-                else if (dataType == DATATYPE_ERROR) {
+                else if (dataType == settings.DATATYPE_ERROR) {
                     self.printErrorGraph(col,svgArea);
                 }
             }
@@ -1358,7 +1350,7 @@ define(["jquery", "d3", "d3-tip",
 
                     //this function will highlight all the column
                     //whose row identifier is true
-                    var rows = document.getElementsByClassName(colId);
+                    var rows = self.$root.find('.'+colId);
                     for (var i = 0; i < rows.length ; i++) {
                         rows[i].style.backgroundColor = "rgba(0, 0, 0, 0.1)";
                     }
@@ -1382,7 +1374,7 @@ define(["jquery", "d3", "d3-tip",
 
                     //this function will highlight all the column
                     //whose row identifier is true
-                    var rows = document.getElementsByClassName(colId);
+                    var rows = self.$root.find('.'+colId);
                     for (var i = 0; i < rows.length ; i++) {
                         rows[i].style.backgroundColor = "rgba(255, 0, 0, 0.15)";
                     }
@@ -1403,7 +1395,7 @@ define(["jquery", "d3", "d3-tip",
                 var rowId = "row-"+id;
 
                 //this function will highlight all the row ids
-                var rows = document.getElementsByClassName(rowId);
+                var rows = self.$root.find('.'+rowId);
                 for (var i = 0; i < rows.length ; i++) {
                     rows[i].style.backgroundColor = "rgba(0, 0, 0, 0.1)";
                 }
@@ -1424,7 +1416,7 @@ define(["jquery", "d3", "d3-tip",
                     var rowId = "row-" + id;
 
                     //this function will highlight all the row ids
-                    var rows = document.getElementsByClassName(rowId);
+                    var rows = self.$root.find('.'+rowId);
 
                     for (var i = 0; i < rows.length; i++) {
                         rows[i].style.backgroundColor = "rgba(255, 0, 0, 0.15)";
@@ -1446,7 +1438,7 @@ define(["jquery", "d3", "d3-tip",
             var ind = 0;
             var dInd = 0;
             var columnWidth = 150;
-            for (key in self.data) {
+            for (var key in self.data) {
                 var col = self.data[key];
                 columns[ind] = col;
                 columns[ind].x = (columnWidth/2 ) + (columnWidth * ind); // required for drag and drop selection
@@ -1466,7 +1458,7 @@ define(["jquery", "d3", "d3-tip",
             self.topLeftTableHead = self.topLeftTable.append("thead");
 
             //todo following left table goes into separate function
-            var rowsToCreateLeftView = (self.rowCount / DISPLAY_ROW_COUNT >= 1) ? DISPLAY_ROW_COUNT : self.rowCount;
+            var rowsToCreateLeftView = (self.rowCount / settings.DISPLAY_ROW_COUNT >= 1) ? settings.DISPLAY_ROW_COUNT : self.rowCount;
            leftTableView.reload(self.root, columns,rowsToCreateLeftView);
 
             self.table = d3.select(self.root).select("#importedTable").append("table")
@@ -1509,11 +1501,11 @@ define(["jquery", "d3", "d3-tip",
                     d3.select(this).style("background-color", "white")
                 });
 
-            var dataTypeArray = [   DATATYPE_NUMERICAL,
-                                    DATATYPE_NOMINAL,
-                                    DATATYPE_ORDINAL,
-                                    DATATYPE_STRING,
-                                    DATATYPE_ERROR  ];
+            var dataTypeArray = [   settings.DATATYPE_NUMERICAL,
+                                    settings.DATATYPE_NOMINAL,
+                                    settings.DATATYPE_ORDINAL,
+                                    settings.DATATYPE_STRING,
+                                    settings.DATATYPE_ERROR  ];
 
             var opr = svgCells.append("div").style("height", "20px");
             var select = opr.append("div")
@@ -1609,7 +1601,7 @@ define(["jquery", "d3", "d3-tip",
             //calculate intial and start index of the bar
             var rectStartIndex = 0;
             var flag = true;
-            for(key in columns){
+            for(var key in columns){
                 var col = columns[key];
                 if(col.isColType){
                     if(flag){
@@ -1723,10 +1715,10 @@ define(["jquery", "d3", "d3-tip",
                 .style("font-size", "10px")
                 .attr("height","24.44")//todo think some permananet solution
                 .each(function(d){
-                    if(d.dataTypeObj.type == DATATYPE_NUMERICAL){
+                    if(d.dataTypeObj.type == settings.DATATYPE_NUMERICAL){
                         self.numericalOpr(d3.select(this),d);
                     }
-                    else if(d.dataTypeObj.type == DATATYPE_NOMINAL || d.dataTypeObj.type == DATATYPE_ORDINAL){
+                    else if(d.dataTypeObj.type == settings.DATATYPE_NOMINAL || d.dataTypeObj.type == settings.DATATYPE_ORDINAL){
                         self.nominalOpr(d3.select(this),d);
                     }
                 });
@@ -1862,8 +1854,8 @@ define(["jquery", "d3", "d3-tip",
             var rowIndex = 0;
             // this will create the data 2d array which
             // will be used to print the data
-            for (var index = (pageNum - 1) * DISPLAY_ROW_COUNT;
-                 index < ((pageNum - 1) * DISPLAY_ROW_COUNT) + DISPLAY_ROW_COUNT && index < self.rowCount;
+            for (var index = (pageNum - 1) * settings.DISPLAY_ROW_COUNT;
+                 index < ((pageNum - 1) * settings.DISPLAY_ROW_COUNT) + settings.DISPLAY_ROW_COUNT && index < self.rowCount;
                  index++) {
 
                 self.dataToDisplay[rowIndex] = [];
@@ -1930,7 +1922,7 @@ define(["jquery", "d3", "d3-tip",
                 return "col-" + i;
             })
             .attr("class", function (d, i) {
-                return "row-"+ (Math.floor(rowId++ / colCount) + (self.currPage-1)*DISPLAY_ROW_COUNT) +" "+"col-" + i;
+                return "row-"+ (Math.floor(rowId++ / colCount) + (self.currPage-1)*settings.DISPLAY_ROW_COUNT) +" "+"col-" + i;
             })
             .style("border", "1px black solid")
             .style("padding", "5px")
@@ -2000,7 +1992,7 @@ define(["jquery", "d3", "d3-tip",
 
             //now make the regex for the selection operations
             var x = document.getElementById('data-table').rows;
-            for (var i = startIndexOfData; i < DISPLAY_ROW_COUNT + startIndexOfData; i++) {
+            for (var i = startIndexOfData; i < settings.DISPLAY_ROW_COUNT + startIndexOfData; i++) {
                 var y = x[i].cells;
                 y[col].innerHTML = y[col].textContent.replace(new RegExp('(' + self.regex + ')', 'gi'), '<span style="background-color:#c4e3f3">$1</span>');
             }
@@ -2030,7 +2022,7 @@ define(["jquery", "d3", "d3-tip",
             var self = this;
 
             //setting the column width to 0
-            document.getElementsByTagName('th')[col].style.width = '0.1%';
+            self.$root.find('th')[col].style.width = '0.1%';
 
             //calling the resize event to restore the divs
             $(window).trigger('resize');
