@@ -11,12 +11,12 @@ define(["jquery", "d3", "d3-tip",
 
 
         //defination of the variables
-        var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
-        var DATATYPE_NOMINAL = settings.localSettings().DATATYPE_NOMINAL;
-        var DATATYPE_NUMERICAL = settings.localSettings().DATATYPE_NUMERICAL;
-        var DATATYPE_ORDINAL = settings.localSettings().DATATYPE_ORDINAL;
-        var DATATYPE_ERROR = settings.localSettings().DATATYPE_ERROR;
-        var DISPLAY_ROW_COUNT = settings.localSettings().DISPLAY_ROW_COUNT;
+        var DATATYPE_STRING = settings.DATATYPE_STRING;
+        var DATATYPE_NOMINAL = settings.DATATYPE_NOMINAL;
+        var DATATYPE_NUMERICAL = settings.DATATYPE_NUMERICAL;
+        var DATATYPE_ORDINAL = settings.DATATYPE_ORDINAL;
+        var DATATYPE_ERROR = settings.DATATYPE_ERROR;
+        var DISPLAY_ROW_COUNT = settings.DISPLAY_ROW_COUNT;
 
         //instance of the class
         var instance = null;
@@ -739,7 +739,7 @@ define(["jquery", "d3", "d3-tip",
             var min = dataTypeObj.min;
             var max = dataTypeObj.max;
             var isDataCenter = dataTypeObj.isDataCenter;
-            var binCount = settings.localSettings().NUMERICAL_BIN_COUNT;
+            var binCount = settings.NUMERICAL_BIN_COUNT;
 
             var setColorScale;
             if(isDataCenter){

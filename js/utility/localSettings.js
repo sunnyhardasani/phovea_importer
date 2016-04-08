@@ -3,7 +3,7 @@
  * required by the application
  */
 define(function () {
-  var localSettingsRet = {
+  return {
     INITIAL_START_BYTE: 0,
     INITIAL_END_BYTE: 1024 * 10 * 10,
 
@@ -25,10 +25,4 @@ define(function () {
     TABLE_HOMOGENEOUS: 'HOMOGENEOUS',
     TABLE_HETEROGENEOUS: 'HETEROGENEOUS'
   };
-
-  return {
-    localSettings: function () {
-      return localSettingsRet;
-    }
-  }
 });

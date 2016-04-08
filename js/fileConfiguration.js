@@ -42,8 +42,8 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
             var self = this;
 
             var settings = require("./utility/localSettings");
-            var TABLE_HOMOGENEOUS = settings.localSettings().TABLE_HOMOGENEOUS;
-            var TABLE_HETEROGENEOUS = settings.localSettings().TABLE_HETEROGENEOUS;
+            var TABLE_HOMOGENEOUS = settings.TABLE_HOMOGENEOUS;
+            var TABLE_HETEROGENEOUS = settings.TABLE_HETEROGENEOUS;
 
             var allColData = self.dataWranglerIns.getColumnData();
             var file = self.fileUploader.files[0];
@@ -54,7 +54,7 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
             //fetch the row count of the object
             var rowCount = self.dataWranglerIns.getColumnData()[0].data.length;
-            if(file.size > settings.localSettings().INITIAL_END_BYTE){
+            if(file.size > settings.INITIAL_END_BYTE){
                 rowCount = "NA";
             }
 
@@ -125,14 +125,14 @@ define(["require", "jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
             var settings = require("./utility/localSettings");
 
-            var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
-            var DATATYPE_NOMINAL = settings.localSettings().DATATYPE_NOMINAL;
-            var DATATYPE_NUMERICAL = settings.localSettings().DATATYPE_NUMERICAL;
-            var DATATYPE_ORDINAL = settings.localSettings().DATATYPE_ORDINAL;
-            var DATATYPE_ERROR = settings.localSettings().DATATYPE_ERROR;
+            var DATATYPE_STRING = settings.DATATYPE_STRING;
+            var DATATYPE_NOMINAL = settings.DATATYPE_NOMINAL;
+            var DATATYPE_NUMERICAL = settings.DATATYPE_NUMERICAL;
+            var DATATYPE_ORDINAL = settings.DATATYPE_ORDINAL;
+            var DATATYPE_ERROR = settings.DATATYPE_ERROR;
 
-            var TABLE_HOMOGENEOUS = settings.localSettings().TABLE_HOMOGENEOUS;
-            var TABLE_HETEROGENEOUS = settings.localSettings().TABLE_HETEROGENEOUS;
+            var TABLE_HOMOGENEOUS = settings.TABLE_HOMOGENEOUS;
+            var TABLE_HETEROGENEOUS = settings.TABLE_HETEROGENEOUS;
 
             var allColData = self.dataWranglerIns.getColumnData();
             var lastCol = null;

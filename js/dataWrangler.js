@@ -9,17 +9,17 @@ define(["require","jquery", "./table", "d3",
         var colorbrewer =  require("./utility/modColorBrewer");
 
         // default values
-        var MIN_VALUE = settings.localSettings().MIN_VALUE;
-        var MAX_VALUE = settings.localSettings().MAX_VALUE;
-        var RATIO = settings.localSettings().RATIO;
-        var TOTAL_STRAT_COUNT = settings.localSettings().TOTAL_STRAT_COUNT;
+        var MIN_VALUE = settings.MIN_VALUE;
+        var MAX_VALUE = settings.MAX_VALUE;
+        var RATIO = settings.RATIO;
+        var TOTAL_STRAT_COUNT = settings.TOTAL_STRAT_COUNT;
 
         // defination of the variables
-        var DATATYPE_STRING = settings.localSettings().DATATYPE_STRING;
-        var DATATYPE_NOMINAL = settings.localSettings().DATATYPE_NOMINAL;
-        var DATATYPE_NUMERICAL = settings.localSettings().DATATYPE_NUMERICAL;
-        var DATATYPE_ORDINAL = settings.localSettings().DATATYPE_ORDINAL;
-        var DATATYPE_ERROR = settings.localSettings().DATATYPE_ERROR;
+        var DATATYPE_STRING = settings.DATATYPE_STRING;
+        var DATATYPE_NOMINAL = settings.DATATYPE_NOMINAL;
+        var DATATYPE_NUMERICAL = settings.DATATYPE_NUMERICAL;
+        var DATATYPE_ORDINAL = settings.DATATYPE_ORDINAL;
+        var DATATYPE_ERROR = settings.DATATYPE_ERROR;
 
         //initialize the instance with the null
         var instance = null;
