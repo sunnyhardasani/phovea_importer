@@ -2,9 +2,9 @@
 // JSON Output File to handle output from the class //
 //////////////////////////////////////////////////////
 
-define(["jquery", "d3","./dataWrangler", "./utility/localSettings"],
+define(["exports","jquery", "d3","./dataWrangler", "./utility/localSettings"],
 
-    function ($, d3, dataWrangler, settings) {
+    function (exports, $, d3, dataWrangler, settings) {
         /**
          * 1. Check if instance is null then throw error
          * 2. Calls the load ui related to this class
@@ -458,9 +458,7 @@ define(["jquery", "d3","./dataWrangler", "./utility/localSettings"],
             self.tempData = data;
         };
 
-        return {
-          create: function(parent) {
-            return new FileConfiguration(parent);
-          }
+        exports.create = function(parent) {
+          return new FileConfiguration(parent);
         };
     });

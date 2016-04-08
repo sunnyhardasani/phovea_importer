@@ -2,38 +2,16 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(['require', 'jquery', '../dataWrangler'], function (require, $, dataWrangler) {
+define(['exports', 'jquery', '../dataWrangler'], function (exports, $, dataWrangler) {
 
-  //instance of the class
-  var instance = null;
 
-  /**
-   * if class is reinitialized then throws an eror
-   * @constructor
-   */
-  function TopTableData() {
-    this.operations = [];
-  }
-
-  /**
-   * returns an instance of the class
-   * @returns {*}
-   */
-  TopTableData.getInstance = function () {
-    // summary: Gets an instance of the singleton. It is better to use
-    if (instance === null) {
-      instance = new TopTableData();
-    }
-    return instance;
-  };
-
+  var operations = [];
   /**
    * this function will called when new file
    * is loaded on the same session
    */
-  TopTableData.prototype.reload = function () {
-    var self = this;
-    self.init();
+  exports.reload = function () {
+    exports.init();
   };
 
   /**
@@ -42,22 +20,20 @@ define(['require', 'jquery', '../dataWrangler'], function (require, $, dataWrang
    * update the pagination, update table and
    * print charts
    */
-  TopTableData.prototype.init = function () {
+  exports.init = function () {
 
   };
 
-  TopTableData.prototype.insertNewOpr = function (row, _type, _obj) {
-    var self = this;
-
+  exports.insertNewOpr = function (row, _type, _obj) {
     //this will insert the new operation
     //type
-    self.operations[row] = {
+    operations[row] = {
       'type': _type,
       'obj': _obj
     };
 
     if (_type === 'ID') {
-      dataWrangler.changeRowType(self.operations);
+      dataWrangler.changeRowType(operations);
     } else if (_type === 'COPY_SETTINGS') {
       //now take the column selected array
       //and perform the copy settings operations
@@ -69,11 +45,7 @@ define(['require', 'jquery', '../dataWrangler'], function (require, $, dataWrang
     }
   };
 
-  TopTableData.prototype.getAllOperations = function () {
-    return this.operations;
+  exports.getAllOperations = function () {
+    return operations;
   };
-
-
-  return TopTableData.getInstance();
-
 });

@@ -2,47 +2,21 @@
  * Created by Sunny Hardasani on 13/10/2015
  */
 
-define(["jquery", "d3", "d3-tip",
+define(["exports", "jquery", "d3", "d3-tip",
         "jquery-resizable-columns", "./fileConfiguration",
         "./utility/localSettings", "./utility/modColorBrewer",
         "./top_table/topTableView","./left_table/leftTableView"],
-    function ($,d3, d3tip, jqueryResizableColumns, fileConfiguration,
+    function (exports, $,d3, d3tip, jqueryResizableColumns, fileConfiguration,
                settings, colorbrewer,topTableView,leftTableView) {
 
-        //instance of the class
-        var instance = null;
-
-        /**
-         * if class is reinitilized then throws an eror
-         * @constructor
-         */
-        function Table() {
-            var self = this;
-
-            if (instance !== null) {
-                throw new Error("Cannot instantiate more than one Table, use Table.getInstance()");
-            }
-            self.originalDataFlag = true;
-        }
-
-        /**
-         * returns an instance of the class
-         * @returns {*}
-         */
-        Table.getInstance = function () {
-            // summary: Gets an instance of the singleton. It is better to use
-            if (instance === null) {
-                instance = new Table();
-            }
-            return instance;
-        };
+      exports.originalDataFlag = true;
 
         /**
          * this function will called when new file
          * is loaded on the same session
          * @param _data
          */
-        Table.prototype.reload = function (root, _data, _parentInstance) {
+        exports.reload = function (root, _data, _parentInstance) {
             var self = this;
             self.root = root;
             self.$root = $(root);
@@ -74,7 +48,7 @@ define(["jquery", "d3", "d3-tip",
          * update the pagination, update table and
          * print charts
          */
-        Table.prototype.init = function () {
+        exports.init = function () {
             var self = this;
 
             //take the row count and col count
@@ -104,14 +78,14 @@ define(["jquery", "d3", "d3-tip",
          * required by the application
          * @returns {*}
          */
-        Table.prototype.getLoad = function () {
+        exports.getLoad = function () {
             return self.data;
         }
 
         /**
          *
          */
-        Table.prototype.updatePagination = function () {
+        exports.updatePagination = function () {
             var self = this;
 
             //total pages in the pagination;
@@ -192,7 +166,7 @@ define(["jquery", "d3", "d3-tip",
          * todo later if row count display multiple change is required
          * @param rowCount
          */
-        Table.prototype.changeRowCount = function (rowCount) {
+        exports.changeRowCount = function (rowCount) {
             var self = this;
             self.displayRowCount = rowCount;
         }
@@ -201,7 +175,7 @@ define(["jquery", "d3", "d3-tip",
          * page can be in the range from 1,2,...,n
          * @param page
          */
-        Table.prototype.paginate = function (page) {
+        exports.paginate = function (page) {
 
             var self = this;
 
@@ -240,7 +214,7 @@ define(["jquery", "d3", "d3-tip",
          * of the table i.e. white, after that
          * ID row and ID col with get highlighted
          */
-        Table.prototype.setDefaultTableColor = function(){
+        exports.setDefaultTableColor = function(){
             var self = this;
 
             //changing the default color of the table
@@ -262,7 +236,7 @@ define(["jquery", "d3", "d3-tip",
          * this function will create the data type box
          * @param colId
          */
-        Table.prototype.createDataTypeBox = function (colId) {
+        exports.createDataTypeBox = function (colId) {
             var self = this;
 
             self.$root.find('#datatype-pop-up input:radio').prop('checked', false);
@@ -293,7 +267,7 @@ define(["jquery", "d3", "d3-tip",
          * which appear on click of the bar graph
          * @param selectedScale
          */
-        Table.prototype.createColorBox = function (selectedScale) {
+        exports.createColorBox = function (selectedScale) {
             var self = this;
 
             //check which scale is selected and
@@ -330,7 +304,7 @@ define(["jquery", "d3", "d3-tip",
          * features
          * @param _col
          */
-        Table.prototype.printNominalGraph  = function(_col, _svgArea){
+        exports.printNominalGraph  = function(_col, _svgArea){
             var self = this;
 
             //set up the margins of the svg
@@ -501,7 +475,7 @@ define(["jquery", "d3", "d3-tip",
          * @param _col
          * @param _svgArea
          */
-        Table.prototype.printOrdinalGraph  = function(_col, _svgArea){
+        exports.printOrdinalGraph  = function(_col, _svgArea){
             var self = this;
 
             //set up the margins of the svg
@@ -719,7 +693,7 @@ define(["jquery", "d3", "d3-tip",
          * @param _col
          * @param _svgArea
          */
-        Table.prototype.printNumericalGraph = function(_col, _svgArea){
+        exports.printNumericalGraph = function(_col, _svgArea){
             var self = this;
 
             //take copy of the required parameter
@@ -925,7 +899,7 @@ define(["jquery", "d3", "d3-tip",
          * @param _col
          * @param _svgArea
          */
-        Table.prototype.printErrorGraph = function(_col,_svgArea){
+        exports.printErrorGraph = function(_col,_svgArea){
             var self = this;
 
             //intialize the local variable
@@ -1115,7 +1089,7 @@ define(["jquery", "d3", "d3-tip",
          * @param _col
          * @param _svgArea
          */
-        Table.prototype.printStringGraph  = function(_col, _svgArea){
+        exports.printStringGraph  = function(_col, _svgArea){
             var self = this;
 
             //set up the margins of the svg
@@ -1294,7 +1268,7 @@ define(["jquery", "d3", "d3-tip",
          * This function is responsible to print
          * all the types of chart.
          */
-        Table.prototype.printCharts = function () {
+        exports.printCharts = function () {
 
             var self = this;
 
@@ -1339,7 +1313,7 @@ define(["jquery", "d3", "d3-tip",
          * of the selected row identifier, this function
          * works independently with no extra inputs
          */
-        Table.prototype.highlightColType = function(){
+        exports.highlightColType = function(){
             var self = this;
 
             for (key in self.data) {
@@ -1363,7 +1337,7 @@ define(["jquery", "d3", "d3-tip",
          * of the selected row identifier, this function
          * works independently with no extra inputs
          */
-        Table.prototype.highlightIgnoreColumn = function(){
+        exports.highlightIgnoreColumn = function(){
             var self = this;
 
             for (key in self.data) {
@@ -1386,7 +1360,7 @@ define(["jquery", "d3", "d3-tip",
          * this function will highlight row identification type
          * on every initialization
          */
-        Table.prototype.highlightRowType = function(){
+        exports.highlightRowType = function(){
             var self = this;
 
             var arr = self.parentInstance.getRowTypeID();
@@ -1406,7 +1380,7 @@ define(["jquery", "d3", "d3-tip",
          * this function will highlight all the rows
          * which are give by the user to ignore
          */
-        Table.prototype.highlightIgnoreRows = function(){
+        exports.highlightIgnoreRows = function(){
             var self = this;
 
             var arr = self.parentInstance.getRowsToIgnore();
@@ -1429,7 +1403,7 @@ define(["jquery", "d3", "d3-tip",
          * this function will print the table headers and
          * also initialize printing of the chart
          */
-        Table.prototype.printTableHeaders = function () {
+        exports.printTableHeaders = function () {
             var self = this;
 
             var columns = [];
@@ -1580,7 +1554,7 @@ define(["jquery", "d3", "d3-tip",
          *
          * @param _columns
          */
-        Table.prototype.setCreationOpr = function(_columns){
+        exports.setCreationOpr = function(_columns){
             var self = this;
 
             var columns = _columns;
@@ -1591,7 +1565,7 @@ define(["jquery", "d3", "d3-tip",
          * of row identifier on the table
          * @param _columns
          */
-        Table.prototype.rowIDSelectionOpr = function(_columns){
+        exports.rowIDSelectionOpr = function(_columns){
             var self = this;
 
             var columns = _columns;
@@ -1702,7 +1676,7 @@ define(["jquery", "d3", "d3-tip",
          * for numerical data and add category for the
          * nominal data
          */
-        Table.prototype.addHelperButtons = function(columns){
+        exports.addHelperButtons = function(columns){
             var self = this;
 
             var thCell  = self.thead.append("tr")
@@ -1730,7 +1704,7 @@ define(["jquery", "d3", "d3-tip",
          * @param _head
          * @param _data
          */
-        Table.prototype.nominalOpr = function(_head,_data){
+        exports.nominalOpr = function(_head,_data){
             var self = this;
 
             //fetch the required data
@@ -1773,7 +1747,7 @@ define(["jquery", "d3", "d3-tip",
          * @param _head
          * @param _data
          */
-        Table.prototype.numericalOpr = function(_head,_data){
+        exports.numericalOpr = function(_head,_data){
             var self = this;
 
             //fetch the require variable
@@ -1848,7 +1822,7 @@ define(["jquery", "d3", "d3-tip",
          * and perform the some data wrangling to fetch the data
          * reqruied to display
          */
-        Table.prototype.fetchPageData = function (pageNum) {
+        exports.fetchPageData = function (pageNum) {
             var self = this;
 
             var rowIndex = 0;
@@ -1869,7 +1843,7 @@ define(["jquery", "d3", "d3-tip",
         /**
          * This will print the table and svg content on the webpage
          */
-        Table.prototype.updateTable = function () {
+        exports.updateTable = function () {
 
             var self = this;
             var tableData = self.data;
@@ -1955,7 +1929,7 @@ define(["jquery", "d3", "d3-tip",
          *
          * @param col - column number
          */
-        Table.prototype.mouseUpEventTriggered = function (col) {
+        exports.mouseUpEventTriggered = function (col) {
             var self = this;
 
             var selection;
@@ -1986,12 +1960,12 @@ define(["jquery", "d3", "d3-tip",
          * 1. Add handling when the new page gets loaded it changes
          * @param col
          */
-        Table.prototype.highlightColumn = function (col) {
+        exports.highlightColumn = function (col) {
             var self = this;
             var startIndexOfData = 2;
 
             //now make the regex for the selection operations
-            var x = document.getElementById('data-table').rows;
+            var x = self.root.getElementById('data-table').rows;
             for (var i = startIndexOfData; i < settings.DISPLAY_ROW_COUNT + startIndexOfData; i++) {
                 var y = x[i].cells;
                 y[col].innerHTML = y[col].textContent.replace(new RegExp('(' + self.regex + ')', 'gi'), '<span style="background-color:#c4e3f3">$1</span>');
@@ -2006,7 +1980,7 @@ define(["jquery", "d3", "d3-tip",
          * @param selection
          * @param col
          */
-        Table.prototype.guessRegex = function (selection, col) {
+        exports.guessRegex = function (selection, col) {
             var self = this;
 
             // currently setting the default regex
@@ -2017,7 +1991,7 @@ define(["jquery", "d3", "d3-tip",
          * This function will take the column id and hide the column
          * @param col
          */
-        Table.prototype.hideColumn = function (col) {
+        exports.hideColumn = function (col) {
 
             var self = this;
 
@@ -2033,7 +2007,7 @@ define(["jquery", "d3", "d3-tip",
          * data requried by the table
          * @returns {*}
          */
-        Table.prototype.getTableData = function () {
+        exports.getTableData = function () {
             var self = this;
 
             //returning the current data with
@@ -2047,12 +2021,9 @@ define(["jquery", "d3", "d3-tip",
          * to arrange the circle for selection
          * @returns {number|*}
          */
-        Table.prototype.getCurrentPage = function(){
+        exports.getCurrentPage = function(){
             var self = this;
 
             return self.currPage;
         }
-
-
-        return Table.getInstance();
     });

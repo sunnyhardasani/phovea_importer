@@ -2,37 +2,17 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(['jquery', '../dataWrangler'], function ($, dataWrangler) {
+define(['exports', 'jquery', '../dataWrangler'], function (exports, $, dataWrangler) {
 
-  //instance of the class
-  var instance = null;
+  var operations = [];
 
-  /**
-   * if class is reinitialized then throws an eror
-   * @constructor
-   */
-  function LeftTableData() {
-    this.operations = [];
-  }
-
-  /**
-   * returns an instance of the class
-   * @returns {*}
-   */
-  LeftTableData.getInstance = function () {
-    // summary: Gets an instance of the singleton. It is better to use
-    if (instance === null) {
-      instance = new LeftTableData();
-    }
-    return instance;
-  };
 
   /**
    * this function will called when new file
    * is loaded on the same session
    */
-  LeftTableData.prototype.reload = function () {
-    this.init();
+  exports.reload = function () {
+    exports.init();
   };
 
   /**
@@ -41,7 +21,7 @@ define(['jquery', '../dataWrangler'], function ($, dataWrangler) {
    * update the pagination, update table and
    * print charts
    */
-  LeftTableData.prototype.init = function () {
+  exports.init = function () {
   };
 
   /**
@@ -51,12 +31,10 @@ define(['jquery', '../dataWrangler'], function ($, dataWrangler) {
    * @param _type
    * @param _obj
    */
-  LeftTableData.prototype.insertNewOpr = function (row, _type, _obj) {
-    var self = this;
-
+  exports.insertNewOpr = function (row, _type, _obj) {
     //this will insert the new operation
     //type
-    self.operations[row] = {
+    operations[row] = {
       type: _type,
       obj: _obj
     };
@@ -66,9 +44,9 @@ define(['jquery', '../dataWrangler'], function ($, dataWrangler) {
       //and give to datawrangler to set
       //todo make similar changes in the topTableData
       var arr = [];
-      Object.keys(self.operations).forEach(function(key) {
-        var type = self.operations[key].type;
-        var obj = self.operations[key].obj;
+      Object.keys(operations).forEach(function(key) {
+        var type = operations[key].type;
+        var obj = operations[key].obj;
         if (type === 'ID') {
           for (var index = obj.topIndex; index < obj.bottomIndex; index++) {
             arr[index] = true;
@@ -81,9 +59,7 @@ define(['jquery', '../dataWrangler'], function ($, dataWrangler) {
     }
   };
 
-  LeftTableData.prototype.getAllOperations = function () {
-    return this.operations;
+  exports.getAllOperations = function () {
+    return operations;
   };
-
-  return LeftTableData.getInstance();
 });

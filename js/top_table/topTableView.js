@@ -2,26 +2,17 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(['jquery', 'd3', './topTableData', '../dataWrangler'],
-  function ($, d3, topTableData, dataWrangler) {
+define(['exports', 'jquery', 'd3', './topTableData'],
+  function (exports, $, d3, topTableData) {
 
-    //instance of the class
-    var instance = null;
-
-    /**
-     * if class is reinitialized then throws an eror
-     * @constructor
-     */
-    function TopTableView() {
-      this.oprCount = 0;
-    }
+    exports.oprCount = 0;
 
     /**
      * This will initialize the UI which
      * will be called once on the initialiaztion
      * of the application
      */
-    TopTableView.prototype.initUI = function (root) {
+    exports.initUI = function (root) {
       var self = this;
       self.$root = $(root);
 
@@ -75,22 +66,10 @@ define(['jquery', 'd3', './topTableData', '../dataWrangler'],
     };
 
     /**
-     * returns an instance of the class
-     * @returns {*}
-     */
-    TopTableView.getInstance = function () {
-      // summary: Gets an instance of the singleton. It is better to use
-      if (instance === null) {
-        instance = new TopTableView();
-      }
-      return instance;
-    };
-
-    /**
      * this function will called when new file
      * is loaded on the same session
      */
-    TopTableView.prototype.reload = function (root, _columns) {
+    exports.reload = function (root, _columns) {
       var self = this;
       topTableData.reload();
       self.columns = _columns;
@@ -104,7 +83,7 @@ define(['jquery', 'd3', './topTableData', '../dataWrangler'],
      * update the pagination, update table and
      * print charts
      */
-    TopTableView.prototype.init = function () {
+    exports.init = function () {
       var self = this;
 
       self.loadTopTable();
@@ -130,7 +109,7 @@ define(['jquery', 'd3', './topTableData', '../dataWrangler'],
      * the user interface for performing selection
      * operations on the table
      */
-    TopTableView.prototype.loadTopTable = function () {
+    exports.loadTopTable = function () {
       var self = this;
 
       var tableWidth = self.columns.length * 150;
@@ -151,7 +130,7 @@ define(['jquery', 'd3', './topTableData', '../dataWrangler'],
      * the user interface for performing selection
      * operations on the table
      */
-    TopTableView.prototype.addIDOperation = function (opr, startIndex, endIndex) {
+    exports.addIDOperation = function (opr, startIndex, endIndex) {
       var self = this;
 
       var columns = self.columns;
@@ -258,7 +237,7 @@ define(['jquery', 'd3', './topTableData', '../dataWrangler'],
      * This function will handle all the drag
      * and drop related operations of the table
      */
-    TopTableView.prototype.addDragNDropOperation = function (opr, arrColVisibleStatus, oprType) {
+    exports.addDragNDropOperation = function (opr, arrColVisibleStatus, oprType) {
       var self = this;
 
       var columns = self.columns;
@@ -397,9 +376,4 @@ define(['jquery', 'd3', './topTableData', '../dataWrangler'],
         }
       }
     };
-
-    //this will return the single instance
-    //of the singleton class
-    return TopTableView.getInstance();
-
   });

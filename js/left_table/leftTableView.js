@@ -2,26 +2,17 @@
  * Created by Sunny Hardasani on 12/31/2015.
  */
 
-define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
-  function ($, d3, leftTableData, dataWrangler) {
+define(['exports', 'jquery', 'd3', './leftTableData'],
+  function (exports, $, d3, leftTableData) {
 
-    //instance of the class
-    var instance = null;
-
-    /**
-     * if class is reinitialized then throws an eror
-     * @constructor
-     */
-    function LeftTableView() {
-      this.oprCount = 0;
-    }
+    exports.oprCount = 0;
 
     /**
      * This will initialize the UI which
      * will be called once on the initialiaztion
      * of the application
      */
-    LeftTableView.prototype.initUI = function (root) {
+    exports.initUI = function (root) {
       var self = this;
 
 
@@ -62,25 +53,13 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
       //leftTableData.insertNewOpr(self.oprCount,"ID",{topIndex:0,bottomIndex:1});
     };
 
-    /**
-     * returns an instance of the class
-     * @returns {*}
-     */
-    LeftTableView.getInstance = function () {
-      // summary: Gets an instance of the singleton. It is better to use
-      if (instance === null) {
-        instance = new LeftTableView();
-      }
-
-      return instance;
-    };
 
     /**
      * this function will called when new file
      * is loaded on the same session
      * @param _data
      */
-    LeftTableView.prototype.reload = function (root, _columns, _rowCount) {
+    exports.reload = function (root, _columns, _rowCount) {
       var self = this;
       //self.topTableData =  require("topTableData");
       leftTableData.reload();
@@ -99,7 +78,7 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
      * update the pagination, update table and
      * print charts
      */
-    LeftTableView.prototype.init = function () {
+    exports.init = function () {
       var self = this;
 
       self.loadTopTable();
@@ -110,7 +89,7 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
      * the user interface for performing selection
      * operations on the table
      */
-    LeftTableView.prototype.loadTopTable = function () {
+    exports.loadTopTable = function () {
       var self = this;
 
       var columnWidth = 150;
@@ -167,7 +146,7 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
      * the user interface for performing selection
      * operations on the table
      */
-    LeftTableView.prototype.addRowIDOperation = function (opr, svgCol, obj) {
+    exports.addRowIDOperation = function (opr, svgCol, obj) {
       var self = this;
 
       var columns = self.columns;
@@ -260,7 +239,7 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
      * This function will handle all the drag
      * and drop related operations of the table
      */
-    LeftTableView.prototype.addDragNDropOperation = function (opr, svgCol, obj) {
+    exports.addDragNDropOperation = function (opr, svgCol, obj) {
       var self = this;
 
       var arrVisibilityStatus = obj;
@@ -339,11 +318,5 @@ define(['jquery', 'd3', './leftTableData', '../dataWrangler'],
         })
 
     };
-
-
-    //this will return the single instance
-    //of the singleton class
-    return LeftTableView.getInstance();
-
   });
 

@@ -4,7 +4,7 @@
  * drop or through select file.
  */
 
-define(['jquery', './dataWrangler', './utility/localSettings'], function ($, dataWrangler, settings) {
+define(['exports', 'jquery', './dataWrangler', './utility/localSettings'], function (exports, $, dataWrangler, settings) {
     'use strict';
 
 
@@ -158,9 +158,7 @@ define(['jquery', './dataWrangler', './utility/localSettings'], function ($, dat
       e.target.className = (e.type == 'dragover' ? 'hover' : '');
     };
 
-    return {
-      create: function (parent) {
+    exports.create = function (parent) {
         return new FileUploader(parent);
-      }
     };
   });

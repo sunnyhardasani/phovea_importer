@@ -1,36 +1,9 @@
-define(["require","jquery", "./table", "d3",
+define(['exports', "jquery", "./table", "d3",
         "./utility/localSettings", "./utility/modColorBrewer"],
-    function (require, $, table, d3, settings, colorbrewer) {
+    function (exports, $, table, d3, settings, colorbrewer) {
 
-        //initialize the instance with the null
-        var instance = null;
 
-        /**
-         * this function will check instance is null then
-         * throw an error and register the required html
-         * elements
-         * @constructor
-         */
-        function DataWrangler() {
-            if (instance !== null) {
-                throw new Error("Cannot instantiate more than one DataWrangler, use DataWrangler.getInstance()");
-            }
-        }
-
-        /**
-         * this function will return the instance of
-         * the class
-         * @returns {*}
-         */
-        DataWrangler.getInstance = function () {
-            // summary: Gets an instance of the singleton. It is better to use
-            if (instance === null) {
-                instance = new DataWrangler();
-            }
-            return instance;
-        };
-
-        DataWrangler.prototype.$id = function(id) {
+        exports.$id = function(id) {
             return this.root.getElementById(id);
         };
 
@@ -40,7 +13,7 @@ define(["require","jquery", "./table", "d3",
          * @param file
          * @param _mainInstance
          */
-        DataWrangler.prototype.reload = function (root, data, file, _mainInstance) {
+        exports.reload = function (root, data, file, _mainInstance) {
 
             var self = this;
             self.root = root;
@@ -70,7 +43,7 @@ define(["require","jquery", "./table", "d3",
          * and display the file selected and gives and option
          * to use different types of separator on the file
          */
-        DataWrangler.prototype.init = function () {
+        exports.init = function () {
 
             var self = this;
 
@@ -84,7 +57,7 @@ define(["require","jquery", "./table", "d3",
          * this function will print the msg on the separator modal
          * @param msg
          */
-        DataWrangler.prototype.output = function (msg) {
+        exports.output = function (msg) {
             /*   var m = $id("fileDetails");
              m.innerHTML = msg + m.innerHTML;*/
         };
@@ -92,7 +65,7 @@ define(["require","jquery", "./table", "d3",
         /**
          * this function will clean  all the msg on the separator modal
          */
-        DataWrangler.prototype.clean = function () {
+        exports.clean = function () {
             var self = this;
 
             //todo make the solution for this one urgently !!!
@@ -103,7 +76,7 @@ define(["require","jquery", "./table", "d3",
         /**
          * todo: make another box to show how the demo view how the table will look like
          */
-        DataWrangler.prototype.registerSepEvents = function () {
+        exports.registerSepEvents = function () {
 
             var self = this;
 
@@ -163,7 +136,7 @@ define(["require","jquery", "./table", "d3",
         /**
          * this function will guess the separator from the input data
          */
-        DataWrangler.prototype.guessAndCheckDelimiter = function () {
+        exports.guessAndCheckDelimiter = function () {
             /**
              * take first line, look for comma first, if found then add comma to the list
              * also consider that comma should no tbe present in the double quotes
@@ -247,7 +220,7 @@ define(["require","jquery", "./table", "d3",
          * this function will change the global delimiter
          * with the change made on the ui
          */
-        DataWrangler.prototype.getDelimiterAndQuote = function () {
+        exports.getDelimiterAndQuote = function () {
 
             var self = this;
 
@@ -279,7 +252,7 @@ define(["require","jquery", "./table", "d3",
          * dsv delimiter are used which are checked on the
          * separator modal and also the
          */
-        DataWrangler.prototype.saveClicked = function (newCategoryData) {  //todo temporary solution for new data
+        exports.saveClicked = function (newCategoryData) {  //todo temporary solution for new data
 
             var self = this;
 
@@ -332,7 +305,7 @@ define(["require","jquery", "./table", "d3",
         /**
          * This function will slice the row id
          */
-        DataWrangler.prototype.sliceRowId = function () {
+        exports.sliceRowId = function () {
             var self = this;
 
             /**
@@ -354,7 +327,7 @@ define(["require","jquery", "./table", "d3",
         };
 
         //todo
-        DataWrangler.prototype.sliceColId = function () {
+        exports.sliceColId = function () {
             var self = this;
 
             /**
@@ -370,7 +343,7 @@ define(["require","jquery", "./table", "d3",
 
 
         //this will form each column data
-        DataWrangler.prototype.formColumn = function () {
+        exports.formColumn = function () {
 
             var self = this;
 
@@ -413,7 +386,7 @@ define(["require","jquery", "./table", "d3",
          * let the user the by inserting the data in the array column
          * todo need to optimize the below code for both space and time complexity
          */
-        DataWrangler.prototype.guessDataType = function () {
+        exports.guessDataType = function () {
 
             var self = this;
 
@@ -585,7 +558,7 @@ define(["require","jquery", "./table", "d3",
          * this will take the col id and the new data type change
          * required
          */
-        DataWrangler.prototype.changeDataType = function (colId, newDataType) {
+        exports.changeDataType = function (colId, newDataType) {
             var self = this;
 
             self.allColumnsDataArray[colId]["dataTypeObj"].type = newDataType;
@@ -604,7 +577,7 @@ define(["require","jquery", "./table", "d3",
          * @param colId
          * @param newColor
          */
-        DataWrangler.prototype.changeColColor = function (colId, newColor) {
+        exports.changeColColor = function (colId, newColor) {
             var self = this;
 
             if (self.allColumnsDataArray[colId].colorScheme !== newColor) {
@@ -627,7 +600,7 @@ define(["require","jquery", "./table", "d3",
          * This function will return the current data
          * on which all th operations are performing
          */
-        DataWrangler.prototype.getColumnData = function () {
+        exports.getColumnData = function () {
             var self = this;
 
             //this will return the current column data
@@ -638,7 +611,7 @@ define(["require","jquery", "./table", "d3",
          * This function is responsible adding the new category
          * in the nominal data
          */
-        DataWrangler.prototype.addNewCategoryInNominal = function () {
+        exports.addNewCategoryInNominal = function () {
             var self = this;
 
         };
@@ -649,7 +622,7 @@ define(["require","jquery", "./table", "d3",
          * @param colId
          * @param freqMap
          */
-        DataWrangler.prototype.setNewFreqMap = function (colId, freqMap) {
+        exports.setNewFreqMap = function (colId, freqMap) {
             var self = this;
 
             //set the new freq map
@@ -668,7 +641,7 @@ define(["require","jquery", "./table", "d3",
          * This will update numerical minimum and maximum
          * value
          */
-        DataWrangler.prototype.updateNumericalMinAndMax = function (_colId, _min, _max) {
+        exports.updateNumericalMinAndMax = function (_colId, _min, _max) {
             var self = this;
 
             var colId = _colId;
@@ -691,7 +664,7 @@ define(["require","jquery", "./table", "d3",
          * row identification type of the
          * table
          */
-        DataWrangler.prototype.changeRowType = function (_oprIdArr) {
+        exports.changeRowType = function (_oprIdArr) {
             var self = this;
 
             var oprIdArr = _oprIdArr;
@@ -728,7 +701,7 @@ define(["require","jquery", "./table", "d3",
 
         };
 
-        DataWrangler.prototype.addNewCategory = function (_colId, newCategoryElement) {
+        exports.addNewCategory = function (_colId, newCategoryElement) {
             var self = this;
 
             var colId = _colId;
@@ -765,7 +738,7 @@ define(["require","jquery", "./table", "d3",
          * parsing-csv-strings-with-javascript-exec-regular-exp
          * ression-command.htm
          */
-        DataWrangler.prototype.CSVToArray = function (strData, strDelimiter, strQuote) {
+        exports.CSVToArray = function (strData, strDelimiter, strQuote) {
             // Check to see if the delimiter is defined. If not,
             // then default to comma.
             strDelimiter = (strDelimiter || ",");
@@ -833,7 +806,7 @@ define(["require","jquery", "./table", "d3",
         /**
          * copy settings
          */
-        DataWrangler.prototype.copySettings = function (fromCol, arrSelectedCol) {
+        exports.copySettings = function (fromCol, arrSelectedCol) {
             var self = this;
 
             var copyColData = self.allColumnsDataArray[fromCol];
@@ -861,7 +834,7 @@ define(["require","jquery", "./table", "d3",
         /**
          * remove columns
          */
-        DataWrangler.prototype.removeColumn = function (arrSelectedCol) {
+        exports.removeColumn = function (arrSelectedCol) {
             var self = this;
 
             //this will all
@@ -885,7 +858,7 @@ define(["require","jquery", "./table", "d3",
          * this data will get returned by the
          * table request to highlight the rows
          */
-        DataWrangler.prototype.setRowTypeID = function (arr) {
+        exports.setRowTypeID = function (arr) {
             var self = this;
 
             //before setting new this will clear
@@ -902,7 +875,7 @@ define(["require","jquery", "./table", "d3",
         };
 
         //this will return the row type identification array
-        DataWrangler.prototype.getRowTypeID = function (arr) {
+        exports.getRowTypeID = function (arr) {
             var self = this;
 
             //before setting new this will clear
@@ -910,7 +883,7 @@ define(["require","jquery", "./table", "d3",
             return self.arrRowTypes;
         };
 
-        DataWrangler.prototype.setRowsToIgnore = function (arrIgnoreRows) {
+        exports.setRowsToIgnore = function (arrIgnoreRows) {
             var self = this;
 
             self.arrIgnoreRows = arrIgnoreRows;
@@ -930,12 +903,10 @@ define(["require","jquery", "./table", "d3",
 
         };
 
-        DataWrangler.prototype.getRowsToIgnore = function () {
+        exports.getRowsToIgnore = function () {
             var self = this;
 
             return self.arrIgnoreRows;
         };
-
-        return DataWrangler.getInstance();
     });
 
