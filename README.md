@@ -5,6 +5,9 @@ A data importer that takes a CSV file, let's users define the data types and pro
 
 Installation
 ------------
+
+[Set up a virtual machine using Vagrant](http://www.caleydo.org/documentation/vagrant/) and run these commands inside the virtual machine:
+
 ```bash
 ./manage.sh clone Caleydo/caleydo_importer
 ./manage.sh resolve
