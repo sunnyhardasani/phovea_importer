@@ -21,7 +21,9 @@ function editCategorical(old: ITypeDefinition): Promise<ITypeDefinition> {
     const dialog = dialogs.generateDialog('Edit Categories (name TAB color)', 'Save');
     dialog.body.classList.add('caleydo-importer-categorical');
     dialog.body.innerHTML = `
-      <textarea>${cats.map((cat) => cat.name + '\t' + cat.color).join('\n')}</textarea>
+      <form>
+        <textarea class="form-control">${cats.map((cat) => cat.name + '\t' + cat.color).join('\n')}</textarea>
+      </form>
     `;
     const textarea = dialog.body.querySelector('textarea');
     //http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea#6637396 enable tab character
@@ -46,6 +48,45 @@ function editCategorical(old: ITypeDefinition): Promise<ITypeDefinition> {
   });
 }
 
+function editNumerical(old: ITypeDefinition): Promise<ITypeDefinition> {
+  const type = (<any>old).type || 'real';
+  const range = (<any>old).range || [0, 100];
+
+  return new Promise((resolve) => {
+    const dialog = dialogs.generateDialog('Edit Numerical Range', 'Save');
+    dialog.body.classList.add('caleydo-importer-numerical');
+    dialog.body.innerHTML = `
+      <form>
+        <div class="checkbox">
+          <label class="radio-inline">
+            <input type="radio" name="numerical-type" value="real" ${type !== 'int'? 'checked="checked"' : ''}> Real
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="numerical-type" value="int" ${type === 'int'? 'checked="checked"' : ''}> Int
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="minRange">Minimum Value</label>
+          <input type="number" class="form-control" name="numerical-min" step="any" value="${range[0]}">
+        </div>
+        <div class="form-group">
+          <label for="maxRange">Maximum Value</label>
+          <input type="number" class="form-control" name="numerical-max" step="any" value="${range[1]}">
+        </div>
+      </form>
+    `;
+
+    dialog.onSubmit(() => {
+      const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=numerical-type]')).checked ? 'real' : 'int';
+      const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-min]')).value);
+      const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-max]')).value);
+      dialog.hide();
+      resolve({ type: type_s, range: [min_r, max_r] });
+    });
+    dialog.show();
+  });
+}
+
 export class Importer extends events.EventHandler {
   private options = {};
   private $parent: d3.Selection<any>;
@@ -57,7 +98,7 @@ export class Importer extends events.EventHandler {
 
     this.build(this.$parent);
 
-    editCategorical({ type: 'categorical'}).then((cats) => {
+    editNumerical({ type: 'categorical'}).then((cats) => {
       console.log(cats);
     })
   }
