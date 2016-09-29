@@ -9,12 +9,10 @@ import parser = require('./parser');
 import d3 = require('d3');
 
 export class Importer extends events.EventHandler {
-  private options = {
+  private options = {};
+  private $parent: d3.Selection<any>;
 
-  };
-  private $parent : d3.Selection<any>;
-
-  constructor(parent: Element, options : any = {}) {
+  constructor(parent: Element, options: any = {}) {
     super();
     C.mixin(this.options, options);
     this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
@@ -23,7 +21,7 @@ export class Importer extends events.EventHandler {
   }
 
   private selectedFile(file: File) {
-    parser.parseCSV(file).then((result) => {
+    parser.parseCSV(file, { header: true }).then((result) => {
       console.log(result);
     });
   }
@@ -36,7 +34,7 @@ export class Importer extends events.EventHandler {
     `);
 
     function over() {
-      const e =<DragEvent>d3.event;
+      const e = <DragEvent>d3.event;
       e.stopPropagation();
       e.preventDefault();
       const s = (<HTMLElement>e.target).classList;
@@ -49,9 +47,11 @@ export class Importer extends events.EventHandler {
 
     const select = ()=> {
       over();
-      const e : any =d3.event;
-      const files = e.target.files || e.dataTransfer.files;
+      const e: any = d3.event;
+      //either drop or file select
+      const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
       if (files.length > 0) {
+        //just the first file for now
         this.selectedFile(files[0]);
       }
     };
