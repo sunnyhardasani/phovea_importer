@@ -6,7 +6,45 @@
 import C = require('../caleydo_core/main');
 import events = require('../caleydo_core/event');
 import parser = require('./parser');
+import dialogs = require('../caleydo_bootstrap_fontawesome/dialogs');
 import d3 = require('d3');
+
+export interface ITypeDefinition {
+  type: string;
+  [key: string]: any;
+}
+
+function editCategorical(old: ITypeDefinition): Promise<ITypeDefinition> {
+  const cats = (<any>old).categories || [];
+
+  return new Promise((resolve) => {
+    const dialog = dialogs.generateDialog('Edit Categories (name TAB color)', 'Save');
+    dialog.body.classList.add('caleydo-importer-categorical');
+    dialog.body.innerHTML = `
+      <textarea>${cats.map((cat) => cat.name + '\t' + cat.color).join('\n')}</textarea>
+    `;
+    const textarea = dialog.body.querySelector('textarea');
+    //http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea#6637396 enable tab character
+    textarea.addEventListener('keydown', function(e: KeyboardEvent) {
+      if (e.keyCode == 9 || e.which == 9) {
+        e.preventDefault();
+        var s = this.selectionStart;
+        this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+        this.selectionEnd = s + 1;
+      }
+    });
+    dialog.onSubmit(() => {
+      const text = (<HTMLTextAreaElement>dialog.body.querySelector('textarea')).value;
+      const categories = text.trim().split('\n').map((row) => {
+        var l = row.trim().split('\t');
+        return {name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray' };
+      });
+      dialog.hide();
+      resolve({ type: 'categorical', categories: categories });
+    });
+    dialog.show();
+  });
+}
 
 export class Importer extends events.EventHandler {
   private options = {};
@@ -18,10 +56,14 @@ export class Importer extends events.EventHandler {
     this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
 
     this.build(this.$parent);
+
+    editCategorical({ type: 'categorical'}).then((cats) => {
+      console.log(cats);
+    })
   }
 
   private selectedFile(file: File) {
-    parser.parseCSV(file, { header: true }).then((result) => {
+    parser.parseCSV(file, {header: true}).then((result) => {
       console.log(result);
     });
   }
