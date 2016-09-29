@@ -14,21 +14,8 @@
   "caleydo": {
     "dependencies": {
       "web": {
-        "d3-tip": "~0.6.7",
-        "jquery-resizable-columns": "~0.2.3",
-        "store": "~2.3.2",
+        "papaparse": "~4.1.2",
         "d3": "~3.5.5"
-      }
-    },
-    "requirejs-config": {
-      "paths": {
-        "jquery-resizable-columns": "${baseUrl}/jquery-resizable-columns/dist/jquery.resizableColumns.min"
-      },
-      "shim": {
-        "jquery-resizable-columns": [
-          "jquery",
-          "css!${baseUrl}/jquery-resizable-columns/dist/jquery.resizableColumns.css"
-        ]
       }
     }
   },

@@ -1,12 +1,8 @@
 /**
- *
+ * Created by Samuel Gratzl on 29.09.2016.
  */
-
-//define the main module having 4 dependencies: d3 (external library), caleydo main, caleydo data, and a header template for a common styling
-define(['./main'], function (importer) {
-  'use strict';
-
-  importer.openDialog().then(function(json) {
-    console.log(json);
-  });
+define(["require", "exports"], function (require, exports) {
+    "use strict";
 });
+//TODO
+//# sourceMappingURL=app.js.map
