@@ -2,8 +2,9 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import dialogs = require('../caleydo_bootstrap_fontawesome/dialogs');
-import idtypes = require('../caleydo_core/idtype');
+import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
+import {list as listidtypes} from '../caleydo_core/idtype';
+import {mixin} from '../caleydo_core/main';
 
 export interface ITypeDefinition {
   type: string;
@@ -27,7 +28,7 @@ export function editCategorical(definition: ITypeDefinition) {
   const cats = (<any>definition).categories || [];
 
   return new Promise((resolve) => {
-    const dialog = dialogs.generateDialog('Edit Categories (name TAB color)', 'Save');
+    const dialog = generateDialog('Edit Categories (name TAB color)', 'Save');
     dialog.body.classList.add('caleydo-importer-categorical');
     dialog.body.innerHTML = `
       <form>
@@ -70,7 +71,10 @@ export function guessCategorical(def: ITypeDefinition, data: any[], accessor: (r
     const v = accessor(row);
     cache[v] = v;
   });
-  any_def.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat) => ({ name: cat, color: 'gray'}));
+  any_def.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat) => ({
+    name: cat,
+    color: 'gray'
+  }));
   return def;
 }
 
@@ -84,7 +88,7 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
   const range = (<any>definition).range || [0, 100];
 
   return new Promise((resolve) => {
-    const dialog = dialogs.generateDialog('Edit Numerical Range', 'Save');
+    const dialog = generateDialog('Edit Numerical Range', 'Save');
     dialog.body.classList.add('caleydo-importer-numerical');
     dialog.body.innerHTML = `
       <form>
@@ -140,6 +144,11 @@ export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row
   return def;
 }
 
+function isNumerical(v: string) {
+  //copied from regex from papaparse
+  return /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i.test(v);
+}
+
 /**
  * edits the given type definition in place with idtype properties
  * @param definition call by reference argument
@@ -147,11 +156,11 @@ export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row
  */
 export function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
   const idtype = (<any>definition).idtype || 'Custom';
-  const existing = idtypes.list();
+  const existing = listidtypes();
   const idtypes_list = existing.map((type) => `<option value="${type.id}" ${type.id === idtype ? 'selected="selected"' : ''}>${type.name}</option>`).join('\n');
 
   return new Promise((resolve) => {
-    const dialog = dialogs.generateDialog('Edit IDType', 'Save');
+    const dialog = generateDialog('Edit IDType', 'Save');
     dialog.body.classList.add('caleydo-importer-idtype');
     dialog.body.innerHTML = `
       <form>
@@ -190,11 +199,71 @@ export function guessIDType(def: ITypeDefinition, data: any[], accessor: (row: a
   if (typeof any_def.idType !== 'undefined') {
     return def;
   }
+  any_def.idtype = 'Custom';
   //TODO
   return def;
 }
 
-export function guessValueType(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+export interface IGuessOptions {
+  /**
+   * number of samples considered
+   */
+  sampleSize?: number; //100
+  /**
+   * threshold if more than X percent of the samples are numbers it will be detected as number
+   */
+  numberThreshold?: number; //0.7
+  /**
+   * threshold if less than X percent are unique categories in the samples it will be detected as categorical
+   */
+  categoricalThreshold?: number; //0.3
+}
+
+/**
+ * guesses the value type
+ * @param data the underlying data
+ * @param accessor accessor to the specific property
+ * @return {string}
+ */
+export function guessValueType(data: any[], accessor: (row: any) => string, options: IGuessOptions = {}) {
+  options = mixin({
+    sampleSize: 100,
+    numberThreshold: 0.7,
+    categoricalThreshold: 0.3
+  }, options);
+  const test_size = Math.min(options.sampleSize, data.length);
+
+  var numNumerical = 0;
+  const categories = {};
+  for (let i = 0; i < test_size; ++i) {
+    let v = accessor(data[i]);
+    if (v == null || v.trim().length === 0) {
+      continue; //skip empty samples
+    }
+    if (isNumerical(v)) {
+      numNumerical += 1;
+    }
+    categories[v] = v;
+  }
+
+  if (numNumerical >= test_size * options.numberThreshold) {
+    return 'real';
+  }
+  if (Object.keys(categories).length <= test_size * options.categoricalThreshold) {
+    return 'categorical';
+  }
+
+  return 'string';
+}
+
+/**
+ * guesses and extends the given type definition if needed
+ * @param def the existing definition
+ * @param data the underlying data
+ * @param accessor accessor to the specific property
+ * @return {any}
+ */
+export function guessValueTypeOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
   switch (def.type) {
     case 'idType':
       return guessIDType(def, data, accessor);
@@ -207,8 +276,12 @@ export function guessValueType(def: ITypeDefinition, data: any[], accessor: (row
   return def;
 }
 
-
-export function editValueType(def: ITypeDefinition) {
+/**
+ * edits the given type definition edits it in place
+ * @param def the existing definition
+ * @return {any}
+ */
+export function editValueType(def: ITypeDefinition): Promise<ITypeDefinition> {
   switch (def.type) {
     case 'idType':
       return editIDType(def);

@@ -3,11 +3,11 @@
  */
 
 /// <amd-dependency path='css!./style' />
-import C = require('../caleydo_core/main');
-import events = require('../caleydo_core/event');
-import parser = require('./parser');
+import {mixin} from '../caleydo_core/main';
+import {EventHandler} from '../caleydo_core/event';
+import {parseCSV} from './parser';
 import d3 = require('d3');
-import {guessValueType, editValueType} from './valuetypes';
+import {guessValueType, guessValueTypeOptions, editValueType} from './valuetypes';
 
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
   function over() {
@@ -37,20 +37,20 @@ export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selecti
     $dropZone.on('dragover', over).on('dragleave', over).on('drop', select);
 }
 
-export class Importer extends events.EventHandler {
+export class Importer extends EventHandler {
   private options = {};
   private $parent: d3.Selection<any>;
 
   constructor(parent: Element, options: any = {}) {
     super();
-    C.mixin(this.options, options);
+    mixin(this.options, options);
     this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
 
     this.build(this.$parent);
   }
 
   private selectedFile(file: File) {
-    parser.parseCSV(file).then((result) => {
+    parseCSV(file).then((result) => {
       const data = result.data;
       const header = data.shift();
       this.configureData(this.$parent, header, data);
@@ -81,7 +81,7 @@ export class Importer extends events.EventHandler {
       
       <button class="btn-primary">Dump</button>
     `);
-    const config = header.map((name,i) => ({column: i, name: name, type: 'string'}));
+    const config = header.map((name,i) => ({column: i, name: name, type: guessValueType(data, (row)=>row[i]) }));
     const $rows = this.$parent.select('tbody').selectAll('tr').data(config);
     const types = ['string', 'real', 'int', 'categorical', 'idType'];
 
@@ -92,14 +92,14 @@ export class Importer extends events.EventHandler {
       </td>
       <td class="input-group">
         <select class='form-control'>
-          <option value="string" selected="selected">String</option>
-          <option value="real">Float</option>
-          <option value="int">Integer</option>
-          <option value="categorical">Categorical</option>
-          <option value="idType">ID Type</option>
+          <option value="string" ${d.type === 'string' ? 'selected="selected"': ''}>String</option>
+          <option value="real" ${d.type === 'real' ? 'selected="selected"': ''}>Float</option>
+          <option value="int" ${d.type === 'int' ? 'selected="selected"': ''}>Integer</option>
+          <option value="categorical" ${d.type === 'categorical' ? 'selected="selected"': ''}>Categorical</option>
+          <option value="idType" ${d.type === 'idType' ? 'selected="selected"': ''}>ID Type</option>
         </select>
         <span class="input-group-btn">
-          <button class="btn-default btn-sm disabled" disabled="disabled" type="button"><i class="glyphicon glyphicon-cog"></i></button>
+          <button class="btn-default btn-sm${d.type === 'string' ? ' disabled" disabled="disabled': ''}" type="button"><i class="glyphicon glyphicon-cog"></i></button>
         </span>
       </td>`);
     $rows_enter.select('input').on('change', function(d) {
@@ -119,11 +119,9 @@ export class Importer extends events.EventHandler {
       const tr = this.parentElement.parentElement;
       tr.className = isIDType ? 'info' : '';
       (<HTMLInputElement>(tr.querySelector('input'))).disabled = isIDType;
-
-      //TODO infer numerical bounds and categories from dataset
     });
     $rows_enter.select('button').on('click', (d: any) => {
-      guessValueType(d, data, (row) => row[d.column]);
+      guessValueTypeOptions(d, data, (row) => row[d.column]);
       editValueType(d);
     });
 
@@ -131,7 +129,7 @@ export class Importer extends events.EventHandler {
     $root.select('button.btn-primary').on('click', () => {
       //derive all configs
       config.forEach((d) => {
-        guessValueType(d, data, (row) => row[d.column]);
+        guessValueTypeOptions(d, data, (row) => row[d.column]);
       });
       console.log(config);
     });
