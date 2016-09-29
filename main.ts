@@ -7,7 +7,7 @@ import {mixin} from '../caleydo_core/main';
 import {EventHandler} from '../caleydo_core/event';
 import {parseCSV} from './parser';
 import d3 = require('d3');
-import {guessValueType, guessValueTypeOptions, editValueType} from './valuetypes';
+import {guessValueType, guessValueTypeOptions, editValueType, ITypeDefinition} from './valuetypes';
 
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
   function over() {
@@ -37,9 +37,18 @@ export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selecti
     $dropZone.on('dragover', over).on('dragleave', over).on('drop', select);
 }
 
+export interface IColumnDefinition extends ITypeDefinition {
+  name: string;
+  column: string|number;
+}
+
+
 export class Importer extends EventHandler {
   private options = {};
   private $parent: d3.Selection<any>;
+
+  private data: any[] = null;
+  private config: IColumnDefinition[] = null;
 
   constructor(parent: Element, options: any = {}) {
     super();
@@ -53,6 +62,7 @@ export class Importer extends EventHandler {
     parseCSV(file).then((result) => {
       const data = result.data;
       const header = data.shift();
+      this.data = data;
       this.configureData(this.$parent, header, data);
     });
   }
@@ -78,10 +88,11 @@ export class Importer extends EventHandler {
                 
         </tbody>
       </table>
-      
-      <button class="btn-primary">Dump</button>
     `);
-    const config = header.map((name,i) => ({column: i, name: name, type: guessValueType(data, (row)=>row[i]) }));
+
+    const config = this.config = header.map((name,i) => ({column: i, name: name, type: guessValueType(data, (row)=>row[i]) }));
+
+
     const $rows = this.$parent.select('tbody').selectAll('tr').data(config);
     const types = ['string', 'real', 'int', 'categorical', 'idType'];
 
@@ -124,15 +135,17 @@ export class Importer extends EventHandler {
       guessValueTypeOptions(d, data, (row) => row[d.column]);
       editValueType(d);
     });
+  }
 
-
-    $root.select('button.btn-primary').on('click', () => {
-      //derive all configs
-      config.forEach((d) => {
-        guessValueTypeOptions(d, data, (row) => row[d.column]);
-      });
-      console.log(config);
+  getResult() {
+    //derive all configs
+    this.config.forEach((d) => {
+      guessValueTypeOptions(d, this.data, (row) => row[d.column]);
     });
+    return {
+      data: this.data,
+      meta: this.config
+    };
   }
 }
 

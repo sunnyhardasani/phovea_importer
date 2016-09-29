@@ -4,7 +4,19 @@
 
 import main = require('./main');
 
+import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
+
 //TODO
 
-main.create(document.querySelector('body'), {});
+const dialog = generateDialog('Import', 'Import');
+
+const importer = main.create(dialog.body, {});
+
+dialog.onSubmit(() => {
+  dialog.hide();
+  const r = importer.getResult();
+  console.log(r);
+});
+
+dialog.show();
 
