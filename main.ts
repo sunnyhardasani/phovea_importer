@@ -127,7 +127,12 @@ export class Importer extends events.EventHandler {
       editValueType(d);
     });
 
+
     $root.select('button.btn-primary').on('click', () => {
+      //derive all configs
+      config.forEach((d) => {
+        guessValueType(d, data, (row) => row[d.column]);
+      });
       console.log(config);
     });
   }
