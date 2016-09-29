@@ -3,14 +3,20 @@
  */
 
 import dialogs = require('../caleydo_bootstrap_fontawesome/dialogs');
+import idtypes = require('../caleydo_core/idtype');
 
 export interface ITypeDefinition {
   type: string;
   [key: string]: any;
 }
 
-export function editCategorical(old: ITypeDefinition): Promise<ITypeDefinition> {
-  const cats = (<any>old).categories || [];
+/**
+ * edits the given type definition in place with categories
+ * @param definition call by reference argument
+ * @return {Promise<R>|Promise}
+ */
+export function editCategorical(definition: ITypeDefinition) {
+  const cats = (<any>definition).categories || [];
 
   return new Promise((resolve) => {
     const dialog = dialogs.generateDialog('Edit Categories (name TAB color)', 'Save');
@@ -37,15 +43,22 @@ export function editCategorical(old: ITypeDefinition): Promise<ITypeDefinition> 
         return {name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray' };
       });
       dialog.hide();
-      resolve({ type: 'categorical', categories: categories });
+      definition.type = 'categorical';
+      (<any>definition).categories = categories;
+      resolve(definition);
     });
     dialog.show();
   });
 }
 
-export function editNumerical(old: ITypeDefinition): Promise<ITypeDefinition> {
-  const type = (<any>old).type || 'real';
-  const range = (<any>old).range || [0, 100];
+/**
+ * edits the given type definition in place with numerical properties
+ * @param definition call by reference argument
+ * @return {Promise<R>|Promise}
+ */
+export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinition> {
+  const type = (<any>definition).type || 'real';
+  const range = (<any>definition).range || [0, 100];
 
   return new Promise((resolve) => {
     const dialog = dialogs.generateDialog('Edit Numerical Range', 'Save');
@@ -76,7 +89,50 @@ export function editNumerical(old: ITypeDefinition): Promise<ITypeDefinition> {
       const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-min]')).value);
       const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-max]')).value);
       dialog.hide();
-      resolve({ type: type_s, range: [min_r, max_r] });
+      definition.type = type_s;
+      (<any>definition).range = [min_r, max_r];
+      resolve(definition);
+    });
+    dialog.show();
+  });
+}
+
+
+/**
+ * edits the given type definition in place with idtype properties
+ * @param definition call by reference argument
+ * @return {Promise<R>|Promise}
+ */
+export function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
+  const idtype = (<any>definition).idtype || null;
+  const existing = idtypes.list();
+  const idtypes_list = existing.map((type) => `<option value="${type.id}" ${type.id === idtype ? 'selected="selected"' : ''}>${type.name}</option>`).join('\n');
+
+  return new Promise((resolve) => {
+    const dialog = dialogs.generateDialog('Edit IDType', 'Save');
+    dialog.body.classList.add('caleydo-importer-idtype');
+    dialog.body.innerHTML = `
+      <form>
+        <div class="form-group">
+          <label for="idType">IDType</label>
+          <select id="idType" class="form-control">
+            ${idtypes_list} 
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="idType_new">New IDType</label>
+          <input type="text" class="form-control" id="idType_new">
+        </div>
+      </form>
+    `;
+
+    dialog.onSubmit(() => {
+      const selectedIndex = (<HTMLSelectElement>dialog.body.querySelector('select')).selectedIndex;
+      const idType = selectedIndex < 0 ? (<HTMLInputElement>dialog.body.querySelector('input')).value : idtype[selectedIndex].id;
+      dialog.hide();
+      definition.type = 'idType';
+      (<any>definition).idType = idType;
+      resolve(definition);
     });
     dialog.show();
   });

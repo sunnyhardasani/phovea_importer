@@ -7,7 +7,7 @@ import C = require('../caleydo_core/main');
 import events = require('../caleydo_core/event');
 import parser = require('./parser');
 import d3 = require('d3');
-import {editNumerical} from './valuetypes';
+import {editIDType} from './valuetypes';
 
 export class Importer extends events.EventHandler {
   private options = {};
@@ -20,7 +20,7 @@ export class Importer extends events.EventHandler {
 
     this.build(this.$parent);
 
-    editNumerical({ type: 'categorical'}).then((cats) => {
+    editIDType({type: 'categorical'}).then((cats) => {
       console.log(cats);
     })
   }
