@@ -37,10 +37,10 @@ export function editCategorical(definition: ITypeDefinition) {
     const textarea = dialog.body.querySelector('textarea');
     //http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea#6637396 enable tab character
     textarea.addEventListener('keydown', function (e: KeyboardEvent) {
-      if (e.keyCode == 9 || e.which == 9) {
+      if (e.keyCode === 9 || e.which === 9) {
         e.preventDefault();
         var s = this.selectionStart;
-        this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+        this.value = this.value.substring(0, this.selectionStart) + '\t' + this.value.substring(this.selectionEnd);
         this.selectionEnd = s + 1;
       }
     });

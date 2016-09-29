@@ -6,5 +6,5 @@ import main = require('./main');
 
 //TODO
 
-const importer = main.create(document.querySelector('body'), {});
+main.create(document.querySelector('body'), {});
 
