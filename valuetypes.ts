@@ -10,6 +10,14 @@ export interface ITypeDefinition {
   [key: string]: any;
 }
 
+function submitOnForm(dialog: any, onSubmit: ()=>any) {
+  dialog.body.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    onSubmit();
+  });
+  dialog.onSubmit(onSubmit);
+}
+
 /**
  * edits the given type definition in place with categories
  * @param definition call by reference argument
@@ -28,7 +36,7 @@ export function editCategorical(definition: ITypeDefinition) {
     `;
     const textarea = dialog.body.querySelector('textarea');
     //http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea#6637396 enable tab character
-    textarea.addEventListener('keydown', function(e: KeyboardEvent) {
+    textarea.addEventListener('keydown', function (e: KeyboardEvent) {
       if (e.keyCode == 9 || e.which == 9) {
         e.preventDefault();
         var s = this.selectionStart;
@@ -36,11 +44,11 @@ export function editCategorical(definition: ITypeDefinition) {
         this.selectionEnd = s + 1;
       }
     });
-    dialog.onSubmit(() => {
+    submitOnForm(dialog, () => {
       const text = (<HTMLTextAreaElement>dialog.body.querySelector('textarea')).value;
       const categories = text.trim().split('\n').map((row) => {
         var l = row.trim().split('\t');
-        return {name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray' };
+        return {name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray'};
       });
       dialog.hide();
       definition.type = 'categorical';
@@ -49,6 +57,21 @@ export function editCategorical(definition: ITypeDefinition) {
     });
     dialog.show();
   });
+}
+
+export function guessCategorical(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+  const any_def: any = def;
+  if (typeof any_def.categories !== 'undefined') {
+    return def;
+  }
+  //unique values
+  var cache = {};
+  data.forEach((row) => {
+    const v = accessor(row);
+    cache[v] = v;
+  });
+  any_def.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat) => ({ name: cat, color: 'gray'}));
+  return def;
 }
 
 /**
@@ -67,10 +90,10 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
       <form>
         <div class="checkbox">
           <label class="radio-inline">
-            <input type="radio" name="numerical-type" value="real" ${type !== 'int'? 'checked="checked"' : ''}> Real
+            <input type="radio" name="numerical-type" value="real" ${type !== 'int' ? 'checked="checked"' : ''}> Float
           </label>
           <label class="radio-inline">
-            <input type="radio" name="numerical-type" value="int" ${type === 'int'? 'checked="checked"' : ''}> Int
+            <input type="radio" name="numerical-type" value="int" ${type === 'int' ? 'checked="checked"' : ''}> Integer
           </label>
         </div>
         <div class="form-group">
@@ -83,8 +106,7 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
         </div>
       </form>
     `;
-
-    dialog.onSubmit(() => {
+    submitOnForm(dialog, () => {
       const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=numerical-type]')).checked ? 'real' : 'int';
       const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-min]')).value);
       const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-max]')).value);
@@ -97,6 +119,26 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
   });
 }
 
+export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+  //TODO support different notations, comma vs point
+  const any_def: any = def;
+  if (typeof any_def.range !== 'undefined') {
+    return def;
+  }
+  var min_v = data.length === 0 ? 0 : parseFloat(accessor(data[0]));
+  var max_v = data.length === 0 ? 100 : parseFloat(accessor(data[0]));
+  data.forEach((row) => {
+    const v = parseFloat(accessor(row));
+    if (v < min_v) {
+      min_v = v;
+    }
+    if (v > max_v) {
+      max_v = v;
+    }
+  });
+  any_def.range = [min_v, max_v];
+  return def;
+}
 
 /**
  * edits the given type definition in place with idtype properties
@@ -104,7 +146,7 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
  * @return {Promise<R>|Promise}
  */
 export function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
-  const idtype = (<any>definition).idtype || null;
+  const idtype = (<any>definition).idtype || 'Custom';
   const existing = idtypes.list();
   const idtypes_list = existing.map((type) => `<option value="${type.id}" ${type.id === idtype ? 'selected="selected"' : ''}>${type.name}</option>`).join('\n');
 
@@ -116,19 +158,23 @@ export function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition
         <div class="form-group">
           <label for="idType">IDType</label>
           <select id="idType" class="form-control">
+            <option value=""></option>
             ${idtypes_list} 
           </select>
         </div>
         <div class="form-group">
           <label for="idType_new">New IDType</label>
-          <input type="text" class="form-control" id="idType_new">
+          <input type="text" class="form-control" id="idType_new" value="${existing.some((i) => i.id === idtype) ? '' : idtype}">
         </div>
       </form>
     `;
+    (<HTMLSelectElement>(dialog.body.querySelector('select'))).addEventListener('change', function (e) {
+      (<HTMLInputElement>(dialog.body.querySelector('input'))).disabled = this.selectedIndex !== 0;
+    });
 
-    dialog.onSubmit(() => {
+    submitOnForm(dialog, () => {
       const selectedIndex = (<HTMLSelectElement>dialog.body.querySelector('select')).selectedIndex;
-      const idType = selectedIndex < 0 ? (<HTMLInputElement>dialog.body.querySelector('input')).value : idtype[selectedIndex].id;
+      const idType = selectedIndex <= 0 ? (<HTMLInputElement>dialog.body.querySelector('input')).value : existing[selectedIndex - 1].id;
       dialog.hide();
       definition.type = 'idType';
       (<any>definition).idType = idType;
@@ -136,4 +182,41 @@ export function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition
     });
     dialog.show();
   });
+}
+
+
+export function guessIDType(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+  const any_def: any = def;
+  if (typeof any_def.idType !== 'undefined') {
+    return def;
+  }
+  //TODO
+  return def;
+}
+
+export function guessValueType(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+  switch (def.type) {
+    case 'idType':
+      return guessIDType(def, data, accessor);
+    case 'categorical':
+      return guessCategorical(def, data, accessor);
+    case 'int':
+    case 'real':
+      return guessNumerical(def, data, accessor);
+  }
+  return def;
+}
+
+
+export function editValueType(def: ITypeDefinition) {
+  switch (def.type) {
+    case 'idType':
+      return editIDType(def);
+    case 'categorical':
+      return editCategorical(def);
+    case 'int':
+    case 'real':
+      return editNumerical(def);
+  }
+  return Promise.resolve(def);
 }
