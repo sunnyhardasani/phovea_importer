@@ -27,9 +27,17 @@
           "type": "importer_value_type",
           "file": "valuetypes",
           "factory": "numerical",
-          "name": "Numerical",
-          "id": "numerical",
+          "name": "Float",
+          "id": "real",
           "priority": 10
+        },
+        {
+          "type": "importer_value_type",
+          "file": "valuetypes",
+          "factory": "numerical",
+          "name": "Integer",
+          "id": "int",
+          "priority": 20
         },
         {
           "type": "importer_value_type",
