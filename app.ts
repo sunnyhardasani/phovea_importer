@@ -13,9 +13,12 @@ const dialog = generateDialog('Import', 'Import');
 const importer = main.create(dialog.body, {});
 
 dialog.onSubmit(() => {
-  dialog.hide();
   const r = importer.getResult();
+  if (r == null) {
+    return;
+  }
 
+  dialog.hide();
   console.log(r);
 
   const table = wrapObjects(r.desc, r.data, (<any>r.desc).idcolumn);

@@ -60,7 +60,7 @@ function guessIDType(def: ITypeDefinition, data: any[], accessor: (row: any) => 
   return def;
 }
 
-function isIDType(data: any[], accessor: (row: any) => string, sampleSize: number) {
+function isIDType(name: string, data: any[], accessor: (row: any) => string, sampleSize: number) {
   //TODO
   return 0;
 }

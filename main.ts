@@ -60,7 +60,7 @@ function editTableValues(editors: ValueTypeEditor[], $root: d3.Selection<any>, h
     column: i,
     name: name,
     value: {
-      type: guessValueType(editors, data, (row)=>row[i])
+      type: guessValueType(editors, name, data, (row)=>row[i])
     }
   }));
 
