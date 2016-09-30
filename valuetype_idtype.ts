@@ -12,7 +12,7 @@ import {ITypeDefinition, IValueTypeEditor, submitOnForm} from './valuetypes';
  * @return {Promise<R>|Promise}
  */
 function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
-  const idtype = (<any>definition).idtype || 'Custom';
+  const idtype = (<any>definition).idType || 'Custom';
   const existing = listidtypes();
   const idtypes_list = existing.map((type) => `<option value="${type.id}" ${type.id === idtype ? 'selected="selected"' : ''}>${type.name}</option>`).join('\n');
 
@@ -55,7 +55,7 @@ function guessIDType(def: ITypeDefinition, data: any[], accessor: (row: any) => 
   if (typeof any_def.idType !== 'undefined') {
     return def;
   }
-  any_def.idtype = 'Custom';
+  any_def.idType = 'Custom';
   //TODO
   return def;
 }

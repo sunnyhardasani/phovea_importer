@@ -3,11 +3,12 @@
  */
 
 /// <amd-dependency path='css!./style' />
-import {mixin} from '../caleydo_core/main';
+import {mixin, fix_id} from '../caleydo_core/main';
 import {EventHandler} from '../caleydo_core/event';
 import {parseCSV} from './parser';
 import d3 = require('d3');
 import {createValueTypeEditors, ITypeDefinition, ValueTypeEditor, guessValueType} from './valuetypes';
+import {IDataDescription} from '../caleydo_core/datatype';
 
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
   function over() {
@@ -47,6 +48,7 @@ export class Importer extends EventHandler {
   private options = {};
   private $parent: d3.Selection<any>;
 
+  private name = null;
   private data: any[] = null;
   private config: IColumnDefinition[] = null;
 
@@ -59,6 +61,7 @@ export class Importer extends EventHandler {
   }
 
   private selectedFile(file: File) {
+    this.name = file.name;
     parseCSV(file).then((result) => {
       const data = result.data;
       const header = data.shift();
@@ -156,13 +159,33 @@ export class Importer extends EventHandler {
     this.config.forEach((d) => {
       (<any>d).editor.guessOptions(d, this.data, (row) => row[d.column]);
     });
-    return {
-      data: this.data,
-      meta: this.config.map((c) => {
-        var r : IColumnDefinition = mixin(<any>{}, c);
+
+    var idProperty = this.config.filter((d) => d.type === 'IDType')[0];
+    if (!idProperty) {
+      //create an artificial one
+      idProperty = { type: 'IDType', idType: 'Custom', name: 'IDType', column: '_index' };
+      this.data.forEach((d,i) => d._index = i);
+    }
+    const columns = this.config.filter((c) => c !== idProperty).map((c) => {
+      var r : IColumnDefinition = mixin(<any>{}, c);
         delete (<any>r).editor;
         return r;
-      })
+      });
+
+    const desc: IDataDescription = {
+      type: 'table',
+      id: fix_id(this.name),
+      name: this.name,
+      fqname: 'upload/'+this.name,
+      size: [this.data.length, columns.length],
+      idtype: (<any>idProperty).idType,
+      columns: columns
+    };
+
+    return {
+      data: this.data,
+      idName: <string>idProperty.column,
+      desc: desc
     };
   }
 }
