@@ -9,9 +9,42 @@
   },
   "peerDependencies": {
     "caleydo_core": "*",
-    "caleydo_bootstrap_fontawesome": "*"
+    "caleydo_bootstrap_fontawesome": "*",
+    "caleydo_d3": "*"
   },
   "caleydo": {
+    "plugins": {
+      "web": [
+        {
+          "type": "importer_value_type",
+          "file": "valuetypes",
+          "factory": "categorical",
+          "valuetype": "categorical",
+          "priority": 50
+        },
+        {
+          "type": "importer_value_type",
+          "file": "valuetypes",
+          "factory": "numerical",
+          "valuetype": "numerical",
+          "priority": 10
+        },
+        {
+          "type": "importer_value_type",
+          "file": "valuetypes",
+          "factory": "string_",
+          "valuetype": "string",
+          "priority": 100
+        },
+        {
+          "type": "importer_value_type",
+          "file": "valuetype_idtype",
+          "factory": "idtype",
+          "valuetype": "IDType",
+          "priority": 30
+        }
+      ]
+    },
     "dependencies": {
       "web": {
         "papaparse": "~4.1.2",

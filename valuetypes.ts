@@ -3,15 +3,42 @@
  */
 
 import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
-import {list as listidtypes} from '../caleydo_core/idtype';
-import {mixin} from '../caleydo_core/main';
+import {list as listPlugins, IPluginDesc} from '../caleydo_core/plugin';
 
 export interface ITypeDefinition {
   type: string;
   [key: string]: any;
 }
 
-function submitOnForm(dialog: any, onSubmit: ()=>any) {
+export interface IValueTypeEditor {
+  /**
+   * guesses whether the given data is of the given type, returns a confidence value
+   * @param data
+   * @param accessor
+   * @param sampleSize
+   * @return the confidence (0 ... not, 1 ... sure) that this is the right value type
+   */
+  isType(data: any[], accessor: (row: any) => string, sampleSize: number): number;
+  /**
+   * parses the given value and updates them inplace
+   * @return an array containing invalid indices
+   */
+  parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string): number[];
+  /**
+   * guesses the type definition options
+   * @param def
+   * @param data
+   * @param accessor
+   */
+  guessOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => string);
+  /**
+   * opens and editor to edit the options
+   * @param def
+   */
+  edit(def: ITypeDefinition);
+}
+
+export function submitOnForm(dialog: any, onSubmit: ()=>any) {
   dialog.body.querySelector('form').addEventListener('submit', function (e) {
     e.preventDefault();
     onSubmit();
@@ -19,12 +46,22 @@ function submitOnForm(dialog: any, onSubmit: ()=>any) {
   dialog.onSubmit(onSubmit);
 }
 
+//TODO normalized options: trim, toLowerCase, toUpperCase, Regex replacement
+export function string_() : IValueTypeEditor {
+  return {
+    isType: () => 1,
+    parse: () => [],
+    guessOptions: (d) => d,
+    edit: null
+  }
+}
+
 /**
  * edits the given type definition in place with categories
  * @param definition call by reference argument
  * @return {Promise<R>|Promise}
  */
-export function editCategorical(definition: ITypeDefinition) {
+function editCategorical(definition: ITypeDefinition) {
   const cats = (<any>definition).categories || [];
 
   return new Promise((resolve) => {
@@ -60,7 +97,7 @@ export function editCategorical(definition: ITypeDefinition) {
   });
 }
 
-export function guessCategorical(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+function guessCategorical(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
   const any_def: any = def;
   if (typeof any_def.categories !== 'undefined') {
     return def;
@@ -76,6 +113,48 @@ export function guessCategorical(def: ITypeDefinition, data: any[], accessor: (r
     color: 'gray'
   }));
   return def;
+}
+
+function isCategorical(data: any[], accessor: (row: any) => string, sampleSize: number) {
+  const test_size = Math.min(data.length, sampleSize);
+  if (test_size <= 0) {
+    return 0;
+  }
+  const categories = {};
+  for (let i = 0; i < test_size; ++i) {
+    let v = accessor(data[i]);
+    if (v == null || v.trim().length === 0) {
+      continue; //skip empty samples
+    }
+    categories[v] = v;
+  }
+
+  const num_cats = Object.keys(categories).length;
+  return 1-num_cats/test_size;
+}
+
+function parseCategorical(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
+  const categories = ((<any>def).categories ||[]).map((cat) => cat.name);
+  const invalid = [];
+  function isValidCategory(v: string) {
+    return categories.indexOf(v) >= 0;
+  }
+  data.forEach((d,i) => {
+    const v = accessor(d);
+    if (!isValidCategory(v)) {
+      invalid.push(i);
+    }
+  });
+  return invalid;
+}
+
+export function categorical() : IValueTypeEditor {
+  return {
+    isType: isCategorical,
+    parse: parseCategorical,
+    guessOptions: guessCategorical,
+    edit: editCategorical
+  }
 }
 
 /**
@@ -144,152 +223,67 @@ export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row
   return def;
 }
 
-function isNumerical(v: string) {
-  //copied from regex from papaparse
-  return /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i.test(v);
-}
-
-/**
- * edits the given type definition in place with idtype properties
- * @param definition call by reference argument
- * @return {Promise<R>|Promise}
- */
-export function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
-  const idtype = (<any>definition).idtype || 'Custom';
-  const existing = listidtypes();
-  const idtypes_list = existing.map((type) => `<option value="${type.id}" ${type.id === idtype ? 'selected="selected"' : ''}>${type.name}</option>`).join('\n');
-
-  return new Promise((resolve) => {
-    const dialog = generateDialog('Edit IDType', 'Save');
-    dialog.body.classList.add('caleydo-importer-idtype');
-    dialog.body.innerHTML = `
-      <form>
-        <div class="form-group">
-          <label for="idType">IDType</label>
-          <select id="idType" class="form-control">
-            <option value=""></option>
-            ${idtypes_list} 
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="idType_new">New IDType</label>
-          <input type="text" class="form-control" id="idType_new" value="${existing.some((i) => i.id === idtype) ? '' : idtype}">
-        </div>
-      </form>
-    `;
-    (<HTMLSelectElement>(dialog.body.querySelector('select'))).addEventListener('change', function (e) {
-      (<HTMLInputElement>(dialog.body.querySelector('input'))).disabled = this.selectedIndex !== 0;
-    });
-
-    submitOnForm(dialog, () => {
-      const selectedIndex = (<HTMLSelectElement>dialog.body.querySelector('select')).selectedIndex;
-      const idType = selectedIndex <= 0 ? (<HTMLInputElement>dialog.body.querySelector('input')).value : existing[selectedIndex - 1].id;
-      dialog.hide();
-      definition.type = 'idType';
-      (<any>definition).idType = idType;
-      resolve(definition);
-    });
-    dialog.show();
-  });
-}
-
-
-export function guessIDType(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
-  const any_def: any = def;
-  if (typeof any_def.idType !== 'undefined') {
-    return def;
+function isNumerical(data: any[], accessor: (row: any) => string, sampleSize: number) {
+  const test_size = Math.min(data.length, sampleSize);
+  if (test_size <= 0) {
+    return 0;
   }
-  any_def.idtype = 'Custom';
-  //TODO
-  return def;
-}
-
-export interface IGuessOptions {
-  /**
-   * number of samples considered
-   */
-  sampleSize?: number; //100
-  /**
-   * threshold if more than X percent of the samples are numbers it will be detected as number
-   */
-  numberThreshold?: number; //0.7
-  /**
-   * threshold if less than X percent are unique categories in the samples it will be detected as categorical
-   */
-  categoricalThreshold?: number; //0.3
-}
-
-/**
- * guesses the value type
- * @param data the underlying data
- * @param accessor accessor to the specific property
- * @return {string}
- */
-export function guessValueType(data: any[], accessor: (row: any) => string, options: IGuessOptions = {}) {
-  options = mixin({
-    sampleSize: 100,
-    numberThreshold: 0.7,
-    categoricalThreshold: 0.3
-  }, options);
-  const test_size = Math.min(options.sampleSize, data.length);
-
+  const isFloat = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
   var numNumerical = 0;
-  const categories = {};
+
   for (let i = 0; i < test_size; ++i) {
     let v = accessor(data[i]);
     if (v == null || v.trim().length === 0) {
       continue; //skip empty samples
     }
-    if (isNumerical(v)) {
+    if (isFloat.test(v)) {
       numNumerical += 1;
     }
-    categories[v] = v;
   }
+  return numNumerical / test_size;
+}
 
-  if (numNumerical >= test_size * options.numberThreshold) {
-    return 'real';
-  }
-  if (Object.keys(categories).length <= test_size * options.categoricalThreshold) {
-    return 'categorical';
-  }
+function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
+  const isInt = def.type === 'int';
+  const invalid = [];
+  const isFloat = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
+  data.forEach((d,i) => {
+    const v = accessor(d);
+    if (!isFloat.test(v)) {
+      invalid.push(i);
+    } else {
+      accessor(d, isInt ? parseInt(v) : parseFloat(v));
+    }
+  });
+  return invalid;
+}
 
-  return 'string';
+export function numerical() : IValueTypeEditor {
+  return {
+    isType: isNumerical,
+    parse: parseNumerical,
+    guessOptions: guessNumerical,
+    edit: editNumerical
+  }
+}
+
+export interface IValueTypeDesc extends IPluginDesc {
+  valuetype: string;
+  priority: number;
+}
+
+function toValueTypeDesc(v: any): IValueTypeDesc {
+  if (typeof v.priority === 'undefined') {
+    v.priority = 100;
+  }
+  return v;
 }
 
 /**
- * guesses and extends the given type definition if needed
- * @param def the existing definition
- * @param data the underlying data
- * @param accessor accessor to the specific property
+ * returns all known value type editors
  * @return {any}
  */
-export function guessValueTypeOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
-  switch (def.type) {
-    case 'idType':
-      return guessIDType(def, data, accessor);
-    case 'categorical':
-      return guessCategorical(def, data, accessor);
-    case 'int':
-    case 'real':
-      return guessNumerical(def, data, accessor);
-  }
-  return def;
+export function getValueTypesEditors() {
+  return listPlugins('importer_value_type').map(toValueTypeDesc);
 }
 
-/**
- * edits the given type definition edits it in place
- * @param def the existing definition
- * @return {any}
- */
-export function editValueType(def: ITypeDefinition): Promise<ITypeDefinition> {
-  switch (def.type) {
-    case 'idType':
-      return editIDType(def);
-    case 'categorical':
-      return editCategorical(def);
-    case 'int':
-    case 'real':
-      return editNumerical(def);
-  }
-  return Promise.resolve(def);
-}
