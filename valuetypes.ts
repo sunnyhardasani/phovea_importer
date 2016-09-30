@@ -353,7 +353,7 @@ export interface IGuessOptions {
   /**
    * threshold if more than X percent of the samples are numbers it will be detected as number
    * numerical - 0.7
-   * categorical - 0.3
+   * categorical - 0.7
    */
   thresholds?: { [type: string]: number };
 }
@@ -363,7 +363,7 @@ export function guessValueType(editors: ValueTypeEditor[], data: any[], accessor
     sampleSize: 100,
     thresholds: <any>{
       numerical: 0.7,
-      categorical: 0.3
+      categorical: 0.7
     }
   }, options);
   const test_size = Math.min(options.sampleSize, data.length);
