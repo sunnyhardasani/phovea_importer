@@ -3,7 +3,8 @@
  */
 
 import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
-import {list as listPlugins, IPluginDesc} from '../caleydo_core/plugin';
+import {list as listPlugins, IPluginDesc, load as loadPlugins, IPlugin, get as getPlugin} from '../caleydo_core/plugin';
+import {mixin} from '../caleydo_core/main';
 
 export interface ITypeDefinition {
   type: string;
@@ -23,14 +24,14 @@ export interface IValueTypeEditor {
    * parses the given value and updates them inplace
    * @return an array containing invalid indices
    */
-  parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string): number[];
+  parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => any): number[];
   /**
    * guesses the type definition options
    * @param def
    * @param data
    * @param accessor
    */
-  guessOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => string);
+  guessOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => any);
   /**
    * opens and editor to edit the options
    * @param def
@@ -269,6 +270,7 @@ export function numerical() : IValueTypeEditor {
 
 export interface IValueTypeDesc extends IPluginDesc {
   valuetype: string;
+  name: string;
   priority: number;
 }
 
@@ -276,14 +278,106 @@ function toValueTypeDesc(v: any): IValueTypeDesc {
   if (typeof v.priority === 'undefined') {
     v.priority = 100;
   }
+  if (typeof v.name === 'undefined') {
+    v.name = v.valuetype;
+  }
   return v;
 }
 
-/**
- * returns all known value type editors
- * @return {any}
- */
-export function getValueTypesEditors() {
-  return listPlugins('importer_value_type').map(toValueTypeDesc);
+
+export class ValueTypeEditor implements IValueTypeEditor {
+  private desc: any;
+  private impl : IValueTypeEditor;
+
+  constructor(impl: IPlugin) {
+    this.desc = impl.desc;
+    this.impl = impl.factory();
+  }
+
+  get hasEditor() {
+    return this.impl.edit != null;
+  }
+
+  get isImplicit() {
+    return this.desc.implicit === true;
+  }
+
+  get priority() {
+    return typeof this.desc.priority !== 'undefined' ? this.desc.priority : 100;
+  }
+
+  get name() {
+    return this.desc.name;
+  }
+
+  get id() {
+    return this.desc.id;
+  }
+
+  isType(data: any[], accessor: (row: any) => string, sampleSize: number) {
+    return this.impl.isType(data, accessor, sampleSize);
+  };
+
+  parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => any): number[] {
+    return this.impl.parse(def, data, accessor);
+  }
+
+  guessOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => any) {
+    return this.impl.guessOptions(def, data, accessor);
+  }
+
+  edit(def: ITypeDefinition) {
+    return this.impl.edit(def);
+  }
 }
 
+const EXTENSION_POINT = 'importer_value_type';
+
+export function createValueTypeEditor(id: string): Promise<ValueTypeEditor> {
+  const p = getPlugin(EXTENSION_POINT, id);
+  if (!p) {
+    return Promise.reject('not found: '+id);
+  }
+  return p.load().then((impl) => new ValueTypeEditor(impl));
+}
+
+export function createValueTypeEditors(): Promise<ValueTypeEditor[]> {
+  return loadPlugins(listPlugins(EXTENSION_POINT)).then((impls) => impls.map((i) => new ValueTypeEditor(i)));
+}
+
+export interface IGuessOptions {
+  /**
+   * number of samples considered
+   */
+  sampleSize?: number; //100
+  /**
+   * threshold if more than X percent of the samples are numbers it will be detected as number
+   * numerical - 0.7
+   * categorical - 0.3
+   */
+  thresholds?: { [type: string]: number };
+}
+
+export function guessValueType(editors: ValueTypeEditor[], data: any[], accessor: (row: any) => any, options : IGuessOptions = {}) {
+  options = mixin({
+    sampleSize: 100,
+    thresholds: <any>{
+      numerical: 0.7,
+      categorical: 0.3
+    }
+  }, options);
+  const test_size = Math.min(options.sampleSize, data.length);
+
+  //compute guess results
+  var results = editors.map((editor) => ({type: editor.id, editor: editor, confidence: editor.isType(data, accessor, test_size), priority: editor.priority}));
+  //filter all 0 confidence ones by its threshold
+  results = results.filter((r) => typeof options.thresholds[r.type] !== 'undefined' ? r.confidence >= options.thresholds[r.type] : r.confidence > 0);
+
+  if (results.length <= 0) {
+    return null;
+  }
+  //order by priority (less more important)
+  results = results.sort((a,b) => a.priority - b.priority);
+  //choose the first one
+  return results[0].type;
+}

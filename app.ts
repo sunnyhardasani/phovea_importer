@@ -5,6 +5,8 @@
 import main = require('./main');
 
 import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
+import {parseTable} from '../caleydo_d3/parser';
+
 
 //TODO
 
@@ -15,8 +17,11 @@ const importer = main.create(dialog.body, {});
 dialog.onSubmit(() => {
   dialog.hide();
   const r = importer.getResult();
+
   console.log(r);
+  //parseTable()
 });
+
 
 dialog.show();
 
