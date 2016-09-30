@@ -5,10 +5,8 @@
 import main = require('./main');
 
 import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
-import {parseTable} from '../caleydo_d3/parser';
-
-
-//TODO
+import {wrapObjects} from '../caleydo_core/table_impl';
+import {create, addIconVisChooser} from '../caleydo_core/multiform';
 
 const dialog = generateDialog('Import', 'Import');
 
@@ -19,7 +17,12 @@ dialog.onSubmit(() => {
   const r = importer.getResult();
 
   console.log(r);
-  //parseTable()
+
+  const table = wrapObjects(r.desc, r.data, (<any>r.desc).idcolumn);
+  console.log(table);
+
+  const form = create(table, document.querySelector('main'));
+  addIconVisChooser(document.querySelector('header'), form);
 });
 
 
