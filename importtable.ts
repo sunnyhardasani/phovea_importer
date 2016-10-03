@@ -87,7 +87,6 @@ function toTableDataDescription(config: IColumnDefinition[], data: any[], name: 
   //derive all configs
   config.forEach((d) => {
     const editor = (<any>d).editor;
-    editor.guessOptions(d.value, data, (row) => row[d.column]);
     editor.parse(d.value, data, (row, value?) => {
       if (typeof value !== 'undefined') {
         return row[d.column] = value;
