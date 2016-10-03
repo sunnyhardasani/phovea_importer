@@ -2,9 +2,8 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
 import {list as listidtypes} from '../caleydo_core/idtype';
-import {ITypeDefinition, IValueTypeEditor, submitOnForm} from './valuetypes';
+import {ITypeDefinition, IValueTypeEditor, createDialog} from './valuetypes';
 
 /**
  * edits the given type definition in place with idtype properties
@@ -17,11 +16,16 @@ function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
   const idtypes_list = existing.map((type) => `<option value="${type.id}" ${type.id === idtype ? 'selected="selected"' : ''}>${type.name}</option>`).join('\n');
 
   return new Promise((resolve) => {
-    const dialog = generateDialog('Edit IDType', 'Save');
-    dialog.body.classList.add('caleydo-importer-idtype');
+    const dialog = createDialog('Edit IDType', 'idtype', () => {
+      const selectedIndex = (<HTMLSelectElement>dialog.body.querySelector('select')).selectedIndex;
+      const idType = selectedIndex <= 0 ? (<HTMLInputElement>dialog.body.querySelector('input')).value : existing[selectedIndex - 1].id;
+      dialog.hide();
+      definition.type = 'idType';
+      (<any>definition).idType = idType;
+      resolve(definition);
+    });
     dialog.body.innerHTML = `
-      <form>
-        <div class="form-group">
+       <div class="form-group">
           <label for="idType">IDType</label>
           <select id="idType" class="form-control">
             <option value=""></option>
@@ -32,20 +36,11 @@ function editIDType(definition: ITypeDefinition): Promise<ITypeDefinition> {
           <label for="idType_new">New IDType</label>
           <input type="text" class="form-control" id="idType_new" value="${existing.some((i) => i.id === idtype) ? '' : idtype}">
         </div>
-      </form>
     `;
     (<HTMLSelectElement>(dialog.body.querySelector('select'))).addEventListener('change', function (e) {
       (<HTMLInputElement>(dialog.body.querySelector('input'))).disabled = this.selectedIndex !== 0;
     });
 
-    submitOnForm(dialog, () => {
-      const selectedIndex = (<HTMLSelectElement>dialog.body.querySelector('select')).selectedIndex;
-      const idType = selectedIndex <= 0 ? (<HTMLInputElement>dialog.body.querySelector('input')).value : existing[selectedIndex - 1].id;
-      dialog.hide();
-      definition.type = 'idType';
-      (<any>definition).idType = idType;
-      resolve(definition);
-    });
     dialog.show();
   });
 }
@@ -70,7 +65,7 @@ function parseIDType(def: ITypeDefinition, data: any[], accessor: (row: any, val
   return [];
 }
 
-export function idType() : IValueTypeEditor {
+export function idType(): IValueTypeEditor {
   return {
     isType: isIDType,
     parse: parseIDType,

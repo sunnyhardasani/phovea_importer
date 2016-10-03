@@ -3,7 +3,7 @@
  */
 
 import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
-import {list as listPlugins, IPluginDesc, load as loadPlugins, IPlugin, get as getPlugin} from '../caleydo_core/plugin';
+import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} from '../caleydo_core/plugin';
 import {mixin} from '../caleydo_core/main';
 
 export interface ITypeDefinition {
@@ -40,12 +40,18 @@ export interface IValueTypeEditor {
   edit(def: ITypeDefinition);
 }
 
-export function submitOnForm(dialog: any, onSubmit: ()=>any) {
-  dialog.body.querySelector('form').addEventListener('submit', function (e) {
+export function createDialog(title: string, classSuffix: string, onSubmit: ()=>any) {
+  const dialog = generateDialog(title, 'Save');
+  dialog.body.classList.add('caleydo-importer-'+classSuffix);
+  const form = document.createElement('form');
+  dialog.body.appendChild(form);
+  dialog.body = form;
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
     onSubmit();
   });
   dialog.onSubmit(onSubmit);
+  return dialog;
 }
 
 /**
@@ -60,10 +66,16 @@ function editString(definition: ITypeDefinition) {
   const regexTo = def.regexTo || null;
 
   return new Promise((resolve) => {
-    const dialog = generateDialog('Edit String Conversion', 'Save');
-    dialog.body.classList.add('caleydo-importer-string');
+    const dialog = createDialog('Edit String Conversion', 'string', () => {
+      dialog.hide();
+      definition.type = 'string';
+      def.convert = findSelectedRadio();
+      def.regexFrom = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexFrom"]'))).value : null;
+      def.regexTo = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexTo"]'))).value : null;
+
+      resolve(definition);
+    });
     dialog.body.innerHTML = `
-      <form>
         <div class="form-group">
           <label>Text Conversion</label>
           
@@ -96,7 +108,6 @@ function editString(definition: ITypeDefinition) {
             <label for="regexTo">Regex Replacement Expression</label>
             <input type="text" class="form-control"  ${convert !== 'regex' ? 'disabled="disabled"' : ''} name="regexTo" value="${regexTo || ''}">
           </div>
-      </form>
     `;
     const choices = ([].slice.apply(dialog.body.querySelectorAll('input[type="radio"]')));
     choices.forEach((e) => e.addEventListener('change', function() {
@@ -108,16 +119,6 @@ function editString(definition: ITypeDefinition) {
       const first = choices.filter((e) => e.checked)[0];
       return first ? first.value : '';
     }
-
-    submitOnForm(dialog, () => {
-      dialog.hide();
-      definition.type = 'string';
-      def.convert = findSelectedRadio();
-      def.regexFrom = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexFrom"]'))).value : null;
-      def.regexTo = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexTo"]'))).value : null;
-
-      resolve(definition);
-    });
     dialog.show();
   });
 }
@@ -175,12 +176,20 @@ function editCategorical(definition: ITypeDefinition) {
   const cats = (<any>definition).categories || [];
 
   return new Promise((resolve) => {
-    const dialog = generateDialog('Edit Categories (name TAB color)', 'Save');
-    dialog.body.classList.add('caleydo-importer-categorical');
+    const dialog = createDialog('Edit Categories (name TAB color)', 'categorical', () => {
+      const text = (<HTMLTextAreaElement>dialog.body.querySelector('textarea')).value;
+      const categories = text.trim().split('\n').map((row) => {
+        var l = row.trim().split('\t');
+        return {name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray'};
+      });
+      dialog.hide();
+      definition.type = 'categorical';
+      (<any>definition).categories = categories;
+      resolve(definition);
+    });
+    dialog.body.classList.add('caleydo-importer-');
     dialog.body.innerHTML = `
-      <form>
         <textarea class="form-control">${cats.map((cat) => cat.name + '\t' + cat.color).join('\n')}</textarea>
-      </form>
     `;
     const textarea = dialog.body.querySelector('textarea');
     //http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea#6637396 enable tab character
@@ -191,17 +200,6 @@ function editCategorical(definition: ITypeDefinition) {
         this.value = this.value.substring(0, this.selectionStart) + '\t' + this.value.substring(this.selectionEnd);
         this.selectionEnd = s + 1;
       }
-    });
-    submitOnForm(dialog, () => {
-      const text = (<HTMLTextAreaElement>dialog.body.querySelector('textarea')).value;
-      const categories = text.trim().split('\n').map((row) => {
-        var l = row.trim().split('\t');
-        return {name: l[0].trim(), color: l.length > 1 ? l[1].trim() : 'gray'};
-      });
-      dialog.hide();
-      definition.type = 'categorical';
-      (<any>definition).categories = categories;
-      resolve(definition);
     });
     dialog.show();
   });
@@ -277,10 +275,16 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
   const range = (<any>definition).range || [0, 100];
 
   return new Promise((resolve) => {
-    const dialog = generateDialog('Edit Numerical Range', 'Save');
-    dialog.body.classList.add('caleydo-importer-numerical');
+    const dialog = createDialog('Edit Numerical Range', 'numerical', () => {
+      const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=numerical-type]')).checked ? 'real' : 'int';
+      const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-min]')).value);
+      const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-max]')).value);
+      dialog.hide();
+      definition.type = type_s;
+      (<any>definition).range = [min_r, max_r];
+      resolve(definition);
+    });
     dialog.body.innerHTML = `
-      <form>
         <div class="checkbox">
           <label class="radio-inline">
             <input type="radio" name="numerical-type" value="real" ${type !== 'int' ? 'checked="checked"' : ''}> Float
@@ -297,17 +301,7 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
           <label for="maxRange">Maximum Value</label>
           <input type="number" class="form-control" name="numerical-max" step="any" value="${range[1]}">
         </div>
-      </form>
     `;
-    submitOnForm(dialog, () => {
-      const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=numerical-type]')).checked ? 'real' : 'int';
-      const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-min]')).value);
-      const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-max]')).value);
-      dialog.hide();
-      definition.type = type_s;
-      (<any>definition).range = [min_r, max_r];
-      resolve(definition);
-    });
     dialog.show();
   });
 }
@@ -377,23 +371,6 @@ export function numerical() : IValueTypeEditor {
   }
 }
 
-export interface IValueTypeDesc extends IPluginDesc {
-  valuetype: string;
-  name: string;
-  priority: number;
-}
-
-function toValueTypeDesc(v: any): IValueTypeDesc {
-  if (typeof v.priority === 'undefined') {
-    v.priority = 100;
-  }
-  if (typeof v.name === 'undefined') {
-    v.name = v.valuetype;
-  }
-  return v;
-}
-
-
 export class ValueTypeEditor implements IValueTypeEditor {
   private desc: any;
   private impl : IValueTypeEditor;
@@ -428,6 +405,7 @@ export class ValueTypeEditor implements IValueTypeEditor {
   };
 
   parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => any): number[] {
+    this.impl.guessOptions(def, data, accessor);
     return this.impl.parse(def, data, accessor);
   }
 
@@ -451,7 +429,7 @@ export function createValueTypeEditor(id: string): Promise<ValueTypeEditor> {
 }
 
 export function createValueTypeEditors(): Promise<ValueTypeEditor[]> {
-  return loadPlugins(listPlugins(EXTENSION_POINT)).then((impls) => impls.map((i) => new ValueTypeEditor(i)));
+  return loadPlugins(listPlugins(EXTENSION_POINT).sort((a,b) => a.name.localeCompare(b.name))).then((impls) => impls.map((i) => new ValueTypeEditor(i)));
 }
 
 export interface IGuessOptions {
