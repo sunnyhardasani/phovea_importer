@@ -6,6 +6,9 @@ import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
 import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} from '../caleydo_core/plugin';
 import {mixin} from '../caleydo_core/main';
 
+//https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
+const categoryColors = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']
+
 export interface ITypeDefinition {
   type: string;
   [key: string]: any;
@@ -217,9 +220,9 @@ function guessCategorical(def: ITypeDefinition, data: any[], accessor: (row: any
     const v = accessor(row);
     cache[v] = v;
   });
-  any_def.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat) => ({
+  any_def.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat,i) => ({
     name: cat,
-    color: 'gray'
+    color: categoryColors[i] || 'gray'
   }));
   return def;
 }
