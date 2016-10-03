@@ -48,13 +48,121 @@ export function submitOnForm(dialog: any, onSubmit: ()=>any) {
   dialog.onSubmit(onSubmit);
 }
 
-//TODO normalized options: trim, toLowerCase, toUpperCase, Regex replacement
+/**
+ * edits the given type definition in place with categories
+ * @param definition call by reference argument
+ * @return {Promise<R>|Promise}
+ */
+function editString(definition: ITypeDefinition) {
+  const def: any = definition;
+  const convert = def.convert || null;
+  const regexFrom = def.regexFrom || null;
+  const regexTo = def.regexTo || null;
+
+  return new Promise((resolve) => {
+    const dialog = generateDialog('Edit String Conversion', 'Save');
+    dialog.body.classList.add('caleydo-importer-string');
+    dialog.body.innerHTML = `
+      <form>
+        <div class="form-group">
+          <label>Text Conversion</label>
+          
+          <div class="radio">
+            <label class="radio">
+              <input type="radio" name="string-convert" value="" ${!convert ? 'checked="checked"' : ''}> None
+            </label>
+           </div>
+          <div class="radio">
+            <label class="radio">
+              <input type="radio" name="string-convert" value="toUpperCase" ${convert ==='toUpperCase' ? 'checked="checked"' : ''}> UPPER CASE
+            </label>
+           </div>
+          <div class="radio">
+            <label class="radio">
+              <input type="radio" name="string-convert" value="toLowerCase" ${convert ==='toLowerCase' ? 'checked="checked"' : ''}> lower case
+            </label>
+           </div>
+          <div class="radio">
+            <label class="radio">
+              <input type="radio" name="string-convert" value="regex" ${convert ==='regex"' ? 'checked="checked"' : ''}> Regex Replacement
+            </label>
+           </div>
+          </div>
+          <div class="form-group">
+            <label for="regexFrom">Regex Search Expression</label>
+            <input type="text" class="form-control" ${convert !== 'regex' ? 'disabled="disabled"' : ''} name="regexFrom" value="${regexFrom || ''}">
+          </div>
+          <div class="form-group">
+            <label for="regexTo">Regex Replacement Expression</label>
+            <input type="text" class="form-control"  ${convert !== 'regex' ? 'disabled="disabled"' : ''} name="regexTo" value="${regexTo || ''}">
+          </div>
+      </form>
+    `;
+    const choices = ([].slice.apply(dialog.body.querySelectorAll('input[type="radio"]')));
+    choices.forEach((e) => e.addEventListener('change', function() {
+      const regexSelected = (this.checked && this.value === 'regex');
+      ([].slice.apply(dialog.body.querySelectorAll('input[type="text"]'))).forEach((e) => e.disabled = !regexSelected);
+    }));
+
+    function findSelectedRadio() {
+      const first = choices.filter((e) => e.checked)[0];
+      return first ? first.value : '';
+    }
+
+    submitOnForm(dialog, () => {
+      dialog.hide();
+      definition.type = 'string';
+      def.convert = findSelectedRadio();
+      def.regexFrom = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexFrom"]'))).value : null;
+      def.regexTo = def.convert === 'regex' ? (<HTMLInputElement>(dialog.body.querySelector('input[name="regexTo"]'))).value : null;
+
+      resolve(definition);
+    });
+    dialog.show();
+  });
+}
+
+function guessString(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+  const any_def: any = def;
+  if (typeof any_def.convert !== 'undefined') {
+    return def;
+  }
+  any_def.convert = null;
+  return def;
+}
+
+function parseString(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
+  const anydef : any = def;
+  const regexFrom = new RegExp(anydef.regexFrom);
+  const regexTo = anydef.regexTo;
+
+  const lookup = {
+    toLowerCase: (d:string)=>d.toLowerCase(),
+    toUpperCase: (d:string)=>d.toUpperCase(),
+    regex: (d:string)=>d.replace(regexFrom, regexTo)
+  };
+  const op = lookup[anydef.convert];
+
+  if (!op) {
+    return [];
+  }
+
+  const invalid = [];
+  data.forEach((d,i) => {
+    var v = String(accessor(d));
+    v = op(v);
+    accessor(d,v);
+  });
+  return invalid;
+}
+
+
 export function string_() : IValueTypeEditor {
   return {
-    isType: () => 1,
-    parse: () => [],
-    guessOptions: (d) => d,
-    edit: null
+    isType: () => 1, //always a string
+    parse: parseString,
+    guessOptions: (d) => guessString,
+    edit: editString
   }
 }
 
