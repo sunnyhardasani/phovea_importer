@@ -15,12 +15,13 @@ export interface IValueTypeEditor {
   /**
    * guesses whether the given data is of the given type, returns a confidence value
    * @param name name of the column
+   * @param index the index of the column
    * @param data
    * @param accessor
    * @param sampleSize
    * @return the confidence (0 ... not, 1 ... sure) that this is the right value type
    */
-  isType(name: string, data: any[], accessor: (row: any) => string, sampleSize: number): number;
+  isType(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number): number;
   /**
    * parses the given value and updates them inplace
    * @return an array containing invalid indices
@@ -223,7 +224,7 @@ function guessCategorical(def: ITypeDefinition, data: any[], accessor: (row: any
   return def;
 }
 
-function isCategorical(name: string, data: any[], accessor: (row: any) => string, sampleSize: number) {
+function isCategorical(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
   const test_size = Math.min(data.length, sampleSize);
   if (test_size <= 0) {
     return 0;
@@ -327,7 +328,7 @@ export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row
   return def;
 }
 
-function isNumerical(name: string, data: any[], accessor: (row: any) => string, sampleSize: number) {
+function isNumerical(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
   const test_size = Math.min(data.length, sampleSize);
   if (test_size <= 0) {
     return 0;
@@ -400,8 +401,8 @@ export class ValueTypeEditor implements IValueTypeEditor {
     return this.desc.id;
   }
 
-  isType(name: string, data: any[], accessor: (row: any) => string, sampleSize: number) {
-    return this.impl.isType(name, data, accessor, sampleSize);
+  isType(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
+    return this.impl.isType(name, index, data, accessor, sampleSize);
   };
 
   parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => any): number[] {
@@ -416,6 +417,17 @@ export class ValueTypeEditor implements IValueTypeEditor {
   edit(def: ITypeDefinition) {
     return this.impl.edit(def);
   }
+}
+
+export function createCustomValueTypeEditor(name: string, id: string, implicit: boolean, desc: IValueTypeEditor) {
+  return new ValueTypeEditor(<any>{
+    desc: {
+      name: name,
+      id: id,
+      implicit: implicit
+    },
+    factory: ()=>desc
+  });
 }
 
 const EXTENSION_POINT = 'importer_value_type';
@@ -449,12 +461,13 @@ export interface IGuessOptions {
  * guesses the value type returning a string
  * @param editors the possible types
  * @param name the name of the column/file for helper
+ * @param index the index of this column
  * @param data the data
  * @param accessor to access the column
  * @param options additional options
  * @return {any}
  */
-export function guessValueType(editors: ValueTypeEditor[], name: string, data: any[], accessor: (row: any) => any, options : IGuessOptions = {}) {
+export function guessValueType(editors: ValueTypeEditor[], name: string, index: number, data: any[], accessor: (row: any) => any, options : IGuessOptions = {}) {
   options = mixin({
     sampleSize: 100,
     thresholds: <any>{
@@ -465,7 +478,7 @@ export function guessValueType(editors: ValueTypeEditor[], name: string, data: a
   const test_size = Math.min(options.sampleSize, data.length);
 
   //compute guess results
-  var results = editors.map((editor) => ({type: editor.id, editor: editor, confidence: editor.isType(name, data, accessor, test_size), priority: editor.priority}));
+  var results = editors.map((editor) => ({type: editor.id, editor: editor, confidence: editor.isType(name, index, data, accessor, test_size), priority: editor.priority}));
   //filter all 0 confidence ones by its threshold
   results = results.filter((r) => typeof options.thresholds[r.type] !== 'undefined' ? r.confidence >= options.thresholds[r.type] : r.confidence > 0);
 

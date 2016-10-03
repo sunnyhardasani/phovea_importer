@@ -55,9 +55,9 @@ function guessIDType(def: ITypeDefinition, data: any[], accessor: (row: any) => 
   return def;
 }
 
-function isIDType(name: string, data: any[], accessor: (row: any) => string, sampleSize: number) {
-  //TODO
-  return 0;
+function isIDType(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
+  //TODO guess the first one is it most of the times
+  return index === 0 ? 0.5 : 0;
 }
 
 function parseIDType(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {

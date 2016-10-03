@@ -29,7 +29,7 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
     column: i,
     name: name,
     value: {
-      type: guessValueType(editors, name, data, (row)=>row[i])
+      type: guessValueType(editors, name, i, data, (row)=>row[i], i)
     }
   }));
 
