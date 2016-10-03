@@ -3,6 +3,8 @@ Caleydo Data Importer ![Caleydo Web Client Plugin](https://img.shields.io/badge/
 
 A data importer that takes a CSV file, let's users define the data types and properties, and hands it over for parsing.
 
+A [demonstration](http://playground.caleydo.org/caleydo_importer/) is available in the Caleydo Playground.
+
 Installation
 ------------
 
