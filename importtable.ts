@@ -33,6 +33,27 @@ function extractCommonFields($root: d3.Selection<any>) {
   };
 }
 
+function updateType(editors: ValueTypeEditor[]) {
+  return function (d) {
+    const type = editors[this.selectedIndex < 0 ? 0 : this.selectedIndex];
+    d.value.type = type ? type.id: '';
+    d.editor = type;
+    const configure = <HTMLButtonElement>this.parentElement.querySelector('button');
+
+    if (!type || !type.hasEditor) {
+      configure.classList.add('disabled');
+      configure.disabled = true;
+    } else {
+      configure.classList.remove('disabled');
+      configure.disabled = false;
+    }
+    const isIDType = !type || type.isImplicit;
+    const tr = this.parentElement.parentElement;
+    tr.className = isIDType ? 'info' : '';
+    (<HTMLInputElement>(tr.querySelector('input'))).disabled = isIDType;
+  }
+}
+
 export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string) {
   $root.html(`${commonFields(name)}
       <table class="table table-striped table-condensed">
@@ -68,6 +89,7 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
       </td>
       <td class="input-group">
         <select class='form-control'>
+          <option value=""></option>
           ${editors.map((editor) => `<option value="${editor.id}" ${d.value.type === editor.id ? 'selected="selected"' : ''}>${editor.name}</option>`).join('\n')}
         </select>
         <span class="input-group-btn">
@@ -77,7 +99,7 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
   $rows_enter.select('input').on('change', function (d) {
     d.name = this.value;
   });
-  $rows_enter.select('select').on('change', updateType(editors));
+  $rows_enter.select('select').on('change', updateType([null].concat(editors)));
   $rows_enter.select('button').on('click', (d) => {
     (<any>d).editor.guessOptions(d.value, data, (row) => row[d.column]);
     (<any>d).editor.edit(d.value);
@@ -89,6 +111,7 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
 
 function toTableDataDescription(config: IColumnDefinition[], data: any[], common: { name: string, description: string}) {
   //derive all configs
+  config = config.filter((c) => c.value.type != null);
   config.forEach((d) => {
     const editor = (<any>d).editor;
     editor.parse(d.value, data, (row, value?) => {
@@ -100,10 +123,10 @@ function toTableDataDescription(config: IColumnDefinition[], data: any[], common
   });
 
   //generate config
-  var idProperty = config.filter((d) => d.value.type === 'IDType')[0];
+  var idProperty = config.filter((d) => d.value.type === 'idType')[0];
   if (!idProperty) {
     //create an artificial one
-    idProperty = {value: {type: 'IDType', idType: 'Custom'}, name: 'IDType', column: '_index'};
+    idProperty = {value: {type: 'idType', idType: 'Custom'}, name: 'IDType', column: '_index'};
     data.forEach((d, i) => d._index = i);
   }
   const columns = config.filter((c) => c !== idProperty).map((c) => {
@@ -126,26 +149,6 @@ function toTableDataDescription(config: IColumnDefinition[], data: any[], common
   return desc;
 }
 
-function updateType(editors: ValueTypeEditor[]) {
-  return function (d) {
-    const type = editors[this.selectedIndex < 0 ? 0 : this.selectedIndex];
-    d.value.type = type.id;
-    d.editor = type;
-    const configure = <HTMLButtonElement>this.parentElement.querySelector('button');
-
-    if (!type.hasEditor) {
-      configure.classList.add('disabled');
-      configure.disabled = true;
-    } else {
-      configure.classList.remove('disabled');
-      configure.disabled = false;
-    }
-    const isIDType = type.isImplicit;
-    const tr = this.parentElement.parentElement;
-    tr.className = isIDType ? 'info' : '';
-    (<HTMLInputElement>(tr.querySelector('input'))).disabled = isIDType;
-  }
-}
 
 export function importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string) {
   const prefix = 'a'+random_id(3);
@@ -167,14 +170,14 @@ export function importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any
     column: -1,
     name: 'Row ID Type',
     value: {
-      type: 'IDType'
+      type: 'idType'
     },
     editor: null
   },{
     column: -1,
     name: 'Column ID Type',
     value: {
-      type: 'IDType'
+      type: 'idType'
     },
     editor: null
   }, {
