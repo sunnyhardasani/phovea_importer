@@ -21,11 +21,18 @@ dialog.onSubmit(() => {
   dialog.hide();
   console.log(r);
 
-  const table = wrapObjects(r.desc, r.data, (<any>r.desc).idcolumn);
-  console.log(table);
+  var dataset = null;
+  if (r.desc.type === 'table') {
+    dataset = wrapObjects(r.desc, r.data, (<any>r.desc).idcolumn)
+  } else if (r.desc.type === 'matrix') {
+    dataset = null; //TODO
+  }
+  console.log(dataset);
 
-  const form = create(table, document.querySelector('main'));
-  addIconVisChooser(document.querySelector('header'), form);
+  if (dataset) {
+    const form = create(dataset, document.querySelector('main'));
+    addIconVisChooser(document.querySelector('header'), form);
+  }
 });
 
 

@@ -9,7 +9,7 @@ import {parseCSV} from './parser';
 import d3 = require('d3');
 import {createValueTypeEditors} from './valuetypes';
 import {IDataDescription} from '../caleydo_core/datatype';
-import {importTable} from './importtable';
+import {importTable, importMatrix} from './importtable';
 
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
   function over() {
