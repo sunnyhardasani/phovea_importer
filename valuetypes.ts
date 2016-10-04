@@ -54,6 +54,9 @@ export function createDialog(title: string, classSuffix: string, onSubmit: ()=>a
     e.preventDefault();
     onSubmit();
   });
+  dialog.onHide(() => {
+    dialog.destroy();
+  });
   dialog.onSubmit(onSubmit);
   return dialog;
 }
