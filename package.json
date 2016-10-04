@@ -52,7 +52,7 @@
           "file": "valuetype_idtype",
           "factory": "idType",
           "name": "IDType",
-          "id": "IDType",
+          "id": "idType",
           "priority": 30,
           "implicit": true
         }
