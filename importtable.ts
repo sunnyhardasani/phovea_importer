@@ -4,7 +4,7 @@
 
 import {mixin, fix_id, random_id, identity} from '../caleydo_core/main';
 import d3 = require('d3');
-import {ITypeDefinition, ValueTypeEditor, guessValueType} from './valuetypes';
+import {ITypeDefinition, ValueTypeEditor, guessValueType, updateType,  createTypeEditor} from './valuetypes';
 import {IDataDescription} from '../caleydo_core/datatype';
 
 export interface IColumnDefinition {
@@ -33,27 +33,6 @@ function extractCommonFields($root: d3.Selection<any>) {
   };
 }
 
-function updateType(editors: ValueTypeEditor[]) {
-  return function (d) {
-    const type = editors[this.selectedIndex < 0 ? 0 : this.selectedIndex];
-    d.value.type = type ? type.id: '';
-    d.editor = type;
-    const configure = <HTMLButtonElement>this.parentElement.querySelector('button');
-
-    if (!type || !type.hasEditor) {
-      configure.classList.add('disabled');
-      configure.disabled = true;
-    } else {
-      configure.classList.remove('disabled');
-      configure.disabled = false;
-    }
-    const isIDType = !type || type.isImplicit;
-    const tr = this.parentElement.parentElement;
-    tr.className = isIDType ? 'info' : '';
-    (<HTMLInputElement>(tr.querySelector('input'))).disabled = isIDType;
-  }
-}
-
 export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string) {
   $root.html(`${commonFields(name)}
       <table class="table table-striped table-condensed">
@@ -69,16 +48,11 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
   const config = header.map((name, i) => ({
     column: i,
     name: name,
+    editor: guessValueType(editors, name, i, data, (row)=>row[i], i),
     value: {
-      type: guessValueType(editors, name, i, data, (row)=>row[i], i)
+      type: null
     }
   }));
-
-  const editorLookup = {};
-  editors.forEach((editor) => editorLookup[editor.id] = editor);
-  config.forEach((conf) => {
-    (<any>conf).editor = editorLookup[conf.value.type];
-  });
 
   const $rows = $root.select('tbody').selectAll('tr').data(config);
 
@@ -88,21 +62,15 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
         <input type="input" class="form-control" value="${d.name}">
       </td>
       <td class="input-group">
-        <select class='form-control'>
-          <option value=""></option>
-          ${editors.map((editor) => `<option value="${editor.id}" ${d.value.type === editor.id ? 'selected="selected"' : ''}>${editor.name}</option>`).join('\n')}
-        </select>
-        <span class="input-group-btn">
-          <button class="btn btn-secondary" ${!(<any>d).editor.hasEditor ? 'disabled="disabled' : ''} type="button"><i class="glyphicon glyphicon-cog"></i></button>
-        </span>
+          ${createTypeEditor(editors, d.editor)}
       </td>`);
   $rows_enter.select('input').on('change', function (d) {
     d.name = this.value;
   });
-  $rows_enter.select('select').on('change', updateType([null].concat(editors)));
+  $rows_enter.select('select').on('change', updateType(editors));
   $rows_enter.select('button').on('click', (d) => {
-    (<any>d).editor.guessOptions(d.value, data, (row) => row[d.column]);
-    (<any>d).editor.edit(d.value);
+    d.editor.guessOptions(d.value, data, (row) => row[d.column]);
+    d.editor.edit(d.value);
   });
   const common = extractCommonFields($root);
 
@@ -172,28 +140,22 @@ export function importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any
     value: {
       type: 'idType'
     },
-    editor: null
+    editor: editors.filter((e) => e.id === 'idType')[0]
   },{
     column: -1,
     name: 'Column ID Type',
     value: {
       type: 'idType'
     },
-    editor: null
+    editor: editors.filter((e) => e.id === 'idType')[0]
   }, {
     column: -1,
     name: 'value',
     value: {
-      type: guessValueType(editors, 'value', -1, data_range, byIndex)
+      type: null
     },
-    editor: null
+    editor: guessValueType(editors, 'value', -1, data_range, byIndex)
   }];
-
-  const editorLookup = {};
-  editors.forEach((editor) => editorLookup[editor.id] = editor);
-  configs.forEach((conf) => {
-    conf.editor = editorLookup[conf.value.type];
-  });
 
   const $rows = $root.html(commonFields(name)).selectAll('div.field').data(configs);
   $rows.enter().append('div').classed('form-group', true).html((d,i) => `
@@ -205,7 +167,7 @@ export function importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any
           <span class="input-group-btn"><button class="btn btn-secondary" ${!d.editor.hasEditor ? 'disabled="disabled' : ''} type="button"><i class="glyphicon glyphicon-cog"></i></button></span>
         </div>`);
 
-  $rows.select('select').on('change', updateType(editors));
+  $rows.select('select').on('change', updateType(editors, false));
   $rows.select('button').on('click', (d, i) => {
     if (i < 2) {
       d.editor.guessOptions(d.value, i === 0 ? rows: cols, identity);

@@ -7,7 +7,7 @@ import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} fro
 import {mixin} from '../caleydo_core/main';
 
 //https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
-const categoryColors = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']
+const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
 export interface ITypeDefinition {
   type: string;
@@ -46,7 +46,7 @@ export interface IValueTypeEditor {
 
 export function createDialog(title: string, classSuffix: string, onSubmit: ()=>any) {
   const dialog = generateDialog(title, 'Save');
-  dialog.body.classList.add('caleydo-importer-'+classSuffix);
+  dialog.body.classList.add('caleydo-importer-' + classSuffix);
   const form = document.createElement('form');
   dialog.body.appendChild(form);
   dialog.body = form;
@@ -93,17 +93,17 @@ function editString(definition: ITypeDefinition) {
            </div>
           <div class="radio">
             <label class="radio">
-              <input type="radio" name="string-convert" value="toUpperCase" ${convert ==='toUpperCase' ? 'checked="checked"' : ''}> UPPER CASE
+              <input type="radio" name="string-convert" value="toUpperCase" ${convert === 'toUpperCase' ? 'checked="checked"' : ''}> UPPER CASE
             </label>
            </div>
           <div class="radio">
             <label class="radio">
-              <input type="radio" name="string-convert" value="toLowerCase" ${convert ==='toLowerCase' ? 'checked="checked"' : ''}> lower case
+              <input type="radio" name="string-convert" value="toLowerCase" ${convert === 'toLowerCase' ? 'checked="checked"' : ''}> lower case
             </label>
            </div>
           <div class="radio">
             <label class="radio">
-              <input type="radio" name="string-convert" value="regex" ${convert ==='regex"' ? 'checked="checked"' : ''}> Regex Replacement
+              <input type="radio" name="string-convert" value="regex" ${convert === 'regex"' ? 'checked="checked"' : ''}> Regex Replacement
             </label>
            </div>
           </div>
@@ -117,7 +117,7 @@ function editString(definition: ITypeDefinition) {
           </div>
     `;
     const choices = ([].slice.apply(dialog.body.querySelectorAll('input[type="radio"]')));
-    choices.forEach((e) => e.addEventListener('change', function() {
+    choices.forEach((e) => e.addEventListener('change', function () {
       const regexSelected = (this.checked && this.value === 'regex');
       ([].slice.apply(dialog.body.querySelectorAll('input[type="text"]'))).forEach((e) => e.disabled = !regexSelected);
     }));
@@ -126,6 +126,7 @@ function editString(definition: ITypeDefinition) {
       const first = choices.filter((e) => e.checked)[0];
       return first ? first.value : '';
     }
+
     dialog.show();
   });
 }
@@ -140,14 +141,14 @@ function guessString(def: ITypeDefinition, data: any[], accessor: (row: any) => 
 }
 
 function parseString(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
-  const anydef : any = def;
+  const anydef: any = def;
   const regexFrom = new RegExp(anydef.regexFrom);
   const regexTo = anydef.regexTo;
 
   const lookup = {
-    toLowerCase: (d:string)=>d.toLowerCase(),
-    toUpperCase: (d:string)=>d.toUpperCase(),
-    regex: (d:string)=>d.replace(regexFrom, regexTo)
+    toLowerCase: (d: string)=>d.toLowerCase(),
+    toUpperCase: (d: string)=>d.toUpperCase(),
+    regex: (d: string)=>d.replace(regexFrom, regexTo)
   };
   const op = lookup[anydef.convert];
 
@@ -156,16 +157,16 @@ function parseString(def: ITypeDefinition, data: any[], accessor: (row: any, val
   }
 
   const invalid = [];
-  data.forEach((d,i) => {
+  data.forEach((d, i) => {
     var v = String(accessor(d));
     v = op(v);
-    accessor(d,v);
+    accessor(d, v);
   });
   return invalid;
 }
 
 
-export function string_() : IValueTypeEditor {
+export function string_(): IValueTypeEditor {
   return {
     isType: () => 1, //always a string
     parse: parseString,
@@ -223,7 +224,7 @@ function guessCategorical(def: ITypeDefinition, data: any[], accessor: (row: any
     const v = accessor(row);
     cache[v] = v;
   });
-  any_def.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat,i) => ({
+  any_def.categories = Object.keys(cache).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((cat, i) => ({
     name: cat,
     color: categoryColors[i] || 'gray'
   }));
@@ -245,16 +246,18 @@ function isCategorical(name: string, index: number, data: any[], accessor: (row:
   }
 
   const num_cats = Object.keys(categories).length;
-  return 1-num_cats/test_size;
+  return 1 - num_cats / test_size;
 }
 
 function parseCategorical(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
-  const categories = ((<any>def).categories ||[]).map((cat) => cat.name);
+  const categories = ((<any>def).categories || []).map((cat) => cat.name);
   const invalid = [];
+
   function isValidCategory(v: string) {
     return categories.indexOf(v) >= 0;
   }
-  data.forEach((d,i) => {
+
+  data.forEach((d, i) => {
     const v = accessor(d);
     if (!isValidCategory(v)) {
       invalid.push(i);
@@ -263,7 +266,7 @@ function parseCategorical(def: ITypeDefinition, data: any[], accessor: (row: any
   return invalid;
 }
 
-export function categorical() : IValueTypeEditor {
+export function categorical(): IValueTypeEditor {
   return {
     isType: isCategorical,
     parse: parseCategorical,
@@ -358,7 +361,7 @@ function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, 
   const isInt = def.type === 'int';
   const invalid = [];
   const isFloat = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
-  data.forEach((d,i) => {
+  data.forEach((d, i) => {
     const v = accessor(d);
     if (!isFloat.test(v)) {
       invalid.push(i);
@@ -369,7 +372,7 @@ function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, 
   return invalid;
 }
 
-export function numerical() : IValueTypeEditor {
+export function numerical(): IValueTypeEditor {
   return {
     isType: isNumerical,
     parse: parseNumerical,
@@ -380,7 +383,7 @@ export function numerical() : IValueTypeEditor {
 
 export class ValueTypeEditor implements IValueTypeEditor {
   private desc: any;
-  private impl : IValueTypeEditor;
+  private impl: IValueTypeEditor;
 
   constructor(impl: IPlugin) {
     this.desc = impl.desc;
@@ -441,13 +444,13 @@ const EXTENSION_POINT = 'importer_value_type';
 export function createValueTypeEditor(id: string): Promise<ValueTypeEditor> {
   const p = getPlugin(EXTENSION_POINT, id);
   if (!p) {
-    return Promise.reject('not found: '+id);
+    return Promise.reject('not found: ' + id);
   }
   return p.load().then((impl) => new ValueTypeEditor(impl));
 }
 
 export function createValueTypeEditors(): Promise<ValueTypeEditor[]> {
-  return loadPlugins(listPlugins(EXTENSION_POINT).sort((a,b) => a.name.localeCompare(b.name))).then((impls) => impls.map((i) => new ValueTypeEditor(i)));
+  return loadPlugins(listPlugins(EXTENSION_POINT).sort((a, b) => a.name.localeCompare(b.name))).then((impls) => impls.map((i) => new ValueTypeEditor(i)));
 }
 
 export interface IGuessOptions {
@@ -473,7 +476,7 @@ export interface IGuessOptions {
  * @param options additional options
  * @return {any}
  */
-export function guessValueType(editors: ValueTypeEditor[], name: string, index: number, data: any[], accessor: (row: any) => any, options : IGuessOptions = {}) {
+export function guessValueType(editors: ValueTypeEditor[], name: string, index: number, data: any[], accessor: (row: any) => any, options: IGuessOptions = {}): ValueTypeEditor {
   options = mixin({
     sampleSize: 100,
     thresholds: <any>{
@@ -484,7 +487,12 @@ export function guessValueType(editors: ValueTypeEditor[], name: string, index: 
   const test_size = Math.min(options.sampleSize, data.length);
 
   //compute guess results
-  var results = editors.map((editor) => ({type: editor.id, editor: editor, confidence: editor.isType(name, index, data, accessor, test_size), priority: editor.priority}));
+  var results = editors.map((editor) => ({
+    type: editor.id,
+    editor: editor,
+    confidence: editor.isType(name, index, data, accessor, test_size),
+    priority: editor.priority
+  }));
   //filter all 0 confidence ones by its threshold
   results = results.filter((r) => typeof options.thresholds[r.type] !== 'undefined' ? r.confidence >= options.thresholds[r.type] : r.confidence > 0);
 
@@ -492,7 +500,39 @@ export function guessValueType(editors: ValueTypeEditor[], name: string, index: 
     return null;
   }
   //order by priority (less more important)
-  results = results.sort((a,b) => a.priority - b.priority);
+  results = results.sort((a, b) => a.priority - b.priority);
   //choose the first one
-  return results[0].type;
+  return results[0].editor;
+}
+
+export function createTypeEditor(editors: ValueTypeEditor[], current: ValueTypeEditor, emptyOne = true) {
+  return `
+  <select class='form-control'>
+          ${emptyOne? '<option value=""></option>':''}
+          ${editors.map((editor) => `<option value="${editor.id}" ${current && current.id === editor.id ? 'selected="selected"' : ''}>${editor.name}</option>`).join('\n')}
+        </select>
+        <span class="input-group-btn">
+          <button class="btn btn-secondary" ${!current || !current.hasEditor ? 'disabled="disabled' : ''} type="button"><i class="glyphicon glyphicon-cog"></i></button>
+        </span>`;
+}
+
+export function updateType(editors: ValueTypeEditor[], emptyOne = true) {
+  return function (d) {
+    const type = ((emptyOne && this.selectedIndex <= 0)) ? null : editors[this.selectedIndex < 0 ? 0 : this.selectedIndex - (emptyOne?1:0)];
+    d.value.type = type ? type.id : '';
+    d.editor = type;
+    const configure = <HTMLButtonElement>this.parentElement.querySelector('button');
+
+    if (!type || !type.hasEditor) {
+      configure.classList.add('disabled');
+      configure.disabled = true;
+    } else {
+      configure.classList.remove('disabled');
+      configure.disabled = false;
+    }
+    const isIDType = !type || type.isImplicit;
+    const tr = this.parentElement.parentElement;
+    tr.className = isIDType ? 'info' : '';
+    (<HTMLInputElement>(tr.querySelector('input'))).disabled = isIDType;
+  }
 }
