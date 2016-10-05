@@ -13,7 +13,7 @@ import {importTable} from './importtable';
 
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
   function over() {
-    const e = <DragEvent>d3.event;
+    const e = <Event>(<any>d3.event);
     e.stopPropagation();
     e.preventDefault();
     const s = (<HTMLElement>e.target).classList;
