@@ -415,15 +415,18 @@ export class ValueTypeEditor implements IValueTypeEditor {
   };
 
   parse(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => any): number[] {
+    def.type = this.id;
     this.impl.guessOptions(def, data, accessor);
     return this.impl.parse(def, data, accessor);
   }
 
   guessOptions(def: ITypeDefinition, data: any[], accessor: (row: any) => any) {
+    def.type = this.id;
     return this.impl.guessOptions(def, data, accessor);
   }
 
   edit(def: ITypeDefinition) {
+    def.type = this.id;
     return this.impl.edit(def);
   }
 }
