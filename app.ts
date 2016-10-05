@@ -23,7 +23,7 @@ dialog.onSubmit(() => {
 
   var dataset = null;
   if (r.desc.type === 'table') {
-    dataset = wrapObjects(r.desc, r.data, (<any>r.desc).idcolumn)
+    dataset = wrapObjects(r.desc, r.data, (<any>r.desc).idcolumn);
   } else if (r.desc.type === 'matrix') {
     dataset = null; //TODO
   }

@@ -7,7 +7,7 @@ import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} fro
 import {mixin} from '../caleydo_core/main';
 
 //https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
-const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
 
 export interface ITypeDefinition {
   type: string;
@@ -172,7 +172,7 @@ export function string_(): IValueTypeEditor {
     parse: parseString,
     guessOptions: (d) => guessString,
     edit: editString
-  }
+  };
 }
 
 /**
@@ -272,7 +272,7 @@ export function categorical(): IValueTypeEditor {
     parse: parseCategorical,
     guessOptions: guessCategorical,
     edit: editCategorical
-  }
+  };
 }
 
 /**
@@ -366,7 +366,7 @@ function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, 
     if (!isFloat.test(v)) {
       invalid.push(i);
     } else {
-      accessor(d, isInt ? parseInt(v) : parseFloat(v));
+      accessor(d, isInt ? parseInt(v,10) : parseFloat(v));
     }
   });
   return invalid;
@@ -378,7 +378,7 @@ export function numerical(): IValueTypeEditor {
     parse: parseNumerical,
     guessOptions: guessNumerical,
     edit: editNumerical
-  }
+  };
 }
 
 export class ValueTypeEditor implements IValueTypeEditor {
@@ -534,5 +534,5 @@ export function updateType(editors: ValueTypeEditor[], emptyOne = true) {
     const tr = this.parentElement.parentElement;
     tr.className = isIDType ? 'info' : '';
     (<HTMLInputElement>(tr.querySelector('input'))).disabled = isIDType;
-  }
+  };
 }

@@ -71,5 +71,5 @@ export function idType(): IValueTypeEditor {
     parse: parseIDType,
     guessOptions: guessIDType,
     edit: editIDType
-  }
+  };
 }
