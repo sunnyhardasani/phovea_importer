@@ -3,9 +3,9 @@
  */
 
 
-/// <reference path="../../tsd.d.ts" />
-import C = require('../caleydo_core/main');
-import papaparse = require('papaparse');
+
+import * as C from 'phovea_core/src/index';
+import * as papaparse from 'papaparse';
 
 export interface IParseResult {
   data: any;

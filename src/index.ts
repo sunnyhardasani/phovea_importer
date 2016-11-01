@@ -2,13 +2,13 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-/// <amd-dependency path='css!./style' />
-import {mixin} from '../caleydo_core/main';
-import {EventHandler} from '../caleydo_core/event';
+import './style.scss';
+import {mixin} from 'phovea_core/src/index';
+import {EventHandler} from 'phovea_core/src/event';
 import {parseCSV} from './parser';
-import d3 = require('d3');
+import * as d3 from 'd3';
 import {createValueTypeEditors} from './valuetypes';
-import {IDataDescription} from '../caleydo_core/datatype';
+import {IDataDescription} from 'phovea_core/src/datatype';
 import {importTable} from './importtable';
 
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {

@@ -2,11 +2,11 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import main = require('./main');
+import * as main from './index';
 
-import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
-import {wrapObjects} from '../caleydo_core/table_impl';
-import {create, addIconVisChooser} from '../caleydo_core/multiform';
+import {generateDialog} from 'phovea_bootstrap_fontawesome/src/dialogs';
+import {wrapObjects} from 'phovea_core/src/table_impl';
+import {create, addIconVisChooser} from 'phovea_core/src/multiform';
 
 const dialog = generateDialog('Import', 'Import');
 

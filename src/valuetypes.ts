@@ -2,9 +2,9 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {generateDialog} from '../caleydo_bootstrap_fontawesome/dialogs';
-import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} from '../caleydo_core/plugin';
-import {mixin} from '../caleydo_core/main';
+import {generateDialog} from 'phovea_bootstrap_fontawesome/src/dialogs';
+import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} from 'phovea_core/src/plugin';
+import {mixin} from 'phovea_core/src/index';
 
 //https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
 const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
