@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import * as main from './index';
+import {create as createImporter} from './index';
 
 import {generateDialog} from 'phovea_bootstrap_fontawesome/src/dialogs';
 import {wrapObjects} from 'phovea_core/src/table_impl';
@@ -10,7 +10,7 @@ import {create, addIconVisChooser} from 'phovea_core/src/multiform';
 
 const dialog = generateDialog('Import', 'Import');
 
-const importer = main.create(dialog.body, {});
+const importer = createImporter(dialog.body, {});
 
 dialog.onSubmit(() => {
   const r = importer.getResult();
