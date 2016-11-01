@@ -1,0 +1,78 @@
+{
+  "generator-phovea": {
+    "type": "lib",
+    "name": "phovea_importer",
+    "author": "The Caleydo Team",
+    "githubAccount": "phovea",
+    "libraries": [
+      "papaparse",
+      "d3"
+    ],
+    "modules": [
+      "phovea_core",
+      "phovea_bootstrap_fontawesome",
+      "phovea_d3"
+    ],
+    "extensions": [
+      {
+        "type": "importer_value_type",
+        "id": "categorical",
+        "module": "valuetypes",
+        "extras": {
+          "factory": "categorical",
+          "name": "Categorical",
+          "priority": 50
+        }
+      },
+      {
+        "type": "importer_value_type",
+        "id": "real",
+        "module": "valuetypes",
+        "extras": {
+          "factory": "numerical",
+          "name": "Float",
+          "priority": 10
+        }
+      },
+      {
+        "type": "importer_value_type",
+        "id": "int",
+        "module": "valuetypes",
+        "extras": {
+          "factory": "numerical",
+          "name": "Integer",
+          "priority": 20
+        }
+      },
+      {
+        "type": "importer_value_type",
+        "id": "string",
+        "module": "valuetypes",
+        "extras": {
+          "factory": "string_",
+          "name": "String",
+          "priority": 100
+        }
+      },
+      {
+        "type": "importer_value_type",
+        "id": "idType",
+        "module": "valuetype_idtype",
+        "extras": {
+          "factory": "idType",
+          "name": "IDType",
+          "priority": 30,
+          "implicit": true
+        }
+      }
+    ],
+    "libraryAliases": {
+      "papaparse": "papaparse",
+      "d3": "d3/d3",
+      "jquery": "jquery"
+    },
+    "entries": "./index.js",
+    "ignores": [],
+    "today": "Tue, 01 Nov 2016 15:57:01 GMT"
+  }
+}
