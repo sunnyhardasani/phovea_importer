@@ -69,7 +69,8 @@
     "libraryAliases": {
       "papaparse": "papaparse",
       "d3": "d3/d3",
-      "jquery": "jquery"
+      "jquery": "jquery",
+      "font-awesome": "font-awesome"
     },
     "entries": "./index.js",
     "ignores": [],

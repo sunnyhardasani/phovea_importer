@@ -1,7 +1,7 @@
 phovea_importer [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 =====================
 
-A data importer that takes a CSV file, let's users define the data types and properties, and hands it over for parsing.
+Flexible Smart and Visual Data Importer for Web Based Visualization
 
 Installation
 ------------
