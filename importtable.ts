@@ -79,7 +79,7 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
 
 function toTableDataDescription(config: IColumnDefinition[], data: any[], common: { name: string, description: string}) {
   //derive all configs
-  config = config.filter((c) => c.editor != null);
+  config = config.filter((c) => (<any>c).editor != null);
   config.forEach((d) => {
     const editor = (<any>d).editor;
     editor.parse(d.value, data, (row, value?) => {
