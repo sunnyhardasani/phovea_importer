@@ -64,9 +64,9 @@
     "mkdirp": "^0.5.1"
   },
   "dependencies": {
-    "phovea_core": "github:sgratzl/phovea_core",
-    "phovea_bootstrap_fontawesome": "github:sgratzl/phovea_bootstrap_fontawesome",
-    "phovea_d3": "github:sgratzl/phovea_d3",
+    "phovea_core": "github:phovea/phovea_core",
+    "phovea_bootstrap_fontawesome": "github:phovea/phovea_bootstrap_fontawesome",
+    "phovea_d3": "github:phovea/phovea_d3",
     "@types/papaparse": "^4.1.28",
     "papaparse": "^4.1.2",
     "@types/d3": "^3.5.36",
