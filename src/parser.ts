@@ -3,9 +3,9 @@
  */
 
 
-/// <reference path="../../tsd.d.ts" />
-import C = require('../caleydo_core/main');
-import papaparse = require('papaparse');
+
+import {mixin} from 'phovea_core/src/index';
+import * as papaparse from 'papaparse';
 
 export interface IParseResult {
   data: any;
@@ -31,7 +31,7 @@ const defaultOptions = {
 export function parseCSV(data: any, options: ICSVParsingOptions = {}): Promise<IParseResult> {
 
   return new Promise((resolve, reject) => {
-    papaparse.parse(data, C.mixin({
+    papaparse.parse(data, mixin({
       complete: (result) => resolve({data: result.data, meta: result.meta}),
       error: (error) => reject(error)
     }, defaultOptions, options));
@@ -41,7 +41,7 @@ export function parseCSV(data: any, options: ICSVParsingOptions = {}): Promise<I
 export function streamCSV(data: any, chunk: (chunk: IParseResult)=>any, options: ICSVParsingOptions = {}): Promise<IParseResult> {
 
   return new Promise((resolve, reject) => {
-    papaparse.parse(data, C.mixin({
+    papaparse.parse(data, mixin({
       complete: (result) => resolve(null),
       chunk: (result) => chunk({data: result.data, meta: result.meta}),
       error: (error) => reject(error)

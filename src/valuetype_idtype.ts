@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {list as listidtypes} from '../caleydo_core/idtype';
+import {list as listidtypes} from 'phovea_core/src/idtype';
 import {ITypeDefinition, IValueTypeEditor, createDialog} from './valuetypes';
 
 /**

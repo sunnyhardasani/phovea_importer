@@ -2,10 +2,10 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {mixin, fix_id, random_id, identity} from '../caleydo_core/main';
-import d3 = require('d3');
+import {mixin, fix_id, random_id, identity} from 'phovea_core/src/index';
+import * as d3 from 'd3';
 import {ITypeDefinition, ValueTypeEditor, guessValueType, updateType,  createTypeEditor} from './valuetypes';
-import {IDataDescription} from '../caleydo_core/datatype';
+import {IDataDescription} from 'phovea_core/src/datatype';
 
 export interface IColumnDefinition {
   name: string;
