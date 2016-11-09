@@ -67,13 +67,17 @@
       }
     ],
     "libraryAliases": {
-      "papaparse": "papaparse",
-      "d3": "d3/d3",
-      "jquery": "jquery",
-      "font-awesome": "font-awesome"
+      "d3": "d3/d3"
     },
     "entries": "./index.js",
     "ignores": [],
-    "today": "Tue, 01 Nov 2016 15:57:01 GMT"
+    "today": "Tue, 01 Nov 2016 15:57:01 GMT",
+    "libraryExternals": [
+      "papaparse",
+      "d3",
+      "jquery",
+      "font-awesome",
+      "d3"
+    ]
   }
 }
