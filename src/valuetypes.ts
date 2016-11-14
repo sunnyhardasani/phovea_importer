@@ -232,21 +232,23 @@ function guessCategorical(def: ITypeDefinition, data: any[], accessor: (row: any
 }
 
 function isCategorical(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
-  const test_size = Math.min(data.length, sampleSize);
-  if (test_size <= 0) {
+  const testSize = Math.min(data.length, sampleSize);
+  if (testSize <= 0) {
     return 0;
   }
   const categories = {};
-  for (let i = 0; i < test_size; ++i) {
+  var validSize = 0;
+  for (let i = 0; i < testSize; ++i) {
     let v = accessor(data[i]);
     if (v == null || v.trim().length === 0) {
       continue; //skip empty samples
     }
+    validSize++;
     categories[v] = v;
   }
 
   const num_cats = Object.keys(categories).length;
-  return 1 - num_cats / test_size;
+  return 1 - num_cats / validSize;
 }
 
 function parseCategorical(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
@@ -316,45 +318,55 @@ export function editNumerical(definition: ITypeDefinition): Promise<ITypeDefinit
   });
 }
 
+function isMissingNumber(v: string) {
+  return v == null || v.trim().length === 0 || v === 'NaN';
+}
+
 export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
   //TODO support different notations, comma vs point
   const any_def: any = def;
   if (typeof any_def.range !== 'undefined') {
     return def;
   }
-  var min_v = data.length === 0 ? 0 : parseFloat(accessor(data[0]));
-  var max_v = data.length === 0 ? 100 : parseFloat(accessor(data[0]));
+  var min_v = NaN;
+  var max_v = NaN;
   data.forEach((row) => {
-    const v = parseFloat(accessor(row));
-    if (v < min_v) {
+    const raw = accessor(row);
+    if (isMissingNumber(raw)) {
+      return; //skip
+    }
+    const v = parseFloat(raw);
+    if (isNaN(min_v) || v < min_v) {
       min_v = v;
     }
-    if (v > max_v) {
+    if (isNaN(max_v) || v > max_v) {
       max_v = v;
     }
   });
-  any_def.range = [min_v, max_v];
+  any_def.range = [isNaN(min_v) ? 0: min_v, isNaN(max_v) ? 100 : max_v];
   return def;
 }
 
 function isNumerical(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
-  const test_size = Math.min(data.length, sampleSize);
-  if (test_size <= 0) {
+  const testSize = Math.min(data.length, sampleSize);
+  if (testSize <= 0) {
     return 0;
   }
   const isFloat = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
   var numNumerical = 0;
+  var validSize = 0;
 
-  for (let i = 0; i < test_size; ++i) {
+  for (let i = 0; i < testSize; ++i) {
     let v = accessor(data[i]);
-    if (v == null || v.trim().length === 0) {
+    if (isMissingNumber(v)) {
       continue; //skip empty samples
     }
-    if (isFloat.test(v)) {
+    validSize++;
+    if (isFloat.test(v) || v === 'NaN') {
       numNumerical += 1;
     }
   }
-  return numNumerical / test_size;
+  return numNumerical / validSize;
 }
 
 function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
@@ -363,6 +375,10 @@ function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, 
   const isFloat = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
   data.forEach((d, i) => {
     const v = accessor(d);
+    if (isMissingNumber(v)) {
+      accessor(d, NaN);
+      return;
+    }
     if (!isFloat.test(v)) {
       invalid.push(i);
     } else {
@@ -487,13 +503,13 @@ export function guessValueType(editors: ValueTypeEditor[], name: string, index: 
       categorical: 0.7
     }
   }, options);
-  const test_size = Math.min(options.sampleSize, data.length);
+  const testSize = Math.min(options.sampleSize, data.length);
 
   //compute guess results
   var results = editors.map((editor) => ({
     type: editor.id,
     editor: editor,
-    confidence: editor.isType(name, index, data, accessor, test_size),
+    confidence: editor.isType(name, index, data, accessor, testSize),
     priority: editor.priority
   }));
   //filter all 0 confidence ones by its threshold

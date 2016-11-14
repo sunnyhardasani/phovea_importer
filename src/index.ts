@@ -9,7 +9,7 @@ import {parseCSV} from './parser';
 import * as d3 from 'd3';
 import {createValueTypeEditors} from './valuetypes';
 import {IDataDescription} from 'phovea_core/src/datatype';
-import {importTable} from './importtable';
+import {importTable, importMatrix} from './importtable';
 
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
   function over() {
@@ -39,13 +39,22 @@ export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selecti
   $dropZone.on('dragover', over).on('dragleave', over).on('drop', select);
 }
 
+export interface IImporterOptions {
+  /**
+   * type to import: table,matrix
+   */
+  type?: string;
+}
+
 export class Importer extends EventHandler {
-  private options = {};
+  private options : IImporterOptions = {
+    type: 'table'
+  };
   private $parent: d3.Selection<any>;
 
   private builder: ()=>{data: any, desc: IDataDescription};
 
-  constructor(parent: Element, options: any = {}) {
+  constructor(parent: Element, options: IImporterOptions = {}) {
     super();
     mixin(this.options, options);
     this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
@@ -62,7 +71,14 @@ export class Importer extends EventHandler {
       const data = results[0].data;
       const header = data.shift();
 
-      this.builder = importTable(editors, this.$parent, header, data, name);
+      switch(this.options.type) {
+        case 'matrix':
+          this.builder = importMatrix(editors, this.$parent, header, data, name);
+          break;
+        default:
+          this.builder = importTable(editors, this.$parent, header, data, name);
+          break;
+      }
     });
   }
 
@@ -82,6 +98,6 @@ export class Importer extends EventHandler {
 }
 
 
-export function create(parent: Element, options: any = {}) {
+export function create(parent: Element, options: IImporterOptions = {}) {
   return new Importer(parent, options);
 }
