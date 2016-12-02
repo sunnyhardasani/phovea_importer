@@ -460,6 +460,7 @@ export function multivalue(): IValueTypeEditor {
   };
 }
 
+
 export class ValueTypeEditor implements IValueTypeEditor {
   private desc: any;
   private impl: IValueTypeEditor;
