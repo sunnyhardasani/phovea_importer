@@ -14,6 +14,9 @@ import {importTable, importMatrix} from './importtable';
 export function selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
   function over() {
     const e = <Event>(<any>d3.event);
+    if(e === null) {
+      return;
+    }
     e.stopPropagation();
     e.preventDefault();
     const s = (<HTMLElement>e.target).classList;

@@ -363,6 +363,7 @@ function isNumerical(name: string, index: number, data: any[], accessor: (row: a
     }
     validSize++;
     if (isFloat.test(v) || v === 'NaN') {
+
       numNumerical += 1;
     }
   }
@@ -382,6 +383,7 @@ function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, 
     if (!isFloat.test(v)) {
       invalid.push(i);
     } else {
+
       accessor(d, isInt ? parseInt(v,10) : parseFloat(v));
     }
   });
@@ -394,6 +396,67 @@ export function numerical(): IValueTypeEditor {
     parse: parseNumerical,
     guessOptions: guessNumerical,
     edit: editNumerical
+  };
+}
+
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+function isMultiValue(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
+   const testSize = Math.min(data.length, sampleSize);
+    var validSize = 0;
+    var multiValue=0;
+  if (testSize <= 0) {
+    return 0;
+  }
+
+   for (let i = 0; i < testSize; ++i) {
+    let v = accessor(data[i]);
+    if (isMissingNumber(v)) {
+      continue; //skip empty samples
+    }
+     validSize++;
+     const x = (IsJsonString(v)===true)?JSON.parse(v):0;
+     if ((typeof(x)==='object' || typeof(x)==='array') && (x.length != undefined || x.length != null ) && (x.length > 1)){
+       multiValue += 1;
+      console.log('I am isMultivalue')
+     }
+  }
+  return multiValue/validSize;
+}
+
+function parseMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
+  const isInt = def.type === 'int';
+  const invalid = [];
+  console.log('I am parsemultivalue')
+  return invalid;
+}
+
+
+function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
+  const any_def: any = def;
+  console.log('I am guessemultivalue')
+  return def;
+}
+
+export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefinition> {
+  const any_def: any = 'def';
+    console.log('I am editmultivalue')
+  return any_def;
+}
+
+export function multivalue(): IValueTypeEditor {
+ return {
+    isType: isMultiValue,
+    parse: parseMultiValue,
+    guessOptions: guessMultiValue,
+    edit: editMultiValue
   };
 }
 

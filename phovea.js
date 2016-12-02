@@ -47,5 +47,15 @@ module.exports = function (registry) {
     'priority': 30,
     'implicit': true
   });
+   registry.push('importer_value_type', 'multivalue', function () {
+    return System.import('./src/valuetypes');
+  }, {
+    'factory':'multivalue',
+    'name': 'multivalue',
+    'priority': 30,
+    'implicit': true
+  });
+
+
 };
 
