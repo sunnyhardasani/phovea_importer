@@ -6,6 +6,7 @@ import {generateDialog} from 'phovea_bootstrap_fontawesome/src/dialogs';
 import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} from 'phovea_core/src/plugin';
 import {mixin} from 'phovea_core/src/index';
 
+
 //https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
 const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
 
@@ -344,6 +345,7 @@ export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row
     }
   });
   any_def.range = [isNaN(min_v) ? 0: min_v, isNaN(max_v) ? 100 : max_v];
+
   return def;
 }
 
@@ -425,7 +427,7 @@ function isMultiValue(name: string, index: number, data: any[], accessor: (row: 
      const x = (IsJsonString(v)===true)?JSON.parse(v):0;
      if ((typeof(x)==='object' || typeof(x)==='array') && (x.length != undefined || x.length != null ) && (x.length > 1)){
        multiValue += 1;
-      console.log('I am isMultivalue')
+
      }
   }
   return multiValue/validSize;
@@ -441,14 +443,66 @@ function parseMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any,
 
 function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
   const any_def: any = def;
-  console.log('I am guessemultivalue')
+  if (typeof any_def.range !== 'undefined') {
+    return def;
+  }
+  var min_v = NaN;
+  var max_v = NaN;
+  data.forEach((row) => {
+    const raw = accessor(row);
+    if (isMissingNumber(raw)) {
+      return; //skip
+    }
+
+    const raw_max = Math.max.apply(null,JSON.parse(raw));
+    const raw_min = Math.min.apply(null,JSON.parse(raw));
+
+    if (isNaN(min_v) || raw_min < min_v) {
+      min_v = raw_min;
+    }
+    if (isNaN(max_v) || raw_max > max_v) {
+      max_v = raw_max;
+    }
+  });
+  any_def.range = [isNaN(min_v) ? 0: min_v, isNaN(max_v) ? 100 : max_v];
+  console.log(any_def,def)
   return def;
 }
 
 export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefinition> {
-  const any_def: any = 'def';
-    console.log('I am editmultivalue')
-  return any_def;
+  const type = (<any>definition).type || 'multivalue';
+  const range = (<any>definition).range || [0, 100];
+  console.log(type,range);
+  return new Promise((resolve) => {
+    const dialog = createDialog('Edit Numerical Range', 'numerical', () => {
+      const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=numerical-type]')).checked ? 'real' : 'int';
+      const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-min]')).value);
+      const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-max]')).value);
+      dialog.hide();
+      definition.type = type_s;
+      (<any>definition).range = [min_r, max_r];
+      resolve(definition);
+    });
+    dialog.body.innerHTML = `
+        <div class="checkbox">
+          <label class="radio-inline">
+            <input type="radio" name="numerical-type" value="real" ${type !== 'int' ? 'checked="checked"' : ''}> Float
+          </label>
+          <label class="radio-inline">
+            <input type="radio" name="numerical-type" value="int" ${type === 'int' ? 'checked="checked"' : ''}> Integer
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="minRange">Minimum Value</label>
+          <input type="number" class="form-control" name="numerical-min" step="any" value="${range[0]}">
+        </div>
+        <div class="form-group">
+          <label for="maxRange">Maximum Value</label>
+          <input type="number" class="form-control" name="numerical-max" step="any" value="${range[1]}">
+        </div>
+    `;
+    dialog.show();
+  });
 }
 
 export function multivalue(): IValueTypeEditor {
@@ -459,7 +513,6 @@ export function multivalue(): IValueTypeEditor {
     edit: editMultiValue
   };
 }
-
 
 export class ValueTypeEditor implements IValueTypeEditor {
   private desc: any;
