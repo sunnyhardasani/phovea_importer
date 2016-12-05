@@ -436,16 +436,18 @@ function isMultiValue(name: string, index: number, data: any[], accessor: (row: 
 function parseMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
   const isInt = def.type === 'int';
   const invalid = [];
-  console.log('I am parsemultivalue')
+  //console.log('I am parsemultivalue')
   return invalid;
 }
 
 
 function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any) => string) {
   const any_def: any = def;
-  if (typeof any_def.range !== 'undefined') {
+  if ((typeof any_def.range !== 'undefined') && (typeof any_def.datalength !== 'undefined')) {
     return def;
   }
+  var datalength = NaN;
+  console.log(def,data)
   var min_v = NaN;
   var max_v = NaN;
   data.forEach((row) => {
@@ -453,7 +455,7 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
     if (isMissingNumber(raw)) {
       return; //skip
     }
-
+    const raw_datalength = JSON.parse(raw).length;
     const raw_max = Math.max.apply(null,JSON.parse(raw));
     const raw_min = Math.min.apply(null,JSON.parse(raw));
 
@@ -463,15 +465,20 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
     if (isNaN(max_v) || raw_max > max_v) {
       max_v = raw_max;
     }
+    if (isNaN(datalength) || raw_datalength > datalength) {
+      datalength = raw_datalength;
+    }
   });
   any_def.range = [isNaN(min_v) ? 0: min_v, isNaN(max_v) ? 100 : max_v];
-  console.log(any_def,def)
+  any_def.datalength = (datalength===undefined)?100:datalength;
+  //console.log(any_def,def)
   return def;
 }
 
 export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefinition> {
   const type = (<any>definition).type || 'multivalue';
   const range = (<any>definition).range || [0, 100];
+
   console.log(type,range);
   return new Promise((resolve) => {
     const dialog = createDialog('Edit Numerical Range', 'numerical', () => {
