@@ -461,7 +461,6 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
     return def;
   }
   var datalength = NaN;
-
   var min_v = NaN;
   var max_v = NaN;
   data.forEach((row) => {
@@ -485,9 +484,9 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
   });
   any_def.range = [isNaN(min_v) ? 0 : min_v, isNaN(max_v) ? 100 : max_v];
   any_def.datalength = (datalength === undefined) ? 100 : datalength;
- console.log(def);
+  console.log(def);
   any_def.colorrange = ['blue', 'red'];
-  //console.log(any_def,def)
+  any_def.sort='min';
   return def;
 }
 
@@ -496,6 +495,7 @@ export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefini
   const range = (<any>definition).range || [0, 100];
   const datalength = (<any>definition).datalength || 100;
   const colorrange = (<any>definition).colorrange || ['blue', 'red'];
+  const sortstring: any = ['min', 'max', 'mean', 'median', 'q1', 'q3'];
 
   console.log(type, range);
   return new Promise((resolve) => {
@@ -504,14 +504,17 @@ export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefini
       const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-min]')).value);
       const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-max]')).value);
       const datasize = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-datalength]')).value);
-      var min_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-mincolor]')).value);
-      var max_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-maxcolor]')).value);
-      console.log(datalength,[min_color, max_color]);
+      const min_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-mincolor]')).value);
+      const max_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-maxcolor]')).value);
+      const sort = ((<HTMLInputElement>dialog.body.querySelector("select[name=multivalue-sort] > option:checked")).value);
+
+      console.log(datalength, [min_color, max_color], sort);
       dialog.hide();
       definition.type = type_s;
       (<any>definition).range = [min_r, max_r];
       (<any>definition).datalength = datasize;
       (<any>definition).colorrange = [min_color, max_color];
+      (<any>definition).sort = sort;
       resolve(definition);
     });
     dialog.body.innerHTML = `
@@ -543,6 +546,14 @@ export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefini
           <label for="maxcolor">Maximum  Color </label>
           <input type="string" class="form-control" name="multivalue-maxcolor" step="any" value="${colorrange[1]}">
         </div>
+         <div class="form-group">
+          <label for="sort">Sort By</label>
+           <select class="form-control" name="multivalue-sort" step="any">
+           ${ sortstring.map(function (d) {
+      return `<option value="${d}">${d}</option>`;
+    }).join('\n')}
+           </select>
+            </div>
     `;
     dialog.show();
   });
