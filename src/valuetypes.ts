@@ -344,7 +344,7 @@ export function guessNumerical(def: ITypeDefinition, data: any[], accessor: (row
       max_v = v;
     }
   });
-  any_def.range = [isNaN(min_v) ? 0: min_v, isNaN(max_v) ? 100 : max_v];
+  any_def.range = [isNaN(min_v) ? 0 : min_v, isNaN(max_v) ? 100 : max_v];
 
   return def;
 }
@@ -386,7 +386,7 @@ function parseNumerical(def: ITypeDefinition, data: any[], accessor: (row: any, 
       invalid.push(i);
     } else {
 
-      accessor(d, isInt ? parseInt(v,10) : parseFloat(v));
+      accessor(d, isInt ? parseInt(v, 10) : parseFloat(v));
     }
   });
   return invalid;
@@ -402,41 +402,55 @@ export function numerical(): IValueTypeEditor {
 }
 
 function IsJsonString(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
 
 function isMultiValue(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
-   const testSize = Math.min(data.length, sampleSize);
-    var validSize = 0;
-    var multiValue=0;
+  const testSize = Math.min(data.length, sampleSize);
+  var validSize = 0;
+  var multiValue = 0;
   if (testSize <= 0) {
     return 0;
   }
 
-   for (let i = 0; i < testSize; ++i) {
+  for (let i = 0; i < testSize; ++i) {
     let v = accessor(data[i]);
     if (isMissingNumber(v)) {
       continue; //skip empty samples
     }
-     validSize++;
-     const x = (IsJsonString(v)===true)?JSON.parse(v):0;
-     if ((typeof(x)==='object' || typeof(x)==='array') && (x.length != undefined || x.length != null ) && (x.length > 1)){
-       multiValue += 1;
+    validSize++;
+    const x = (IsJsonString(v) === true) ? JSON.parse(v) : 0;
+    if ((typeof(x) === 'object' || typeof(x) === 'array') && (x.length != undefined || x.length != null ) && (x.length > 1)) {
+      multiValue += 1;
 
-     }
+    }
   }
-  return multiValue/validSize;
+  return multiValue / validSize;
 }
 
 function parseMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
   const isInt = def.type === 'int';
+  console.log(def)
   const invalid = [];
-  //console.log('I am parsemultivalue')
+  const isFloat = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
+  data.forEach((d, i) => {
+    const v = accessor(d);
+    if (isMissingNumber(v)) {
+      accessor(d, NaN);
+      return;
+    }
+    if (!isFloat.test(v)) {
+      invalid.push(i);
+    } else {
+
+      accessor(d, isInt ? parseInt(v, 10) : parseFloat(v));
+    }
+  });
   return invalid;
 }
 
@@ -447,7 +461,7 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
     return def;
   }
   var datalength = NaN;
-  console.log(def,data)
+
   var min_v = NaN;
   var max_v = NaN;
   data.forEach((row) => {
@@ -456,8 +470,8 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
       return; //skip
     }
     const raw_datalength = JSON.parse(raw).length;
-    const raw_max = Math.max.apply(null,JSON.parse(raw));
-    const raw_min = Math.min.apply(null,JSON.parse(raw));
+    const raw_max = Math.max.apply(null, JSON.parse(raw));
+    const raw_min = Math.min.apply(null, JSON.parse(raw));
 
     if (isNaN(min_v) || raw_min < min_v) {
       min_v = raw_min;
@@ -469,8 +483,10 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
       datalength = raw_datalength;
     }
   });
-  any_def.range = [isNaN(min_v) ? 0: min_v, isNaN(max_v) ? 100 : max_v];
-  any_def.datalength = (datalength===undefined)?100:datalength;
+  any_def.range = [isNaN(min_v) ? 0 : min_v, isNaN(max_v) ? 100 : max_v];
+  any_def.datalength = (datalength === undefined) ? 100 : datalength;
+ console.log(def);
+  any_def.colorrange = ['blue', 'red'];
   //console.log(any_def,def)
   return def;
 }
@@ -478,34 +494,54 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
 export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefinition> {
   const type = (<any>definition).type || 'multivalue';
   const range = (<any>definition).range || [0, 100];
+  const datalength = (<any>definition).datalength || 100;
+  const colorrange = (<any>definition).colorrange || ['blue', 'red'];
 
-  console.log(type,range);
+  console.log(type, range);
   return new Promise((resolve) => {
-    const dialog = createDialog('Edit Numerical Range', 'numerical', () => {
-      const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=numerical-type]')).checked ? 'real' : 'int';
-      const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-min]')).value);
-      const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=numerical-max]')).value);
+    const dialog = createDialog('Edit Multi Value', 'multivalue', () => {
+      const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-type]')).checked ? 'real' : 'int';
+      const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-min]')).value);
+      const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-max]')).value);
+      const datasize = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-datalength]')).value);
+      var min_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-mincolor]')).value);
+      var max_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-maxcolor]')).value);
+      console.log(datalength,[min_color, max_color]);
       dialog.hide();
       definition.type = type_s;
       (<any>definition).range = [min_r, max_r];
+      (<any>definition).datalength = datasize;
+      (<any>definition).colorrange = [min_color, max_color];
       resolve(definition);
     });
     dialog.body.innerHTML = `
         <div class="checkbox">
           <label class="radio-inline">
-            <input type="radio" name="numerical-type" value="real" ${type !== 'int' ? 'checked="checked"' : ''}> Float
+            <input type="radio" name="multivalue-type" value="real" ${type !== 'int' ? 'checked="checked"' : ''}> Float
           </label>
           <label class="radio-inline">
-            <input type="radio" name="numerical-type" value="int" ${type === 'int' ? 'checked="checked"' : ''}> Integer
+            <input type="radio" name="multivalue-type" value="int" ${type === 'int' ? 'checked="checked"' : ''}> Integer
           </label>
         </div>
         <div class="form-group">
           <label for="minRange">Minimum Value</label>
-          <input type="number" class="form-control" name="numerical-min" step="any" value="${range[0]}">
+          <input type="number" class="form-control" name="multivalue-min" step="any" value="${range[0]}">
         </div>
         <div class="form-group">
           <label for="maxRange">Maximum Value</label>
-          <input type="number" class="form-control" name="numerical-max" step="any" value="${range[1]}">
+          <input type="number" class="form-control" name="multivalue-max" step="any" value="${range[1]}">
+        </div>
+         <div class="form-group">
+          <label for="datalength">Data Length</label>
+          <input type="number" class="form-control" name="multivalue-datalength" step="any" value="${datalength}">
+        </div>
+         <div class="form-group">
+          <label for="mincolor">Minimum Color </label>
+          <input type="string" class="form-control" name="multivalue-mincolor" step="any" value="${colorrange[0]}">
+        </div>
+          <div class="form-group">
+          <label for="maxcolor">Maximum  Color </label>
+          <input type="string" class="form-control" name="multivalue-maxcolor" step="any" value="${colorrange[1]}">
         </div>
     `;
     dialog.show();
@@ -513,7 +549,7 @@ export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefini
 }
 
 export function multivalue(): IValueTypeEditor {
- return {
+  return {
     isType: isMultiValue,
     parse: parseMultiValue,
     guessOptions: guessMultiValue,
@@ -651,7 +687,7 @@ export function guessValueType(editors: ValueTypeEditor[], name: string, index: 
 export function createTypeEditor(editors: ValueTypeEditor[], current: ValueTypeEditor, emptyOne = true) {
   return `
   <select class='form-control'>
-          ${emptyOne? '<option value=""></option>':''}
+          ${emptyOne ? '<option value=""></option>' : ''}
           ${editors.map((editor) => `<option value="${editor.id}" ${current && current.id === editor.id ? 'selected="selected"' : ''}>${editor.name}</option>`).join('\n')}
         </select>
         <span class="input-group-btn">
@@ -661,7 +697,7 @@ export function createTypeEditor(editors: ValueTypeEditor[], current: ValueTypeE
 
 export function updateType(editors: ValueTypeEditor[], emptyOne = true) {
   return function (d) {
-    const type = ((emptyOne && this.selectedIndex <= 0)) ? null : editors[this.selectedIndex < 0 ? 0 : this.selectedIndex - (emptyOne?1:0)];
+    const type = ((emptyOne && this.selectedIndex <= 0)) ? null : editors[this.selectedIndex < 0 ? 0 : this.selectedIndex - (emptyOne ? 1 : 0)];
     d.value.type = type ? type.id : '';
     d.editor = type;
     const configure = <HTMLButtonElement>this.parentElement.querySelector('button');
