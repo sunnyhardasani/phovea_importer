@@ -486,7 +486,7 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
   any_def.datalength = (datalength === undefined) ? 100 : datalength;
   console.log(def);
   any_def.colorrange = ['blue', 'red'];
-  any_def.sort='min';
+  any_def.sort = 'min';
   return def;
 }
 
