@@ -434,23 +434,22 @@ function isMultiValue(name: string, index: number, data: any[], accessor: (row: 
 }
 
 function parseMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any, value?: any) => string) {
-  const isInt = def.type === 'int';
-  console.log(def)
+  const isMultivalue = def.type === 'multivalue';
   const invalid = [];
-  const isFloat = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
   data.forEach((d, i) => {
     const v = accessor(d);
     if (isMissingNumber(v)) {
       accessor(d, NaN);
       return;
     }
-    if (!isFloat.test(v)) {
-      invalid.push(i);
-    } else {
+    if ((IsJsonString(v) === true)) {
+      accessor(d, isMultivalue ? JSON.parse(v) : 0);
 
-      accessor(d, isInt ? parseInt(v, 10) : parseFloat(v));
+    } else {
+      invalid.push(i);
     }
   });
+
   return invalid;
 }
 
@@ -461,6 +460,7 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
     return def;
   }
   var datalength = NaN;
+  var threshold = 0;
   var min_v = NaN;
   var max_v = NaN;
   data.forEach((row) => {
@@ -484,7 +484,7 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
   });
   any_def.range = [isNaN(min_v) ? 0 : min_v, isNaN(max_v) ? 100 : max_v];
   any_def.datalength = (datalength === undefined) ? 100 : datalength;
-  console.log(def);
+  any_def.threshold = threshold;
   any_def.colorrange = ['blue', 'red'];
   any_def.sort = 'min';
   return def;
@@ -493,28 +493,23 @@ function guessMultiValue(def: ITypeDefinition, data: any[], accessor: (row: any)
 export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefinition> {
   const type = (<any>definition).type || 'multivalue';
   const range = (<any>definition).range || [0, 100];
-  const datalength = (<any>definition).datalength || 100;
+  const threshold = (<any>definition).threshold || 0;
   const colorrange = (<any>definition).colorrange || ['blue', 'red'];
-  const sortstring: any = ['min', 'max', 'mean', 'median', 'q1', 'q3'];
 
-  console.log(type, range);
   return new Promise((resolve) => {
     const dialog = createDialog('Edit Multi Value', 'multivalue', () => {
       const type_s = (<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-type]')).checked ? 'real' : 'int';
       const min_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-min]')).value);
       const max_r = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-max]')).value);
-      const datasize = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-datalength]')).value);
+      const threshold = parseFloat((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-threshold]')).value);
       const min_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-mincolor]')).value);
       const max_color = ((<HTMLInputElement>dialog.body.querySelector('input[name=multivalue-maxcolor]')).value);
-      const sort = ((<HTMLInputElement>dialog.body.querySelector("select[name=multivalue-sort] > option:checked")).value);
 
-      console.log(datalength, [min_color, max_color], sort);
       dialog.hide();
       definition.type = type_s;
       (<any>definition).range = [min_r, max_r];
-      (<any>definition).datalength = datasize;
+      (<any>definition).threshold = threshold;
       (<any>definition).colorrange = [min_color, max_color];
-      (<any>definition).sort = sort;
       resolve(definition);
     });
     dialog.body.innerHTML = `
@@ -534,11 +529,11 @@ export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefini
           <label for="maxRange">Maximum Value</label>
           <input type="number" class="form-control" name="multivalue-max" step="any" value="${range[1]}">
         </div>
-         <div class="form-group">
-          <label for="datalength">Data Length</label>
-          <input type="number" class="form-control" name="multivalue-datalength" step="any" value="${datalength}">
+        <div class="form-group">
+          <label for="threholdvalue">Threshold Value</label>
+          <input type="number" class="form-control" name="multivalue-threshold" step="any" value="${threshold}">
         </div>
-         <div class="form-group">
+          <div class="form-group">
           <label for="mincolor">Minimum Color </label>
           <input type="string" class="form-control" name="multivalue-mincolor" step="any" value="${colorrange[0]}">
         </div>
@@ -546,14 +541,7 @@ export function editMultiValue(definition: ITypeDefinition): Promise<ITypeDefini
           <label for="maxcolor">Maximum  Color </label>
           <input type="string" class="form-control" name="multivalue-maxcolor" step="any" value="${colorrange[1]}">
         </div>
-         <div class="form-group">
-          <label for="sort">Sort By</label>
-           <select class="form-control" name="multivalue-sort" step="any">
-           ${ sortstring.map(function (d) {
-      return `<option value="${d}">${d}</option>`;
-    }).join('\n')}
-           </select>
-            </div>
+
     `;
     dialog.show();
   });
