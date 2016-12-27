@@ -2,7 +2,8 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {mixin, fix_id, random_id, identity} from 'phovea_core/src/index';
+import {mixin, fixId, randomId, identity} from 'phovea_core/src/index';
+import {retrieve} from 'phovea_core/src/session';
 import * as d3 from 'd3';
 import {ITypeDefinition, ValueTypeEditor, guessValueType, updateType,  createTypeEditor} from './valuetypes';
 import {IDataDescription} from 'phovea_core/src/datatype';
@@ -14,7 +15,7 @@ export interface IColumnDefinition {
 }
 
 function commonFields(name: string) {
-  const prefix = 'i'+random_id(3);
+  const prefix = 'i'+randomId(3);
   return `
     <div class="form-group">
       <label for="${prefix}_name">Name</label>
@@ -77,6 +78,10 @@ export function importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>
   return () => ({data: data, desc: toTableDataDescription(config, data, common)});
 }
 
+function getCurrentUser() {
+  return retrieve('username', 'Anonymous');
+}
+
 function toTableDataDescription(config: IColumnDefinition[], data: any[], common: { name: string, description: string}) {
   //derive all configs
   config = config.filter((c) => (<any>c).editor != null);
@@ -104,9 +109,11 @@ function toTableDataDescription(config: IColumnDefinition[], data: any[], common
   });
   const desc: IDataDescription = {
     type: 'table',
-    id: fix_id(common.name+random_id(2)),
+    id: fixId(common.name+randomId(2)),
     name: common.name,
     description: common.description,
+    creator: getCurrentUser(),
+    ts: Date.now(),
     fqname: 'upload/' + common.name,
     size: [data.length, columns.length],
     idtype: (<any>idProperty).value.idType,
@@ -119,7 +126,7 @@ function toTableDataDescription(config: IColumnDefinition[], data: any[], common
 
 
 export function importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string) {
-  const prefix = 'a'+random_id(3);
+  const prefix = 'a'+randomId(3);
 
   const rows = header.slice(1),
     cols = data.map((d) => d.shift());
@@ -188,9 +195,11 @@ export function importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any
 
   const desc: IDataDescription = {
     type: 'matrix',
-    id: fix_id(common.name+random_id(3)),
+    id: fixId(common.name+randomId(3)),
     name: common.name,
     fqname: 'upload/' + common.name,
+    creator: getCurrentUser(),
+    ts: Date.now(),
     description: common.description,
     size: [rows.length, cols.length],
     rowtype: (<any>configs[0]).value.idType,
