@@ -2,7 +2,7 @@
  * Created by Samuel Gratzl on 29.09.2016.
  */
 
-import {generateDialog} from 'phovea_bootstrap_fontawesome/src/dialogs';
+import {generateDialog} from 'phovea_ui/src/dialogs';
 import {list as listPlugins, load as loadPlugins, IPlugin, get as getPlugin} from 'phovea_core/src/plugin';
 import {mixin} from 'phovea_core/src/index';
 

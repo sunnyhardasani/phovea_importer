@@ -11,7 +11,7 @@ import {register} from 'phovea_core/src/plugin';
  */
 //other modules
 import 'phovea_core/phovea_registry.js';
-import 'phovea_bootstrap_fontawesome/phovea_registry.js';
+import 'phovea_ui/phovea_registry.js';
 import 'phovea_d3/phovea_registry.js';
 //self
 register('phovea_importer',require('./phovea.js'));
