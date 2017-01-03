@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "phovea_core": "github:phovea/phovea_core",
-    "phovea_bootstrap_fontawesome": "github:phovea/phovea_bootstrap_fontawesome",
+    "phovea_ui": "github:phovea/phovea_ui",
     "phovea_d3": "github:phovea/phovea_d3",
     "@types/papaparse": "4.1.28",
     "papaparse": "4.1.2",
